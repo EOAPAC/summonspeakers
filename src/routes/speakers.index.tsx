@@ -17,7 +17,7 @@ const faqs = [
   },
 ];
 
-export const Route = createFileRoute("/speakers")({
+export const Route = createFileRoute("/speakers/")({
   head: () => ({
     meta: [
       { title: "All Speakers — fees shown upfront | SummonSpeakers" },
