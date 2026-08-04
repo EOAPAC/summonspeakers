@@ -42,6 +42,10 @@ roster to every visitor.
   `color` declaration and the font size is silently dropped.
 - `src/routes/sitemap[.]xml.tsx` and `robots[.]txt.tsx` are server routes. A
   static file in `public/` with the same name would shadow them.
+- Image work uses the Chromium that `build-og-images.ts` already needs, not
+  `cwebp`, ImageMagick or `sharp`. `bun run to:webp <file-or-dir> --width=1024`
+  converts PNG/JPEG to WEBP that way, so it behaves the same on every machine
+  rather than silently skipping compression when a binary is absent.
 
 ## Secrets and third-party APIs
 
