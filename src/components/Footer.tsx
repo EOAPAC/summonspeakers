@@ -25,6 +25,14 @@ const cols = [
       { to: "/for-speakers/join", label: "Join SummonSpeakers" },
     ],
   },
+  {
+    heading: "COMPANY",
+    links: [
+      { to: "/about", label: "About" },
+      { to: "/blog", label: "Journal" },
+      { to: "/case-studies", label: "Case studies" },
+    ],
+  },
 ];
 
 export function Footer() {
