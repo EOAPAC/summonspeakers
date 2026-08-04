@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as GetMatchedRouteImport } from './routes/get-matched'
 import { Route as SpeakersRouteImport } from './routes/speakers'
 import { Route as SpeakersIndexRouteImport } from './routes/speakers.index'
 import { Route as SpeakersSlugRouteImport } from './routes/speakers.$slug'
@@ -18,6 +19,11 @@ import { Route as TopicsSlugRouteImport } from './routes/topics.$slug'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GetMatchedRoute = GetMatchedRouteImport.update({
+  id: '/get-matched',
+  path: '/get-matched',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SpeakersRoute = SpeakersRouteImport.update({
@@ -43,6 +49,7 @@ const TopicsSlugRoute = TopicsSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/get-matched': typeof GetMatchedRoute
   '/speakers': typeof SpeakersRouteWithChildren
   '/speakers/$slug': typeof SpeakersSlugRoute
   '/topics/$slug': typeof TopicsSlugRoute
@@ -50,6 +57,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/get-matched': typeof GetMatchedRoute
   '/speakers/$slug': typeof SpeakersSlugRoute
   '/topics/$slug': typeof TopicsSlugRoute
   '/speakers': typeof SpeakersIndexRoute
@@ -57,6 +65,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/get-matched': typeof GetMatchedRoute
   '/speakers': typeof SpeakersRouteWithChildren
   '/speakers/$slug': typeof SpeakersSlugRoute
   '/topics/$slug': typeof TopicsSlugRoute
@@ -65,12 +74,18 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/speakers' | '/speakers/$slug' | '/topics/$slug' | '/speakers/'
+    | '/'
+    | '/get-matched'
+    | '/speakers'
+    | '/speakers/$slug'
+    | '/topics/$slug'
+    | '/speakers/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/speakers/$slug' | '/topics/$slug' | '/speakers'
+  to: '/' | '/get-matched' | '/speakers/$slug' | '/topics/$slug' | '/speakers'
   id:
     | '__root__'
     | '/'
+    | '/get-matched'
     | '/speakers'
     | '/speakers/$slug'
     | '/topics/$slug'
@@ -79,6 +94,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  GetMatchedRoute: typeof GetMatchedRoute
   SpeakersRoute: typeof SpeakersRouteWithChildren
   TopicsSlugRoute: typeof TopicsSlugRoute
 }
@@ -90,6 +106,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/get-matched': {
+      id: '/get-matched'
+      path: '/get-matched'
+      fullPath: '/get-matched'
+      preLoaderRoute: typeof GetMatchedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/speakers': {
@@ -139,6 +162,7 @@ const SpeakersRouteWithChildren = SpeakersRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  GetMatchedRoute: GetMatchedRoute,
   SpeakersRoute: SpeakersRouteWithChildren,
   TopicsSlugRoute: TopicsSlugRoute,
 }
