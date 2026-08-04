@@ -3,6 +3,8 @@ import { Page, Eyebrow } from "@/components/Page";
 import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { ButtonLink } from "@/components/Button";
 import { ClosingCta } from "@/components/ClosingCta";
+import { ROSTER_COUNT } from "@/data/roster-facets";
+import { speakers } from "@/data/speakers";
 import { absoluteUrl } from "@/lib/site";
 
 const values = [
@@ -28,8 +30,12 @@ const values = [
   },
 ];
 
+// The speaker count is derived from the roster rather than typed in, so this
+// page cannot drift from what the directory actually holds.
+const speakerCount = ROSTER_COUNT + speakers.length;
+
 const numbers = [
-  { value: "1,400+", label: "speakers listed" },
+  { value: speakerCount.toLocaleString("en-AU"), label: "speakers listed" },
   { value: "$0", label: "added to any fee" },
   { value: "1 day", label: "median time to shortlist" },
   { value: "4.9", label: "average event rating" },

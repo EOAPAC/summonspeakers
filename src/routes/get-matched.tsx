@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Page } from "@/components/Page";
 import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { EnquiryFlow } from "@/components/EnquiryFlow";
+import { getSpeaker } from "@/data/speakers";
+import { fetchRosterSpeakerName } from "@/lib/roster.server";
 import { absoluteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/get-matched")({
@@ -12,6 +14,18 @@ export const Route = createFileRoute("/get-matched")({
     const speaker = search["speaker"];
     return typeof speaker === "string" && speaker !== "" ? { speaker } : {};
   },
+
+  // Resolve the slug to a name here: full profiles are in the client bundle
+  // already, the wider roster needs a server hop.
+  loaderDeps: ({ search }) => ({ speaker: search.speaker ?? "" }),
+  loader: async ({ deps }): Promise<{ presetName: string }> => {
+    if (!deps.speaker) return { presetName: "" };
+    const profile = getSpeaker(deps.speaker);
+    if (profile) return { presetName: profile.name };
+    const { name } = await fetchRosterSpeakerName({ data: deps.speaker });
+    return { presetName: name ?? "" };
+  },
+
   head: () => ({
     meta: [
       { title: "Get matched with speakers in one business day | SummonSpeakers" },
@@ -45,11 +59,12 @@ export const Route = createFileRoute("/get-matched")({
 
 function GetMatched() {
   const { speaker } = Route.useSearch();
+  const { presetName } = Route.useLoaderData();
   return (
     <Page>
       <Breadcrumbs items={[{ label: "Home", to: "/" }, { label: "Get matched" }]} />
       <section className="container-x pb-24 pt-10">
-        <EnquiryFlow speakerSlug={speaker} />
+        <EnquiryFlow presetName={presetName} presetSlug={speaker ?? ""} />
       </section>
     </Page>
   );

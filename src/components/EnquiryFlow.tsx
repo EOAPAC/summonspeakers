@@ -32,6 +32,9 @@ const budgets = ["Under $10k", "$10k – $20k", "$20k – $35k", "$35k+", "Not s
 const fieldBase =
   "min-h-[56px] w-full rounded-[var(--radius-sm)] border border-[var(--line-2)] bg-surface px-4 text-base";
 
+/** Names already offered by the topic and profile option groups. */
+const knownNames = new Set<string>([...topics.map((t) => t.name), ...speakers.map((s) => s.name)]);
+
 function Field({
   id,
   label,
@@ -61,13 +64,20 @@ function Field({
   );
 }
 
-export function EnquiryFlow({ speakerSlug }: { speakerSlug?: string | undefined }) {
-  const preset = speakerSlug ? speakers.find((s) => s.slug === speakerSlug) : undefined;
+/**
+ * `presetName` is resolved by the route loader, which looks the slug up in the
+ * full profiles and then the wider roster — so a roster speaker with no profile
+ * page still arrives here with their name filled in.
+ */
+export function EnquiryFlow({
+  presetName = "",
+  presetSlug = "",
+}: {
+  presetName?: string | undefined;
+  presetSlug?: string | undefined;
+}) {
   const [step, setStep] = useState(1);
-  const [values, setValues] = useState<Values>({
-    ...empty,
-    topic_or_speaker: preset ? preset.name : "",
-  });
+  const [values, setValues] = useState<Values>({ ...empty, topic_or_speaker: presetName });
   const [errors, setErrors] = useState<Partial<Record<keyof Values, string>>>({});
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
@@ -104,10 +114,10 @@ export function EnquiryFlow({ speakerSlug }: { speakerSlug?: string | undefined 
     try {
       // Resolve the slug from what is actually selected, not from the speaker
       // the visitor happened to arrive from — they may have changed it since.
-      const chosen = speakers.find((s) => s.name === values.topic_or_speaker);
-      await submitEnquiry({
-        data: { ...values, speaker_slug: chosen?.slug ?? null },
-      });
+      const profile = speakers.find((s) => s.name === values.topic_or_speaker);
+      const speaker_slug =
+        profile?.slug ?? (values.topic_or_speaker === presetName ? presetSlug || null : null);
+      await submitEnquiry({ data: { ...values, speaker_slug } });
       setDone(true);
     } catch {
       setSubmitError("We couldn't send that. Try again, or email hello@summonspeakers.com.");
@@ -202,12 +212,19 @@ export function EnquiryFlow({ speakerSlug }: { speakerSlug?: string | undefined 
               aria-describedby={errors.topic_or_speaker ? "topic_or_speaker-error" : undefined}
             >
               <option value="">Choose a topic or a speaker</option>
+              {/* A roster speaker has no entry in the lists below, so add one —
+                  otherwise the select would render blank despite a valid value. */}
+              {presetName && !knownNames.has(presetName) && (
+                <optgroup label="Your selection">
+                  <option>{presetName}</option>
+                </optgroup>
+              )}
               <optgroup label="Topics">
                 {topics.map((t) => (
                   <option key={t.slug}>{t.name}</option>
                 ))}
               </optgroup>
-              <optgroup label="Speakers">
+              <optgroup label="Speakers with published fees">
                 {speakers.map((s) => (
                   <option key={s.slug}>{s.name}</option>
                 ))}
