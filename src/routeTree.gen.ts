@@ -16,6 +16,7 @@ import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as SpeakerFeesRouteImport } from './routes/speaker-fees'
 import { Route as SpeakersRouteImport } from './routes/speakers'
 import { Route as ForSpeakersIndexRouteImport } from './routes/for-speakers.index'
+import { Route as ForSpeakersJoinRouteImport } from './routes/for-speakers.join'
 import { Route as SpeakersIndexRouteImport } from './routes/speakers.index'
 import { Route as SpeakersSlugRouteImport } from './routes/speakers.$slug'
 import { Route as TopicsSlugRouteImport } from './routes/topics.$slug'
@@ -55,6 +56,11 @@ const ForSpeakersIndexRoute = ForSpeakersIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ForSpeakersRoute,
 } as any)
+const ForSpeakersJoinRoute = ForSpeakersJoinRouteImport.update({
+  id: '/join',
+  path: '/join',
+  getParentRoute: () => ForSpeakersRoute,
+} as any)
 const SpeakersIndexRoute = SpeakersIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -78,6 +84,7 @@ export interface FileRoutesByFullPath {
   '/how-it-works': typeof HowItWorksRoute
   '/speaker-fees': typeof SpeakerFeesRoute
   '/speakers': typeof SpeakersRouteWithChildren
+  '/for-speakers/join': typeof ForSpeakersJoinRoute
   '/speakers/$slug': typeof SpeakersSlugRoute
   '/topics/$slug': typeof TopicsSlugRoute
   '/for-speakers/': typeof ForSpeakersIndexRoute
@@ -88,6 +95,7 @@ export interface FileRoutesByTo {
   '/get-matched': typeof GetMatchedRoute
   '/how-it-works': typeof HowItWorksRoute
   '/speaker-fees': typeof SpeakerFeesRoute
+  '/for-speakers/join': typeof ForSpeakersJoinRoute
   '/speakers/$slug': typeof SpeakersSlugRoute
   '/topics/$slug': typeof TopicsSlugRoute
   '/for-speakers': typeof ForSpeakersIndexRoute
@@ -101,6 +109,7 @@ export interface FileRoutesById {
   '/how-it-works': typeof HowItWorksRoute
   '/speaker-fees': typeof SpeakerFeesRoute
   '/speakers': typeof SpeakersRouteWithChildren
+  '/for-speakers/join': typeof ForSpeakersJoinRoute
   '/speakers/$slug': typeof SpeakersSlugRoute
   '/topics/$slug': typeof TopicsSlugRoute
   '/for-speakers/': typeof ForSpeakersIndexRoute
@@ -115,6 +124,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/speaker-fees'
     | '/speakers'
+    | '/for-speakers/join'
     | '/speakers/$slug'
     | '/topics/$slug'
     | '/for-speakers/'
@@ -125,6 +135,7 @@ export interface FileRouteTypes {
     | '/get-matched'
     | '/how-it-works'
     | '/speaker-fees'
+    | '/for-speakers/join'
     | '/speakers/$slug'
     | '/topics/$slug'
     | '/for-speakers'
@@ -137,6 +148,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/speaker-fees'
     | '/speakers'
+    | '/for-speakers/join'
     | '/speakers/$slug'
     | '/topics/$slug'
     | '/for-speakers/'
@@ -204,6 +216,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForSpeakersIndexRouteImport
       parentRoute: typeof ForSpeakersRoute
     }
+    '/for-speakers/join': {
+      id: '/for-speakers/join'
+      path: '/join'
+      fullPath: '/for-speakers/join'
+      preLoaderRoute: typeof ForSpeakersJoinRouteImport
+      parentRoute: typeof ForSpeakersRoute
+    }
     '/speakers/': {
       id: '/speakers/'
       path: '/'
@@ -229,10 +248,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface ForSpeakersRouteChildren {
+  ForSpeakersJoinRoute: typeof ForSpeakersJoinRoute
   ForSpeakersIndexRoute: typeof ForSpeakersIndexRoute
 }
 
 const ForSpeakersRouteChildren: ForSpeakersRouteChildren = {
+  ForSpeakersJoinRoute: ForSpeakersJoinRoute,
   ForSpeakersIndexRoute: ForSpeakersIndexRoute,
 }
 
