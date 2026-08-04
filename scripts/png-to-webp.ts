@@ -78,7 +78,7 @@ img.onload = () => {
     return;
   }
   document.getElementById("r").textContent =
-    "OK:" + c.width + "x" + c.height + ":" + url.slice(url.indexOf(",") + 1);
+    "OK:" + c.width + "x" + c.height + "x" + img.naturalWidth + ":" + url.slice(url.indexOf(",") + 1);
 };
 img.onerror = () => { document.getElementById("r").textContent = "ERR:image failed to decode"; };
 img.src = ${JSON.stringify(dataUrl)};
@@ -91,7 +91,14 @@ async function convert(
   src: string,
   maxWidth: number,
   quality: number,
-): Promise<{ out: string; width: number; height: number; before: number; after: number }> {
+): Promise<{
+  out: string;
+  width: number;
+  height: number;
+  origWidth: number;
+  before: number;
+  after: number;
+}> {
   const ext = extname(src).toLowerCase();
   const mime = MIME[ext];
   if (!mime) throw new Error(`${src}: not a PNG or JPEG`);
@@ -126,7 +133,7 @@ async function convert(
 
   const [, dims, b64] = payload.split(":", 3);
   if (!dims || !b64) throw new Error(`${src}: malformed result`);
-  const [w, h] = dims.split("x").map(Number);
+  const [w, h, ow] = dims.split("x").map(Number);
 
   const outBytes = Buffer.from(b64, "base64");
   // RIFF....WEBP — refuse to write a file that is not actually WEBP.
@@ -144,6 +151,7 @@ async function convert(
     out,
     width: w ?? 0,
     height: h ?? 0,
+    origWidth: ow ?? 0,
     before: bytes.byteLength,
     after: outBytes.byteLength,
   };
@@ -199,16 +207,40 @@ async function main(): Promise<void> {
   let after = 0;
   const failures: string[] = [];
 
+  let kept = 0;
+
   try {
     for (const src of files) {
       try {
         const r = await convert(src, maxWidth, quality);
+
+        // Lossy WEBP is a poor fit for flat graphics: a plate of solid colour
+        // and 1px hatch lines encodes larger than the PNG does losslessly, and
+        // with artefacts on the lines. A compression step that inflates the file
+        // has failed at its job, so throw the output away and keep the original
+        // rather than quietly shipping the worse of the two.
+        //
+        // Only skipped when no resize was requested — a resize is a deliberate
+        // change of dimensions and stands on its own merits.
+        const resized = maxWidth > 0 && r.width < r.origWidth;
+        if (!resized && r.after >= r.before) {
+          await unlink(r.out);
+          kept++;
+          console.log(
+            `keep   ${basename(src)}  ${kb(r.before)} → would be ${kb(r.after)}, so left as-is`,
+          );
+          before += r.before;
+          after += r.before;
+          continue;
+        }
+
         before += r.before;
         after += r.after;
         if (!keep) await unlink(src);
-        const pct = r.before ? Math.round((1 - r.after / r.before) * 100) : 0;
+        const delta = Math.round((1 - r.after / r.before) * 100);
+        const change = delta >= 0 ? `−${delta}%` : `+${-delta}%`;
         console.log(
-          `ok     ${basename(r.out)}  ${r.width}x${r.height}  ${kb(r.before)} → ${kb(r.after)}  (−${pct}%)`,
+          `ok     ${basename(r.out)}  ${r.width}x${r.height}  ${kb(r.before)} → ${kb(r.after)}  (${change})`,
         );
       } catch (err) {
         failures.push(src);
@@ -223,8 +255,14 @@ async function main(): Promise<void> {
 
   const done = files.length - failures.length;
   console.log(
-    `\n${done}/${files.length} converted` +
-      (done ? `, ${kb(before)} → ${kb(after)} (−${Math.round((1 - after / before) * 100)}%)` : ""),
+    `\n${done - kept}/${files.length} converted` +
+      (kept ? `, ${kept} left as-is` : "") +
+      (done
+        ? `, ${kb(before)} → ${kb(after)} (${(() => {
+            const d = Math.round((1 - after / before) * 100);
+            return d >= 0 ? `−${d}%` : `+${-d}%`;
+          })()})`
+        : ""),
   );
   if (failures.length) process.exit(1);
 }

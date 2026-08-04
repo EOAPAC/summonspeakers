@@ -21,7 +21,8 @@ which export a JSON-LD helper alongside their components by design.
 | ----------------------------------------------------------- | ---------------------------------------------------------- |
 | `src/data/roster.generated.ts`, `src/data/roster-facets.ts` | `bun run import:roster <csv>`                              |
 | `public/og/*.png`                                           | `bun run build:og`                                         |
-| `public/speakers/*`, `src/data/speaker-portraits.ts`        | `bun run build:portraits` (needs `RUNWARE_API_KEY`)        |
+| `public/speakers/*.plate.png`                               | `bun run build:plates`                                     |
+| `src/data/speaker-portraits.ts`                             | `bun run build:portraits --manifest-only`                  |
 | `public/favicon.ico`, `public/*icon*.png`                   | `bun run build:favicons` (edit `public/favicon.svg` first) |
 | `src/routeTree.gen.ts`                                      | the router plugin, on dev/build                            |
 
