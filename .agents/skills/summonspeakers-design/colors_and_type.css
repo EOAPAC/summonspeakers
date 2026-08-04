@@ -47,7 +47,7 @@
   --warning: #7a2e1c;
   --accent: #000000;
   --accent-hover: #ffffff;
-  --cta-amber: #d4a017;
+  
 
   /* Typography */
   --font-body: "Hanken Grotesk Variable", "Hanken Grotesk", system-ui, sans-serif;
@@ -206,10 +206,6 @@ body {
   background-color: var(--surface-alt);
 }
 
-.cta-amber {
-  color: #000;
-  background-color: var(--cta-amber);
-}
 
 .on-ink {
   background-color: var(--ink);
@@ -232,38 +228,16 @@ body {
   font-weight: 600;
   letter-spacing: var(--tracking-body);
   text-decoration: none;
-  border: none;
+  border: 1px solid var(--ink);
   cursor: pointer;
-  transition: transform var(--dur-base) var(--ease), opacity var(--dur-base) var(--ease);
+  transition: background var(--dur-base) var(--ease), color var(--dur-base) var(--ease);
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  opacity: 0.92;
+  background: var(--surface);
+  color: var(--ink);
 }
 
-.btn-amber {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  min-height: var(--hit-primary);
-  padding-inline: var(--space-6);
-  border-radius: var(--radius-pill);
-  background: var(--cta-amber);
-  color: #000;
-  font-family: var(--font-body);
-  font-weight: 700;
-  letter-spacing: var(--tracking-body);
-  text-decoration: none;
-  border: none;
-  cursor: pointer;
-  transition: transform var(--dur-base) var(--ease);
-}
-
-.btn-amber:hover {
-  transform: translateY(-2px);
-}
 
 .btn-secondary {
   display: inline-flex;
@@ -295,12 +269,16 @@ body {
 .pill {
   display: inline-flex;
   align-items: center;
-  padding: var(--space-2) var(--space-3);
+  min-height: var(--hit-min);
+  padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-pill);
-  background: var(--surface-alt);
+  background: transparent;
+  border: 1px solid var(--line-2);
   color: var(--ink);
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-family: var(--font-mono-stack);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-mono);
+  font-size: 0.6875rem;
 }
 
 .card {
@@ -308,12 +286,12 @@ body {
   background: var(--surface);
   border: 1px solid var(--line);
   overflow: hidden;
-  transition: transform var(--dur-base) var(--ease), box-shadow var(--dur-base) var(--ease);
+  transition: transform var(--dur-base) var(--ease), border-color var(--dur-base) var(--ease);
 }
 
 .card:hover {
   transform: translateY(-4px);
-  box-shadow: var(--elev-2);
+  border-color: var(--ink);
 }
 
 .media-well {
