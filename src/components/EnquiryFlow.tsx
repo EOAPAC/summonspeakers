@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Button, ButtonLink } from "./Button";
 import { speakers, topics } from "@/data/speakers";
-import { submitEnquiry } from "@/lib/enquiries.functions";
+import { submitEnquiry } from "@/lib/enquiries";
 
 type Values = {
   event_date: string;
@@ -41,7 +41,7 @@ function Field({
 }: {
   id: string;
   label: string;
-  error?: string;
+  error?: string | undefined;
   children: React.ReactNode;
   optional?: boolean;
 }) {
@@ -85,8 +85,6 @@ export function EnquiryFlow({ speakerSlug }: { speakerSlug?: string }) {
     }
     if (n === 2) {
       if (!values.full_name.trim()) next.full_name = "Add your full name.";
-      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(values.work_email))
-        next.full_name === undefined;
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(values.work_email))
         next.work_email = "Add a valid work email address.";
     }
