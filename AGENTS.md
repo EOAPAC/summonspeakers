@@ -60,8 +60,21 @@ Two patterns already in the repo, either of which can read `process.env`:
 into the client bundle at build time, so the secret ships to every visitor.
 Verified on this repo: a build with `VITE_FAKE=x` puts `x` verbatim into
 `.vercel/output/static/assets/index-*.js`, while an unprefixed var does not
-appear there at all. `VITE_SITE_URL` is prefixed deliberately, because a public
-canonical URL is not a secret.
+appear there at all. Three VITE_ vars are permitted because their values are
+public by design: `VITE_SITE_URL` (a canonical URL), and `VITE_SUPABASE_URL` /
+`VITE_SUPABASE_ANON_KEY` (the anon key ships in every Supabase browser app; the
+RLS policies in `supabase/migrations/` are the enforcement). CI fails on any
+other VITE_ variable. `SUPABASE_SERVICE_ROLE_KEY` and `RESEND_API_KEY` are
+secrets and stay unprefixed.
+
+## Backend
+
+Schema and RLS live in `supabase/migrations/` — a change to the data model is a
+new migration file, never a hand-edit in the dashboard. Server-side Supabase
+goes through `src/lib/supabase.server.ts` (service role); the browser auth
+client is `src/lib/supabase-auth.ts` (anon key, OAuth on the join page).
+Email is `src/lib/email.server.ts` (Resend). Env vars are documented in
+`.env.example`.
 
 To check a secret has not leaked:
 
@@ -71,8 +84,11 @@ bun run build && grep -rl "$YOUR_SECRET" .vercel/output/static/   # want no outp
 
 ## Not wired up yet
 
-| Feature                | State                                                                                                                                                        | Where the work goes                                                                                                                                                                                                                           |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Enquiry submission     | `src/lib/enquiries.ts` validates and then **discards** every enquiry. Both `/get-matched` and `/for-speakers/join` show success without persisting anything. | Replace the stub body with a server function that persists the enquiry and sends the planner and admin emails.                                                                                                                                |
-| Speaker portraits      | Every card and profile renders a `hatch` placeholder. No real imagery exists.                                                                                | A `RUNWARE_API_KEY` is set in Vercel but nothing reads it. Call Runware from a server function, and prefer generating images once into `public/` over calling the API per request — this is SSR, so a per-request call is a per-visitor cost. |
-| Client error telemetry | The root error boundary logs to the console only.                                                                                                            | Needs an integration; the previous reporting only worked inside the Lovable editor and was removed.                                                                                                                                           |
+| Feature | State | Where the work goes |
+| ------- | ----- | ------------------- |
+| Speaker portraits | Every card and profile renders a `hatch` placeholder. No real imagery exists. | A `RUNWARE_API_KEY` is set in Vercel but nothing reads it. Call Runware from a server function, and prefer generating images once into `public/` over calling the API per request — this is SSR, so a per-request call is a per-visitor cost. Once portraits exist, wire uploads into the `speaker-media` bucket. |
+| Client error telemetry | The root error boundary logs to the console only. | Needs an integration; the previous reporting only worked inside the Lovable editor and was removed. |
+
+Enquiry submission and speaker listings **are** wired: `submitEnquiry` and
+`submitListing` persist to Supabase and notify via Resend. See the Backend
+section above.
