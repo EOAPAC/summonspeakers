@@ -83,7 +83,7 @@ function Home() {
           With fees shown upfront.
         </p>
 
-        <p className="mt-10 max-w-[48ch] text-lg text-[var(--ink-2)]">
+        <p className="mt-10 max-w-[48ch] text-lg text-[var(--ink-2)] md:max-w-none">
           Browse, compare and book professional speakers directly. No bureau markup, no
           guessing what they cost.
         </p>
