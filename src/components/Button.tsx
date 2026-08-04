@@ -5,7 +5,19 @@ import { cn } from "@/lib/utils";
 type Variant = "primary" | "secondary" | "ghost";
 
 const base =
-  "inline-flex items-center justify-center gap-2 font-medium transition-all duration-500 [transition-timing-function:var(--ease)] disabled:opacity-40 disabled:pointer-events-none";
+  "group inline-flex items-center justify-center gap-3 font-semibold transition-all duration-500 [transition-timing-function:var(--ease)] disabled:opacity-40 disabled:pointer-events-none";
+
+const arrow = (variant: Variant) =>
+  variant === "primary" ? (
+    <span
+      aria-hidden="true"
+      className="transition-transform duration-500 [transition-timing-function:var(--ease)] group-hover:translate-x-1 group-hover:-translate-y-1"
+    >
+      ↗
+    </span>
+  ) : variant === "secondary" ? (
+    <span aria-hidden="true">→</span>
+  ) : null;
 
 const variants: Record<Variant, string> = {
   primary:
@@ -31,7 +43,7 @@ export function Button({
       {...props}
     >
       {loading ? "Sending…" : children}
-      {variant === "secondary" ? <span aria-hidden="true">→</span> : null}
+      {arrow(variant)}
     </button>
   );
 }
@@ -45,7 +57,7 @@ export function ButtonLink({
   return (
     <Link className={cn(base, variants[variant], className)} {...props}>
       {children}
-      {variant === "secondary" ? <span aria-hidden="true">→</span> : null}
+      {arrow(variant)}
     </Link>
   );
 }
