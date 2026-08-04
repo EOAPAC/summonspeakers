@@ -5,14 +5,15 @@ import { SpeakerDirectory } from "@/components/SpeakerDirectory";
 import { ClosingCta } from "@/components/ClosingCta";
 import { ButtonLink } from "@/components/Button";
 import { getTopic, speakersByTopic } from "@/data/speakers";
+import { feeAnswerForTopic } from "@/data/fees";
 
 function faqsFor(name: string) {
   const lower = name.toLowerCase();
+  const feeAnswer = feeAnswerForTopic(name, lower);
   return [
-    {
-      q: `How much do ${lower} speakers cost?`,
-      a: `Most ${lower} speakers charge between $7,000 and $30,000 for a keynote. Emerging names sit at the lower end; broadcast and celebrity names go above it. Every fee band on this page is published, so you can shortlist inside your budget before making contact.`,
-    },
+    ...(feeAnswer
+      ? [{ q: `How much do ${lower} speakers cost?`, a: feeAnswer }]
+      : []),
     {
       q: `How do I book a ${lower} speaker?`,
       a: `Send an enquiry with your date, audience size and theme. We confirm availability and the exact fee within one business day, then you book directly through us. There is no bureau markup, and cancellation is free up to 14 days before your event.`,

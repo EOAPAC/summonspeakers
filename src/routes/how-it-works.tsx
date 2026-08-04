@@ -36,9 +36,10 @@ const faqs = [
     a: "We find a replacement of the same calibre at the same fee, or you receive a full refund. Free cancellation applies up to 14 days before your event if you need to cancel.",
   },
   {
-    q: "Do you add a markup to the speaker's fee?",
-    a: "No. The band you see on a profile is the speaker's own fee. We are paid a flat listing fee by speakers, not a percentage of your booking.",
+    q: "What if we're not sure what we want yet?",
+    a: "Send the enquiry anyway. Roughly half the briefs we get name a theme rather than a speaker, and the shortlist is usually more useful when you haven't already narrowed it. Tell us the audience and what you want them to leave thinking.",
   },
+
 ];
 
 export const Route = createFileRoute("/how-it-works")({
