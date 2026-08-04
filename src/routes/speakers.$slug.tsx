@@ -97,7 +97,7 @@ export const Route = createFileRoute("/speakers/$slug")({
 });
 
 function SpeakerProfile() {
-  const { speaker: s } = Route.useLoaderData();
+  const { speaker: s } = Route.useLoaderData() as { speaker: Speaker };
   const fee = formatFee(s.fee_min, s.fee_max, s.fee_on_application);
   const similar = speakers
     .filter((o) => o.slug !== s.slug && o.topics.some((t) => s.topics.includes(t)))
