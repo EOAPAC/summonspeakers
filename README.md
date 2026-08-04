@@ -47,15 +47,29 @@ TypeScript, Tailwind v4. Hosted on Vercel. Speaker and editorial content is
 committed TypeScript under `src/data/`; the 2,131-speaker roster is imported
 from CSV by `bun run import:roster`.
 
-**Not built yet.** Everything below is the intended backend. `src/lib/enquiries.ts`
-is currently a local stub that validates and discards, so no database, auth or
-email service is wired up and no secrets are needed to run the site.
+**Backend:** Supabase (Postgres, auth, storage) with Resend for transactional
+email. The schema and every RLS policy live in `supabase/migrations/`; apply
+them to the project once (SQL editor or `supabase db push`). All backend calls
+are server functions — see AGENTS.md for the secret-handling rules.
 
-- **Supabase** for Postgres, auth, storage (speaker photos, showreel thumbnails) and row-level security.
+- **Enquiries** persist to the `enquiries` table via `submitEnquiry`
+  (`src/lib/enquiries.server.ts`), then trigger a confirmation email to the
+  planner and a notification to `ADMIN_EMAIL`. No account needed — never gate
+  the enquiry behind signup.
+- **Speaker listings** from `/for-speakers/join` persist to `speakers` as
+  `pending_review` via `submitListing` (`src/lib/listings.server.ts`).
+- **Auth:** Google and Microsoft OAuth on the join page (Supabase Auth; the
+  Microsoft provider is `azure` / Entra ID). A signed-in speaker's listing is
+  linked to their user as `owner_id`; the email-only path creates an unclaimed
+  listing the admin follows up on. Only the admin can publish — RLS keeps
+  owners to `draft`/`pending_review`.
+- **Storage:** the `speaker-media` bucket holds speaker photos and showreel
+  thumbnails; public read, owners write only inside their own user-id folder.
 
-- **Auth:** Google and Microsoft OAuth as the primary options, email/password as fallback. Planners do **not** need an account to submit an enquiry — this is critical, never gate the enquiry behind signup.
-
-- **Email:** transactional via Resend (enquiry confirmation to planner, notification to admin).
+The site still renders published content from committed data. If the backend
+env vars are absent the pages render normally, but enquiry and listing
+submission fail loudly (an error shown to the visitor) rather than pretending
+to succeed.
 
 - **SEO:** every page needs server-renderable meta, a canonical URL, and JSON-LD. Use `react-helmet-async`. Routes must be real URLs, never hash routes.
 
@@ -382,9 +396,26 @@ server-rendered, so rewriting everything to `index.html` would break it.
 Project settings that matter:
 
 | Setting         | Value                                                | Why                                                                                                                                                                                                                                                              |
-| --------------- | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| --------------- | ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `VITE_SITE_URL` | e.g. `https://summonspeakers.com`, no trailing slash | Every canonical, `og:url`, share card and the sitemap resolve against it. `VITE_*` vars are inlined at build time, so it must exist before the build runs — otherwise preview deployments advertise the production canonical. Set it for Production and Preview. |
 | Node version    | 22.x                                                 | Vite 8 needs 20.19+/22.12+. `engines` in `package.json` pins the floor.                                                                                                                                                                                          |
 
+Backend variables — the full list with placeholders is in `.env.example`:
+
+| Setting | Where | Why |
+| --------------- | -------- | --- |
+| `VITE_SUPABASE_URL` | Build time | Public by design; feeds the browser auth client. |
+| `VITE_SUPABASE_ANON_KEY` | Build time | Public by design — RLS is the enforcement. |
+| `SUPABASE_URL` | Runtime | Same project URL, read by server functions. |
+| `SUPABASE_SERVICE_ROLE_KEY` | Runtime | Secret. Bypasses RLS; used only in server functions to persist enquiries and listings. |
+| `RESEND_API_KEY` | Runtime | Secret. Transactional email. Without it, submissions still persist but no email goes out. |
+| `RESEND_FROM` | Runtime | Verified sender, e.g. `SummonSpeakers <hello@summonspeakers.com>`. |
+| `ADMIN_EMAIL` | Runtime | Inbox for enquiry and listing notifications. |
+
+Supabase dashboard, one-time: run `supabase/migrations/20260805000000_init.sql`
+(SQL editor or `supabase db push`), then enable the **Google** and **Azure**
+(Microsoft) auth providers under Authentication → Providers with the site's URL
+in the redirect allowlist.
+
 `bun.lock` is committed, so Vercel installs with bun without further
-configuration. No secrets are required until the enquiry backend is wired up.
+configuration.
