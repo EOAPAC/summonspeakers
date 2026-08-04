@@ -4,6 +4,8 @@ description: Use this skill to generate well-branded interfaces and assets for S
 user-invocable: true
 ---
 
+**Source of truth:** `src/styles.css` defines every token and utility this project uses. Where this skill and the code disagree, the code wins — and the skill should be corrected. Never introduce a colour that is not in `src/styles.css`.
+
 Read the `README.md` file within this skill, and explore the other available files.
 
 If creating visual artifacts (slides, mocks, throwaway prototypes, etc), copy assets out and create static HTML files for the user to view. If working on production code, copy assets and read the rules here to become an expert in designing with this brand.
@@ -20,11 +22,11 @@ If the user invokes this skill without any other guidance, ask them what they wa
 
 - `preview/` — small specimen cards for every token group and component.
 
-- `ui_kits/website/` — interactive recreation of the marketing + marketplace site (home, category, profile, enquiry flow) with reusable JSX components in `shared.jsx`, `Chrome.jsx`, `Home.jsx`, `Category.jsx`, `Profile.jsx`, `Enquiry.jsx`.
+- Reference implementations live in the app itself at `src/components/` — read those, not a separate prototype kit.
 
 ## The one thing to remember
 
-Trust is the product. Amber is rationed to the single primary CTA per page; navy is the trust anchor; the fee band is a hero element, never fine print. Clarity in five seconds, one primary action, show value before asking for commitment.
+Trust is the product. The system is monochrome — there is no brand hue, and the single primary action per page is a solid ink pill that inverts to white on hover. The fee band is a hero element, never fine print. Clarity in five seconds, one primary action, show value before asking for commitment.
 
 ## Caveats
 

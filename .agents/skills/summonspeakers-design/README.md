@@ -12,7 +12,7 @@ Both audiences share one emotional need: **confidence**. Every interface decisio
 ## Ten principles
 
 1. **Trust is the product.** The visual system exists to remove doubt before the user asks a question.
-2. **One primary action per page.** One black pill CTA, one amber accent, one next step. No competing buttons.
+2. **One primary action per page.** One black pill CTA, one next step. No competing buttons.
 3. **Show the fee like a headline.** The fee band is a hero element, never fine print. It signals honesty.
 4. **Black is a colour, not an absence.** Ink black carries weight; white breathes; greys organise.
 5. **No gradients, no shadows as decoration.** Elevation is only for functional layers (nav, cards, modals).
@@ -48,10 +48,9 @@ Both audiences share one emotional need: **confidence**. Every interface decisio
 | `--line-2` | `rgba(0,0,0,0.18)` | Input borders |
 | `--line-on-dark` | `rgba(255,255,255,0.10)` | Dividers on dark surfaces |
 | `--warning` | `#7a2e1c` | Errors and destructive actions |
-| `--accent` | `#000000` | Default accent (overridden by CTA amber) |
+| `--accent` | `#000000` | Primary action fill (ink) |
 | `--accent-hover` | `#ffffff` | Hover accent |
 
-**CTA amber:** reserved for the single primary action per page. Hex `#d4a017`. Use sparingly — it is the only warm colour in the system.
 
 ### Typography
 
@@ -123,11 +122,11 @@ Use **Lucide** icons. Choose line icons at 1.5px stroke, 24px default size. No f
 
 ## Components
 
-See `ui_kits/website/shared.jsx` for reference implementations of:
+See `src/components/` for the reference implementations of:
 
 - `Button` — primary (black pill), secondary (underlined text), ghost.
 - `FeeBand` — mono uppercase hairline pill with optional availability dot.
-- `Pill` — topic/tag with sentence case text.
+- `Pill` — topic/tag, mono uppercase in a hairline pill, inverts on hover.
 - `SpeakerCard` — grayscale media well, hover lift, fee display.
 - `Header` — responsive nav with mobile drawer.
 - `Footer` — four-column editorial footer.
