@@ -61,15 +61,59 @@ jobs:
       # be vacuous — it never holds the deployment's vars — so this checks what
       # the source actually reads, which is the realistic way a secret ends up
       # with the wrong prefix.
-      - name: Assert the source reads no VITE_ variable except VITE_SITE_URL
+      #
+      # The allowlist is deliberately short, and it is an allowlist rather than a
+      # deny-list of scary-looking names so that any NEW prefixed variable fails
+      # until someone decides it is genuinely publishable. The three permitted:
+      #
+      #   VITE_SITE_URL           — a public canonical URL.
+      #   VITE_SUPABASE_URL       — a public project URL.
+      #   VITE_SUPABASE_ANON_KEY  — public by design. It sits in every Supabase
+      #                             client app on the internet and grants only
+      #                             what row-level security allows; the
+      #                             migration's policies are the enforcement.
+      #
+      # A service-role key, a Resend key, or a Runware key must never carry the
+      # prefix. Those stay unprefixed and are read server-side.
+      - name: Assert the source reads only the allowlisted VITE_ variables
         run: |
+          ALLOWED='VITE_SITE_URL|VITE_SUPABASE_URL|VITE_SUPABASE_ANON_KEY'
           offenders=$(grep -rhoE 'VITE_[A-Z0-9_]+' src/ scripts/ \
-            | sort -u | grep -vxE 'VITE_SITE_URL' || true)
+            | sort -u | grep -vxE "$ALLOWED" || true)
           if [ -n "$offenders" ]; then
-            echo "::error::A VITE_ variable other than VITE_SITE_URL is read by the source."
+            echo "::error::A VITE_ variable outside the allowlist is read by the source."
             echo "$offenders"
-            echo "That prefix publishes the value in the client bundle. Drop the prefix"
-            echo "and read it from a server function instead."
+            echo "That prefix publishes the value in the client bundle. If it is genuinely"
+            echo "public, add it to ALLOWED in this step and say why. Otherwise drop the"
+            echo "prefix and read it from a server function instead."
             exit 1
           fi
-          echo "Source reads only VITE_SITE_URL — ok"
+          echo "Source reads only allowlisted VITE_ variables — ok"
+
+      # RLS is what makes publishing the anon key safe, so a table without it is
+      # the difference between a public key and an open database.
+      - name: Assert every migration table enables row level security
+        run: |
+          if [ ! -d supabase/migrations ]; then
+            echo "No migrations — skipping"; exit 0
+          fi
+          tables=$(grep -rhoiE 'create table +(if not exists +)?[a-zA-Z0-9_."]+' supabase/migrations/ \
+                   | awk '{print $NF}' | tr -d '"' | sed 's/^public\.//' | sort -u)
+          if [ -z "$tables" ]; then
+            echo "::error::Found migrations but parsed no CREATE TABLE — this check would pass vacuously."
+            exit 1
+          fi
+          echo "tables: $(echo "$tables" | tr '\n' ' ')"
+          missing=""
+          for bare in $tables; do
+            if ! grep -rqiE "alter table +(public\.)?\"?${bare}\"? +enable row level security" supabase/migrations/; then
+              missing="$missing $bare"
+            fi
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::Table(s) created without enabling row level security:$missing"
+            echo "The anon key is published in the client bundle, so RLS is the only"
+            echo "thing standing between it and the data."
+            exit 1
+          fi
+          echo "All migration tables enable row level security — ok"
