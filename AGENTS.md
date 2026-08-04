@@ -3,6 +3,12 @@
 TanStack Start (SSR) on Vite 8, React 19, Tailwind v4, bun. Nitro builds for
 Vercel — `bun run build` writes `.vercel/output` in Build Output API v3 format.
 
+This file is the short version, covering what you need to change code safely.
+`context.md` has the full picture (data model, counts, design tokens, what is
+still stubbed) and `instructions.md` has the working rules (definition of done,
+git workflow, the SEO invariants, gotchas). Where they disagree with this file,
+they are more current — the counts here are the ones most likely to go stale.
+
 ## Before you finish
 
 `bunx tsc --noEmit`, `bun run lint` and `bun run build` all need to pass. Lint
