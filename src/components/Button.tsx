@@ -43,7 +43,7 @@ export function Button({
       {...props}
     >
       {loading ? "Sending…" : children}
-      {variant === "secondary" ? <span aria-hidden="true">→</span> : null}
+      {arrow(variant)}
     </button>
   );
 }
@@ -57,7 +57,7 @@ export function ButtonLink({
   return (
     <Link className={cn(base, variants[variant], className)} {...props}>
       {children}
-      {variant === "secondary" ? <span aria-hidden="true">→</span> : null}
+      {arrow(variant)}
     </Link>
   );
 }
