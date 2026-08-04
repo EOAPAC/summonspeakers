@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Button, ButtonLink } from "./Button";
 import { speakers, topics } from "@/data/speakers";
-import { submitEnquiry } from "@/lib/enquiries";
+import { submitEnquiry } from "@/lib/enquiries.server";
 
 type Values = {
   event_date: string;
