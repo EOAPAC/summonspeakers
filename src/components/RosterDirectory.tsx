@@ -168,10 +168,28 @@ export function RosterDirectory({
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-4 py-4">
-        <p className="label-mono text-[var(--ink-3)]" aria-live="polite">
-          {total.toLocaleString("en-AU")} {total === 1 ? "SPEAKER" : "SPEAKERS"}
-          {pageCount > 1 && ` · PAGE ${page} OF ${pageCount}`}
-        </p>
+        <div>
+          <p className="label-mono text-[var(--ink-3)]" aria-live="polite">
+            {total.toLocaleString("en-AU")} {total === 1 ? "SPEAKER" : "SPEAKERS"}
+            {pageCount > 1 && ` · PAGE ${page} OF ${pageCount}`}
+          </p>
+          {/* Say so rather than let them vanish: a gender filter cannot include
+              a speaker whose gender the source never recorded. */}
+          {data.unrecordedGender > 0 && (
+            <p className="mt-2 text-sm text-[var(--ink-2)]">
+              {data.unrecordedGender}{" "}
+              {data.unrecordedGender === 1 ? "speaker has" : "speakers have"} no gender recorded and{" "}
+              {data.unrecordedGender === 1 ? "is" : "are"} not shown.{" "}
+              <Link
+                to="/speakers"
+                search={withFilters({ gender: "any" })}
+                className="underline underline-offset-4"
+              >
+                Include them
+              </Link>
+            </p>
+          )}
+        </div>
         {active.length > 0 && (
           <ul className="flex flex-wrap items-center gap-2">
             {active.map((a) => (

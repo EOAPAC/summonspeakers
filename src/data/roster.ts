@@ -46,6 +46,13 @@ export type RosterPage = {
   rows: RosterRow[];
   /** Matches across every page, not just this one. */
   total: number;
+  /**
+   * Speakers that match every other filter but have no gender recorded, so a
+   * gender filter excludes them. Surfaced rather than swallowed: 16 of the
+   * 2,131 imported rows have no gender in the source, and silently dropping
+   * people from a result set is how a directory quietly loses them.
+   */
+  unrecordedGender: number;
   page: number;
   pageCount: number;
   /**
@@ -89,15 +96,20 @@ export function queryRoster(filters: RosterFilters): RosterPage {
     (filters.categories.length > 0 && wantCategories.length === 0) ||
     (filters.state !== "" && wantState === undefined);
 
-  const matches = impossible
+  // Everything except gender, so the gender filter's exclusions can be counted
+  // rather than disappearing.
+  const beforeGender = impossible
     ? []
     : roster.filter((e) => {
         if (wantCategories.length && !wantCategories.some((id) => e.c.includes(id))) return false;
         if (wantState !== undefined && !e.s.includes(wantState)) return false;
-        if (wantGender !== 0 && e.g !== wantGender) return false;
         if (needle && !e.name.toLowerCase().includes(needle)) return false;
         return true;
       });
+
+  const matches = wantGender === 0 ? beforeGender : beforeGender.filter((e) => e.g === wantGender);
+  const unrecordedGender =
+    wantGender === 0 ? 0 : beforeGender.reduce((n, e) => n + (e.g === 0 ? 1 : 0), 0);
 
   const size = filters.pageSize ?? ROSTER_PAGE_SIZE;
   const pageCount = Math.max(1, Math.ceil(matches.length / size));
@@ -114,6 +126,7 @@ export function queryRoster(filters: RosterFilters): RosterPage {
 
   return {
     total: matches.length,
+    unrecordedGender,
     page,
     pageCount,
     states: [...stateCounts.entries()]
