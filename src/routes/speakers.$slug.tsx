@@ -132,7 +132,7 @@ function SpeakerProfile() {
             </p>
           </div>
           <div className="mt-10 hidden md:block">
-            <ButtonLink to="/get-matched" search={{ speaker: s.slug }}>
+            <ButtonLink to="/get-matched" search={{ speaker: s.slug } as never}>
               Check availability
             </ButtonLink>
           </div>
@@ -233,7 +233,7 @@ function SpeakerProfile() {
       <div className="sticky bottom-0 z-30 border-t border-[var(--line)] bg-surface p-4 shadow-[0_-8px_24px_rgba(0,0,0,0.06)] md:hidden">
         <div className="flex items-center justify-between gap-4">
           <span className="label-mono">{fee}</span>
-          <ButtonLink to="/get-matched" search={{ speaker: s.slug }} className="px-6">
+          <ButtonLink to="/get-matched" search={{ speaker: s.slug } as never} className="px-6">
             Check availability
           </ButtonLink>
         </div>
