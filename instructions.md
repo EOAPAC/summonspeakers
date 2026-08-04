@@ -101,8 +101,12 @@ shipping 180KB to every visitor.
 
 **Never prefix a secret with `VITE_`.** That inlines it into the client bundle.
 Read secrets from `process.env` inside a server function or server route handler.
-CI asserts no `VITE_` variable other than `VITE_SITE_URL` is read anywhere in
-`src/` or `scripts/`.
+Three `VITE_` variables are permitted because their values are public by design:
+`VITE_SITE_URL`, `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` — the anon key
+ships in every Supabase browser app and the RLS policies in
+`supabase/migrations/` are the enforcement. CI asserts no other `VITE_` variable
+is read anywhere in `src/` or `scripts/`. The service-role key and
+`RESEND_API_KEY` are secrets and stay unprefixed.
 
 **Never hardcode an absolute URL.** Build it with `absoluteUrl()` from
 `src/lib/site.ts`.
@@ -191,8 +195,9 @@ Australian English, and Australian number formatting via
 
 ## Tests
 
-`bun test`, built into bun, no runtime dependency. Two files so far:
-`src/lib/robots.test.ts` and `src/data/roster.test.ts`, 14 tests.
+`bun test`, built into bun, no runtime dependency. Three files so far:
+`src/lib/robots.test.ts`, `src/data/roster.test.ts` and `src/lib/backend.test.ts`,
+35 tests.
 
 Add a test when logic has a subtle failure mode, particularly one where the wrong
 answer looks plausible. Both existing files cover exactly that: a filter silently
