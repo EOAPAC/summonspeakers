@@ -14,7 +14,10 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-[var(--line)] bg-surface/95 backdrop-blur">
       <div className="container-x flex min-h-[72px] items-center justify-between gap-6">
-        <Link to="/" className="label-mono text-sm font-semibold tracking-[0.1em]">
+        <Link
+          to="/"
+          className="label-mono inline-flex min-h-[var(--hit-min)] items-center text-sm font-semibold tracking-[0.1em]"
+        >
           SUMMONSPEAKERS
         </Link>
         <nav aria-label="Main" className="hidden items-center gap-8 md:flex">
