@@ -12,7 +12,7 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
               <Link
                 to={item.to}
                 params={item.params as never}
-                className="hover:text-ink"
+                className="inline-flex items-center min-h-[var(--hit-min)] hover:text-ink"
               >
                 {item.label}
               </Link>
