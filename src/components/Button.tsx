@@ -9,11 +9,11 @@ const base =
 
 const variants: Record<Variant, string> = {
   primary:
-    "rounded-full bg-ink text-surface min-h-[56px] px-8 text-base tracking-[-0.02em] border border-ink hover:bg-surface hover:text-ink",
+    "rounded-full bg-ink text-surface min-h-[var(--hit-primary)] px-8 text-base tracking-[-0.02em] border border-ink hover:bg-surface hover:text-ink",
   secondary:
-    "min-h-[44px] text-base underline underline-offset-4 decoration-[var(--line-2)] hover:decoration-ink text-ink",
+    "min-h-[var(--hit-min)] text-base underline underline-offset-4 decoration-[var(--line-2)] hover:decoration-ink text-ink",
   ghost:
-    "rounded-full border border-[var(--line-2)] min-h-[44px] px-6 text-sm hover:bg-ink hover:text-surface",
+    "rounded-full border border-[var(--line-2)] min-h-[var(--hit-min)] px-6 text-sm hover:bg-ink hover:text-surface",
 };
 
 export function Button({
@@ -27,9 +27,10 @@ export function Button({
     <button
       className={cn(base, variants[variant], className)}
       disabled={props.disabled || loading}
+      aria-busy={loading || undefined}
       {...props}
     >
-      {loading ? "Working…" : children}
+      {loading ? "Sending…" : children}
       {variant === "secondary" ? <span aria-hidden="true">→</span> : null}
     </button>
   );
