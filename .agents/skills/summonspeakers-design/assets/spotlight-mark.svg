@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" role="img" aria-label="SummonSpeakers spotlight mark">
+  <circle cx="24" cy="24" r="23" stroke="#000000" stroke-width="2"/>
+  <circle cx="24" cy="24" r="8" fill="#000000"/>
+  <path d="M24 4v12M24 32v12M4 24h12M32 24h12" stroke="#000000" stroke-width="2" stroke-linecap="round"/>
+</svg>
