@@ -237,8 +237,9 @@ async function writeManifest(): Promise<number> {
 
 export type PortraitKind = "plate" | "photo";
 
-const PORTRAITS: Readonly<Record<string, { src: string; kind: PortraitKind }>> =
-  ${JSON.stringify(Object.fromEntries(entries), null, 2)};
+const PORTRAITS: Readonly<Record<string, { src: string; kind: PortraitKind }>> = {
+${entries.map(([slug, v]) => `  "${slug}": { src: "${v.src}", kind: "${v.kind}" },`).join("\n")}
+};
 
 /** Public path to a speaker's image, or null when there is not one yet. */
 export function portraitFor(slug: string): string | null {

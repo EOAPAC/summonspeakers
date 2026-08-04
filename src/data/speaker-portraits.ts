@@ -11,54 +11,18 @@
 export type PortraitKind = "plate" | "photo";
 
 const PORTRAITS: Readonly<Record<string, { src: string; kind: PortraitKind }>> = {
-  "andres-molina": {
-    src: "/speakers/andres-molina.plate.png",
-    kind: "plate",
-  },
-  "daniel-hsu": {
-    src: "/speakers/daniel-hsu.plate.png",
-    kind: "plate",
-  },
-  "dr-maya-ellison": {
-    src: "/speakers/dr-maya-ellison.plate.png",
-    kind: "plate",
-  },
-  "grace-oyelaran": {
-    src: "/speakers/grace-oyelaran.plate.png",
-    kind: "plate",
-  },
-  "helena-brandt": {
-    src: "/speakers/helena-brandt.plate.png",
-    kind: "plate",
-  },
-  "james-okoro": {
-    src: "/speakers/james-okoro.plate.png",
-    kind: "plate",
-  },
-  "michael-toure": {
-    src: "/speakers/michael-toure.plate.png",
-    kind: "plate",
-  },
-  "nina-castellan": {
-    src: "/speakers/nina-castellan.plate.png",
-    kind: "plate",
-  },
-  "omar-haddad": {
-    src: "/speakers/omar-haddad.plate.png",
-    kind: "plate",
-  },
-  "priya-raman": {
-    src: "/speakers/priya-raman.plate.png",
-    kind: "plate",
-  },
-  "robert-ainsley": {
-    src: "/speakers/robert-ainsley.plate.png",
-    kind: "plate",
-  },
-  "sarah-lindqvist": {
-    src: "/speakers/sarah-lindqvist.plate.png",
-    kind: "plate",
-  },
+  "andres-molina": { src: "/speakers/andres-molina.plate.png", kind: "plate" },
+  "daniel-hsu": { src: "/speakers/daniel-hsu.plate.png", kind: "plate" },
+  "dr-maya-ellison": { src: "/speakers/dr-maya-ellison.plate.png", kind: "plate" },
+  "grace-oyelaran": { src: "/speakers/grace-oyelaran.plate.png", kind: "plate" },
+  "helena-brandt": { src: "/speakers/helena-brandt.plate.png", kind: "plate" },
+  "james-okoro": { src: "/speakers/james-okoro.plate.png", kind: "plate" },
+  "michael-toure": { src: "/speakers/michael-toure.plate.png", kind: "plate" },
+  "nina-castellan": { src: "/speakers/nina-castellan.plate.png", kind: "plate" },
+  "omar-haddad": { src: "/speakers/omar-haddad.plate.png", kind: "plate" },
+  "priya-raman": { src: "/speakers/priya-raman.plate.png", kind: "plate" },
+  "robert-ainsley": { src: "/speakers/robert-ainsley.plate.png", kind: "plate" },
+  "sarah-lindqvist": { src: "/speakers/sarah-lindqvist.plate.png", kind: "plate" },
 };
 
 /** Public path to a speaker's image, or null when there is not one yet. */

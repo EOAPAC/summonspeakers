@@ -25,6 +25,7 @@ import { mkdir, readdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 import { speakers } from "../src/data/speakers";
+import { cropPng, pngSize } from "./lib/png";
 
 const WIDTH = 1024;
 const HEIGHT = 1280; // 4:5, matching the profile page's aspect
@@ -108,7 +109,7 @@ body{
 .mark{
   flex:1;display:flex;align-items:center;justify-content:center;
   font-size:${monoSize}px;font-weight:300;letter-spacing:-0.04em;line-height:1;
-  color:${INK};opacity:.14;
+  color:${INK};opacity:.19;
 }
 .foot{border-top:1.5px solid ${LINE_2};padding-top:28px}
 .name{font-family:"PM",monospace;font-weight:500;font-size:26px;letter-spacing:.1em;
@@ -124,16 +125,54 @@ body{
 const chromium = findChromium();
 
 /**
- * No viewport-offset compensation here, unlike build-og-images.ts.
+ * Chromium withholds ~87px of --window-size from the layout viewport, so the
+ * window has to be that much taller for 1280px of content to lay out, and the
+ * screenshot — which captures the full window height, not the viewport — then
+ * gets cropped back down. build-og-images.ts does the same thing for the same
+ * reason.
  *
- * Chromium withholds ~87px of --window-size from the *layout viewport*, which
- * matters to that script because its cards are laid out against the viewport and
- * it crops the result. `--screenshot` itself captures the full window height, so
- * a plate whose body is a fixed 1280px in a 1280px window comes out at exactly
- * 1024x1280. Adding the offset here produced 1024x1367 with 87px of dead space,
- * which the dimension assertion below caught.
+ * Skipping this is not cosmetic. With a 1280px window the viewport is 1193px, the
+ * footer lands below it, and the role line renders sliced in half. The output was
+ * still exactly 1024x1280, so the dimension check passed and only looking at the
+ * image caught it.
  */
-async function shoot(html: string, out: string): Promise<void> {
+async function viewportOffset(): Promise<number> {
+  const probe = `<!doctype html><html><body style="margin:0"><span id="o"></span>
+<script>document.getElementById("o").textContent="H"+window.innerHeight;</script></body></html>`;
+  const proc = Bun.spawn(
+    [
+      chromium,
+      "--headless",
+      "--disable-gpu",
+      "--no-sandbox",
+      `--window-size=${WIDTH},${HEIGHT}`,
+      "--dump-dom",
+      `data:text/html,${encodeURIComponent(probe)}`,
+    ],
+    { stdout: "pipe", stderr: "ignore" },
+  );
+  const text = await new Response(proc.stdout).text();
+  await proc.exited;
+  const inner = Number(/H(\d+)/.exec(text)?.[1] ?? HEIGHT);
+  const offset = Math.max(0, HEIGHT - inner);
+  console.log(`viewport offset: ${offset}px (window ${HEIGHT} gives viewport ${inner})`);
+  return offset;
+}
+
+/**
+ * Crops the oversized screenshot back to WIDTH x HEIGHT, keeping the top rows.
+ *
+ * Uses the stdlib crop shared with build-og-images.ts rather than a canvas
+ * round-trip. The canvas route works but re-encodes: it took a plate from 71KB to
+ * 266KB, because Chromium's canvas PNG encoder is much weaker than its screenshot
+ * encoder. This keeps the original pixels.
+ */
+async function cropToSize(file: string): Promise<void> {
+  const raw = Buffer.from(await Bun.file(file).arrayBuffer());
+  await writeFile(file, cropPng(raw, HEIGHT));
+}
+
+async function shoot(html: string, out: string, offset: number): Promise<void> {
   const page = join(TMP_DIR, `${out}.html`);
   await writeFile(page, html);
   const proc = Bun.spawn(
@@ -146,18 +185,13 @@ async function shoot(html: string, out: string): Promise<void> {
       "--allow-file-access-from-files",
       "--force-device-scale-factor=1",
       "--virtual-time-budget=8000",
-      `--window-size=${WIDTH},${HEIGHT}`,
+      `--window-size=${WIDTH},${HEIGHT + offset}`,
       `--screenshot=${join(OUT_DIR, `${out}.plate.png`)}`,
       `file://${process.cwd()}/${page}`,
     ],
     { stdout: "ignore", stderr: "ignore" },
   );
   await proc.exited;
-}
-
-function pngSize(bytes: Uint8Array): { w: number; h: number } {
-  const dv = new DataView(bytes.buffer, bytes.byteOffset);
-  return { w: dv.getUint32(16), h: dv.getUint32(20) };
 }
 
 async function main(): Promise<void> {
@@ -178,6 +212,7 @@ async function main(): Promise<void> {
   );
 
   const targets = speakers.filter((s) => !only || only.has(s.slug));
+  const offset = await viewportOffset();
 
   let made = 0;
   let skipped = 0;
@@ -193,16 +228,17 @@ async function main(): Promise<void> {
       }
 
       const initials = monogram(s.name);
-      await shoot(plate(s.name, s.role, initials), s.slug);
+      await shoot(plate(s.name, s.role, initials), s.slug, offset);
 
       const file = join(OUT_DIR, `${s.slug}.plate.png`);
+      if (existsSync(file) && offset > 0) await cropToSize(file);
       if (!existsSync(file)) {
         failures.push(`${s.slug}: Chromium wrote no file`);
         console.error(`FAIL   ${s.slug}: no output`);
         continue;
       }
       const bytes = new Uint8Array(await Bun.file(file).arrayBuffer());
-      const { w, h } = pngSize(bytes);
+      const { width: w, height: h } = pngSize(Buffer.from(bytes));
       if (w !== WIDTH || h !== HEIGHT) {
         failures.push(`${s.slug}: got ${w}x${h}, wanted ${WIDTH}x${HEIGHT}`);
         console.error(`FAIL   ${s.slug}: ${w}x${h} (wanted ${WIDTH}x${HEIGHT})`);
