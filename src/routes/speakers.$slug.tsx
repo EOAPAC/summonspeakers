@@ -7,6 +7,7 @@ import { ButtonLink } from "@/components/Button";
 import { SpeakerCard } from "@/components/SpeakerCard";
 import { getSpeaker, speakers, type Speaker } from "@/data/speakers";
 import { formatFee } from "@/lib/fee";
+import { absoluteUrl } from "@/lib/site";
 
 function faqsFor(name: string, fee: string) {
   return [
@@ -43,9 +44,9 @@ export const Route = createFileRoute("/speakers/$slug")({
         { property: "og:title", content: `${s.name} — ${s.role}` },
         { property: "og:description", content: description },
         { property: "og:type", content: "profile" },
-        { property: "og:url", content: `/speakers/${params.slug}` },
+        { property: "og:url", content: absoluteUrl(`/speakers/${params.slug}`) },
       ],
-      links: [{ rel: "canonical", href: `/speakers/${params.slug}` }],
+      links: [{ rel: "canonical", href: absoluteUrl(`/speakers/${params.slug}`) }],
       scripts: [
         {
           type: "application/ld+json",
@@ -56,7 +57,7 @@ export const Route = createFileRoute("/speakers/$slug")({
             jobTitle: s.role,
             description: s.bio_short,
             knowsAbout: s.topics,
-            url: `/speakers/${s.slug}`,
+            url: absoluteUrl(`/speakers/${s.slug}`),
             makesOffer: {
               "@type": "Offer",
               name: `Keynote speaking engagement with ${s.name}`,
@@ -132,7 +133,7 @@ function SpeakerProfile() {
             </p>
           </div>
           <div className="mt-10 hidden md:block">
-            <ButtonLink to="/get-matched" search={{ speaker: s.slug } as never}>
+            <ButtonLink to="/get-matched" search={{ speaker: s.slug }}>
               Check availability
             </ButtonLink>
           </div>
@@ -233,7 +234,7 @@ function SpeakerProfile() {
       <div className="sticky bottom-0 z-30 border-t border-[var(--line)] bg-surface p-4 shadow-[0_-8px_24px_rgba(0,0,0,0.06)] md:hidden">
         <div className="flex items-center justify-between gap-4">
           <span className="label-mono">{fee}</span>
-          <ButtonLink to="/get-matched" search={{ speaker: s.slug } as never} className="px-6">
+          <ButtonLink to="/get-matched" search={{ speaker: s.slug }} className="px-6">
             Check availability
           </ButtonLink>
         </div>

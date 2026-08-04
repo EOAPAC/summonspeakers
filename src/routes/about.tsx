@@ -3,6 +3,7 @@ import { Page, Eyebrow } from "@/components/Page";
 import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { ButtonLink } from "@/components/Button";
 import { ClosingCta } from "@/components/ClosingCta";
+import { absoluteUrl } from "@/lib/site";
 
 const values = [
   { n: "01", h: "Publish the number", p: "If we know what something costs, we say so. Every profile carries a real range, because a fee you cannot see is a fee you cannot judge." },
@@ -25,9 +26,9 @@ export const Route = createFileRoute("/about")({
       { name: "description", content: "Booking a speaker means committing thousands to a stranger. We publish every fee upfront and take no cut of your booking. Here is why." },
       { property: "og:title", content: "About SummonSpeakers" },
       { property: "og:description", content: "Trust is the product. Why we publish every speaker fee upfront." },
-      { property: "og:url", content: "/about" },
+      { property: "og:url", content: absoluteUrl("/about") },
     ],
-    links: [{ rel: "canonical", href: "/about" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/about") }],
     scripts: [
       {
         type: "application/ld+json",

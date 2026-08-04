@@ -6,6 +6,7 @@ import { FeeBand } from "@/components/FeeBand";
 import { ClosingCta } from "@/components/ClosingCta";
 import { getCaseStudy, type CaseStudy } from "@/data/editorial";
 import { getSpeaker } from "@/data/speakers";
+import { absoluteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/case-studies/$slug")({
   loader: ({ params }): { study: CaseStudy } => {
@@ -25,9 +26,9 @@ export const Route = createFileRoute("/case-studies/$slug")({
         { property: "og:title", content: c.headline },
         { property: "og:description", content: c.summary },
         { property: "og:type", content: "article" },
-        { property: "og:url", content: `/case-studies/${params.slug}` },
+        { property: "og:url", content: absoluteUrl(`/case-studies/${params.slug}`) },
       ],
-      links: [{ rel: "canonical", href: `/case-studies/${params.slug}` }],
+      links: [{ rel: "canonical", href: absoluteUrl(`/case-studies/${params.slug}`) }],
       scripts: [
         {
           type: "application/ld+json",
@@ -108,7 +109,7 @@ function CaseStudyDetail() {
                 />
               </div>
               <div className="mt-8">
-                <ButtonLink to="/speakers/$slug" params={{ slug: speaker.slug } as never} variant="ghost" className="w-full">
+                <ButtonLink to="/speakers/$slug" params={{ slug: speaker.slug }} variant="ghost" className="w-full">
                   View profile
                 </ButtonLink>
               </div>

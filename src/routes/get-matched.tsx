@@ -2,11 +2,16 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Page } from "@/components/Page";
 import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { EnquiryFlow } from "@/components/EnquiryFlow";
+import { absoluteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/get-matched")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    speaker: typeof search['speaker'] === "string" ? (search['speaker'] as string) : "",
-  }),
+  // Omit the key when there is no speaker rather than defaulting to "" —
+  // returning it always made every visit to /get-matched redirect to
+  // /get-matched?speaker=, away from its own canonical URL.
+  validateSearch: (search: Record<string, unknown>): { speaker?: string } => {
+    const speaker = search["speaker"];
+    return typeof speaker === "string" && speaker !== "" ? { speaker } : {};
+  },
   head: () => ({
     meta: [
       { title: "Get matched with speakers in one business day | SummonSpeakers" },
@@ -20,9 +25,9 @@ export const Route = createFileRoute("/get-matched")({
         property: "og:description",
         content: "A shortlist of matched speakers, with fees, within one business day.",
       },
-      { property: "og:url", content: "/get-matched" },
+      { property: "og:url", content: absoluteUrl("/get-matched") },
     ],
-    links: [{ rel: "canonical", href: "/get-matched" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/get-matched") }],
     scripts: [
       {
         type: "application/ld+json",

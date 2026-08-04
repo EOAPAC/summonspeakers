@@ -4,6 +4,7 @@ import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { ButtonLink } from "@/components/Button";
 import { ClosingCta } from "@/components/ClosingCta";
 import { getPost, relatedPosts, type Post } from "@/data/editorial";
+import { absoluteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/blog/$slug")({
   loader: ({ params }): { post: Post } => {
@@ -23,9 +24,9 @@ export const Route = createFileRoute("/blog/$slug")({
         { property: "og:title", content: p.title },
         { property: "og:description", content: p.dek },
         { property: "og:type", content: "article" },
-        { property: "og:url", content: `/blog/${params.slug}` },
+        { property: "og:url", content: absoluteUrl(`/blog/${params.slug}`) },
       ],
-      links: [{ rel: "canonical", href: `/blog/${params.slug}` }],
+      links: [{ rel: "canonical", href: absoluteUrl(`/blog/${params.slug}`) }],
       scripts: [
         {
           type: "application/ld+json",
@@ -48,7 +49,7 @@ export const Route = createFileRoute("/blog/$slug")({
             articleSection: p.category,
             author: { "@type": "Organization", name: "SummonSpeakers" },
             publisher: { "@type": "Organization", name: "SummonSpeakers" },
-            mainEntityOfPage: `/blog/${p.slug}`,
+            mainEntityOfPage: absoluteUrl(`/blog/${p.slug}`),
           }),
         },
       ],
@@ -132,7 +133,7 @@ function BlogPost() {
 
       <section className="container-x pb-24">
         <div className="rule-open pt-10">
-          <h2 className="display text-[var(--display-md)]">Keep reading</h2>
+          <h2 className="display text-[length:var(--display-md)]">Keep reading</h2>
           <ul className="mt-10 border-t border-[var(--line)]">
             {related.map((r) => (
               <li key={r.slug} className="border-b border-[var(--line)]">

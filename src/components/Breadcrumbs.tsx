@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { absoluteUrl } from "@/lib/site";
 
 export type Crumb = { label: string; to?: string; params?: Record<string, string> };
 
@@ -29,6 +30,7 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
   );
 }
 
+/** Callers pass app paths; schema.org wants absolute URLs, so resolve here. */
 export function breadcrumbJsonLd(items: { name: string; item: string }[]) {
   return {
     "@context": "https://schema.org",
@@ -37,7 +39,7 @@ export function breadcrumbJsonLd(items: { name: string; item: string }[]) {
       "@type": "ListItem",
       position: i + 1,
       name: it.name,
-      item: it.item,
+      item: absoluteUrl(it.item),
     })),
   };
 }

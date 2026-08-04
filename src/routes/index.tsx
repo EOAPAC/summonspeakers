@@ -4,6 +4,7 @@ import { ButtonLink } from "@/components/Button";
 import { SpeakerCard } from "@/components/SpeakerCard";
 import { ClosingCta } from "@/components/ClosingCta";
 import { speakers, topics } from "@/data/speakers";
+import { absoluteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -19,9 +20,9 @@ export const Route = createFileRoute("/")({
         property: "og:description",
         content: "Compare speakers and their fees upfront, then book directly.",
       },
-      { property: "og:url", content: "/" },
+      { property: "og:url", content: absoluteUrl("/") },
     ],
-    links: [{ rel: "canonical", href: "/" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/") }],
   }),
   component: Home,
 });

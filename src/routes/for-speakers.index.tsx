@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Page, Eyebrow } from "@/components/Page";
 import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { ButtonLink } from "@/components/Button";
+import { absoluteUrl } from "@/lib/site";
 
 const benefits = [
   {
@@ -41,9 +42,9 @@ export const Route = createFileRoute("/for-speakers/")({
         property: "og:description",
         content: "Direct enquiries, published fees, no bureau taking a percentage.",
       },
-      { property: "og:url", content: "/for-speakers" },
+      { property: "og:url", content: absoluteUrl("/for-speakers") },
     ],
-    links: [{ rel: "canonical", href: "/for-speakers" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/for-speakers") }],
     scripts: [
       {
         type: "application/ld+json",

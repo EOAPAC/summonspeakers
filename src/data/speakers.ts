@@ -58,6 +58,14 @@ export const topics: TopicDef[] = [
     kind: "topic",
   },
   {
+    slug: "resilience",
+    name: "Resilience",
+    heading: "Resilience Speakers",
+    blurb:
+      "Resilience speakers work with teams carrying a heavy quarter, a restructure or a long delivery. Fees are published on every profile, so you can shortlist before you make contact.",
+    kind: "topic",
+  },
+  {
     slug: "keynote",
     name: "Keynote",
     heading: "Keynote Speakers",
@@ -461,6 +469,16 @@ export function getSpeaker(slug: string) {
 
 export function getTopic(slug: string) {
   return topics.find((t) => t.slug === slug);
+}
+
+/**
+ * Slug for a topic label as written on a speaker profile.
+ *
+ * Looked up rather than derived, so a label we publish no page for can never
+ * become a link to a 404.
+ */
+export function topicSlugFor(topicName: string): string | null {
+  return topics.find((t) => t.name === topicName)?.slug ?? null;
 }
 
 export function speakersByTopic(topicName: string) {

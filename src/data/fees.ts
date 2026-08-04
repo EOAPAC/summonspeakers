@@ -44,7 +44,7 @@ const floor = (band: string) => spell(band.split("–")[0]!.trim());
  * The "how much do X speakers cost?" answer, generated from the bands above.
  * Returns null when we publish no bands for the topic — omit rather than guess.
  */
-export function feeAnswerForTopic(topicName: string, lower: string): string | null {
+export function feeAnswerForTopic(topicName: string): string | null {
   const b = bandsForTopic(topicName);
   if (!b) return null;
   return (

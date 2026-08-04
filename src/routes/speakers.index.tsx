@@ -5,6 +5,7 @@ import { SpeakerDirectory } from "@/components/SpeakerDirectory";
 import { ClosingCta } from "@/components/ClosingCta";
 import { ButtonLink } from "@/components/Button";
 import { speakers } from "@/data/speakers";
+import { absoluteUrl } from "@/lib/site";
 
 const faqs = [
   {
@@ -31,9 +32,9 @@ export const Route = createFileRoute("/speakers/")({
         property: "og:description",
         content: "Every speaker, every fee band, filterable in seconds.",
       },
-      { property: "og:url", content: "/speakers" },
+      { property: "og:url", content: absoluteUrl("/speakers") },
     ],
-    links: [{ rel: "canonical", href: "/speakers" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/speakers") }],
     scripts: [
       {
         type: "application/ld+json",

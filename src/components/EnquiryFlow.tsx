@@ -61,7 +61,7 @@ function Field({
   );
 }
 
-export function EnquiryFlow({ speakerSlug }: { speakerSlug?: string }) {
+export function EnquiryFlow({ speakerSlug }: { speakerSlug?: string | undefined }) {
   const preset = speakerSlug ? speakers.find((s) => s.slug === speakerSlug) : undefined;
   const [step, setStep] = useState(1);
   const [values, setValues] = useState<Values>({
@@ -100,12 +100,11 @@ export function EnquiryFlow({ speakerSlug }: { speakerSlug?: string }) {
     setSubmitting(true);
     setSubmitError(null);
     try {
+      // Resolve the slug from what is actually selected, not from the speaker
+      // the visitor happened to arrive from — they may have changed it since.
+      const chosen = speakers.find((s) => s.name === values.topic_or_speaker);
       await submitEnquiry({
-        data: {
-          ...values,
-          audience_size: values.audience_size,
-          speaker_slug: preset?.slug ?? null,
-        },
+        data: { ...values, speaker_slug: chosen?.slug ?? null },
       });
       setDone(true);
     } catch {

@@ -3,6 +3,7 @@ import { Page } from "@/components/Page";
 import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { ClosingCta } from "@/components/ClosingCta";
 import { caseStudies } from "@/data/editorial";
+import { absoluteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/case-studies/")({
   head: () => ({
@@ -11,9 +12,9 @@ export const Route = createFileRoute("/case-studies/")({
       { name: "description", content: "How event teams shortlisted, compared and booked speakers directly, including how long each took from brief to confirmed." },
       { property: "og:title", content: "Case studies | SummonSpeakers" },
       { property: "og:description", content: "Real briefs, real speakers, real fees, and the time each booking took." },
-      { property: "og:url", content: "/case-studies" },
+      { property: "og:url", content: absoluteUrl("/case-studies") },
     ],
-    links: [{ rel: "canonical", href: "/case-studies" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/case-studies") }],
     scripts: [
       {
         type: "application/ld+json",

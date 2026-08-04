@@ -3,6 +3,7 @@ import { Page, Eyebrow } from "@/components/Page";
 import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { ClosingCta } from "@/components/ClosingCta";
 import { posts } from "@/data/editorial";
+import { absoluteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/blog/")({
   head: () => ({
@@ -11,9 +12,9 @@ export const Route = createFileRoute("/blog/")({
       { name: "description", content: "Cost guides, briefing notes and planning advice from the team that sees what speakers actually charge." },
       { property: "og:title", content: "The journal | SummonSpeakers" },
       { property: "og:description", content: "Notes on booking speakers well, from the people who publish the fees." },
-      { property: "og:url", content: "/blog" },
+      { property: "og:url", content: absoluteUrl("/blog") },
     ],
-    links: [{ rel: "canonical", href: "/blog" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/blog") }],
     scripts: [
       {
         type: "application/ld+json",

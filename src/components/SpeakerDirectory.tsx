@@ -3,11 +3,21 @@ import { SpeakerCard } from "./SpeakerCard";
 import type { Speaker } from "@/data/speakers";
 import { topics as allTopics } from "@/data/speakers";
 
+/**
+ * Match when the speaker's band overlaps the filter band at all.
+ *
+ * Testing fee_max on one band and fee_min on the others used to drop anyone
+ * straddling a boundary — a $9k–$13k speaker matched neither "Under $10k" nor
+ * "$10k – $20k" and was reachable only through "Any fee".
+ */
+const overlaps = (min: number, max: number) => (s: Speaker) =>
+  !s.fee_on_application && s.fee_min <= max && s.fee_max >= min;
+
 const feeBands = [
   { id: "any", label: "Any fee", test: () => true },
-  { id: "under-10", label: "Under $10k", test: (s: Speaker) => !s.fee_on_application && s.fee_max < 10000 },
-  { id: "10-20", label: "$10k – $20k", test: (s: Speaker) => !s.fee_on_application && s.fee_min >= 10000 && s.fee_min < 20000 },
-  { id: "20-plus", label: "$20k+", test: (s: Speaker) => !s.fee_on_application && s.fee_min >= 20000 },
+  { id: "under-10", label: "Under $10k", test: overlaps(0, 9999) },
+  { id: "10-20", label: "$10k – $20k", test: overlaps(10000, 19999) },
+  { id: "20-plus", label: "$20k+", test: overlaps(20000, Number.MAX_SAFE_INTEGER) },
 ];
 
 const selectClass =

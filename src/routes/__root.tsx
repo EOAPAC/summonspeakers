@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { OG_IMAGE, SITE_URL } from "../lib/site";
 
 function NotFoundComponent() {
   return (
@@ -85,7 +86,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:site_name", content: "SummonSpeakers" },
       { property: "og:type", content: "website" },
+      // Inherited by every page, so a share card renders whatever gets posted.
+      // Child routes override og:url and og:title; this stays put.
+      { property: "og:image", content: OG_IMAGE },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      {
+        property: "og:image:alt",
+        content: "SummonSpeakers — book keynote speakers with fees shown upfront",
+      },
+      { property: "og:url", content: SITE_URL },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: OG_IMAGE },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

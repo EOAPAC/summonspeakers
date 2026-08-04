@@ -6,10 +6,11 @@ import { ClosingCta } from "@/components/ClosingCta";
 import { ButtonLink } from "@/components/Button";
 import { getTopic, speakersByTopic } from "@/data/speakers";
 import { feeAnswerForTopic } from "@/data/fees";
+import { absoluteUrl } from "@/lib/site";
 
 function faqsFor(name: string) {
   const lower = name.toLowerCase();
-  const feeAnswer = feeAnswerForTopic(name, lower);
+  const feeAnswer = feeAnswerForTopic(name);
   return [
     ...(feeAnswer
       ? [{ q: `How much do ${lower} speakers cost?`, a: feeAnswer }]
@@ -41,9 +42,9 @@ export const Route = createFileRoute("/topics/$slug")({
         { name: "description", content: description },
         { property: "og:title", content: `${t.heading} | SummonSpeakers` },
         { property: "og:description", content: description },
-        { property: "og:url", content: `/topics/${params.slug}` },
+        { property: "og:url", content: absoluteUrl(`/topics/${params.slug}`) },
       ],
-      links: [{ rel: "canonical", href: `/topics/${params.slug}` }],
+      links: [{ rel: "canonical", href: absoluteUrl(`/topics/${params.slug}`) }],
       scripts: [
         {
           type: "application/ld+json",

@@ -3,6 +3,7 @@ import { Page, FAQ, faqJsonLd, Eyebrow } from "@/components/Page";
 import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { ClosingCta } from "@/components/ClosingCta";
 import { feeTiers, feeColumns } from "@/data/fees";
+import { absoluteUrl } from "@/lib/site";
 
 const faqs = [
   {
@@ -41,9 +42,9 @@ export const Route = createFileRoute("/speaker-fees")({
         property: "og:description",
         content: "A published fee guide by speaker tier and topic. No sales call required.",
       },
-      { property: "og:url", content: "/speaker-fees" },
+      { property: "og:url", content: absoluteUrl("/speaker-fees") },
     ],
-    links: [{ rel: "canonical", href: "/speaker-fees" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/speaker-fees") }],
     scripts: [
       {
         type: "application/ld+json",
