@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# A newer push to the same branch makes the in-flight run redundant.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      # Vite 8 needs 20.19+/22.12+; package.json pins the floor.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # --frozen-lockfile so a stale bun.lock fails the run rather than being
+      # silently updated, which is the whole point of committing it.
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Typecheck
+        run: bunx tsc --noEmit
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Build
+        run: bun run build
+
+      # The roster module is ~180KB and server-only. If it ever reaches the
+      # client bundle every visitor downloads it, and nothing else would catch
+      # that — the build succeeds either way.
+      - name: Assert the roster stays out of the client bundle
+        run: |
+          if grep -rlq "Aarathi Arumugam" .vercel/output/static/; then
+            echo "::error::Roster data leaked into the client bundle."
+            grep -rl "Aarathi Arumugam" .vercel/output/static/
+            exit 1
+          fi
+          echo "Roster data absent from .vercel/output/static — ok"
+
+      # A VITE_-prefixed variable is inlined into the client bundle, so reading
+      # one is the same as publishing it. Checking the runner's environment would
+      # be vacuous — it never holds the deployment's vars — so this checks what
+      # the source actually reads, which is the realistic way a secret ends up
+      # with the wrong prefix.
+      - name: Assert the source reads no VITE_ variable except VITE_SITE_URL
+        run: |
+          offenders=$(grep -rhoE 'VITE_[A-Z0-9_]+' src/ scripts/ \
+            | sort -u | grep -vxE 'VITE_SITE_URL' || true)
+          if [ -n "$offenders" ]; then
+            echo "::error::A VITE_ variable other than VITE_SITE_URL is read by the source."
+            echo "$offenders"
+            echo "That prefix publishes the value in the client bundle. Drop the prefix"
+            echo "and read it from a server function instead."
+            exit 1
+          fi
+          echo "Source reads only VITE_SITE_URL — ok"
