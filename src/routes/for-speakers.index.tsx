@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Page, Eyebrow } from "@/components/Page";
 import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { ButtonLink } from "@/components/Button";
-import { absoluteUrl } from "@/lib/site";
+import { absoluteUrl, ogImageMeta } from "@/lib/site";
 
 const benefits = [
   {
@@ -43,11 +43,11 @@ const steps = [
 export const Route = createFileRoute("/for-speakers/")({
   head: () => ({
     meta: [
-      { title: "Get booked for more paid speaking engagements | SummonSpeakers" },
+      { title: "Get Booked for Paid Speaking | SummonSpeakers" },
       {
         name: "description",
         content:
-          "List with SummonSpeakers: a profile that ranks in search, direct enquiries from event planners, and no commission taken from your fee.",
+          "List with SummonSpeakers: a profile built to rank in search, direct enquiries from event planners with the budget attached, and no commission on your fee.",
       },
       { property: "og:title", content: "For speakers | SummonSpeakers" },
       {
@@ -55,6 +55,7 @@ export const Route = createFileRoute("/for-speakers/")({
         content: "Direct enquiries, published fees, no bureau taking a percentage.",
       },
       { property: "og:url", content: absoluteUrl("/for-speakers") },
+      ...ogImageMeta("for-speakers"),
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/for-speakers") }],
     scripts: [

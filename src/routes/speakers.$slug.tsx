@@ -7,7 +7,7 @@ import { ButtonLink } from "@/components/Button";
 import { SpeakerCard } from "@/components/SpeakerCard";
 import { getSpeaker, speakers, type Speaker } from "@/data/speakers";
 import { formatFee } from "@/lib/fee";
-import { absoluteUrl } from "@/lib/site";
+import { absoluteUrl, pageTitle, ogImageMeta } from "@/lib/site";
 
 function faqsFor(name: string, fee: string) {
   return [
@@ -39,15 +39,26 @@ export const Route = createFileRoute("/speakers/$slug")({
     }
     const s = loaderData.speaker;
     const fee = formatFee(s.fee_min, s.fee_max, s.fee_on_application);
-    const description = `${s.name} — ${s.role}. Speaking fee ${fee}. ${s.tagline} Enquire directly, no bureau markup.`;
+    const description =
+      `${s.name}, ${s.role.toLowerCase()}. Published speaking fee ${fee}. ${s.tagline}`.slice(
+        0,
+        158,
+      );
     return {
       meta: [
-        { title: `${s.name} — ${s.role} (${fee}) | SummonSpeakers` },
+        {
+          title: pageTitle(
+            `${s.name} — ${s.role} (${fee})`,
+            s.fee_on_application ? `${s.name} — Keynote Speaker` : `${s.name} — Fee ${fee}`,
+            s.name,
+          ),
+        },
         { name: "description", content: description },
         { property: "og:title", content: `${s.name} — ${s.role}` },
         { property: "og:description", content: description },
         { property: "og:type", content: "profile" },
         { property: "og:url", content: absoluteUrl(`/speakers/${params.slug}`) },
+        ...ogImageMeta("speakers"),
       ],
       links: [{ rel: "canonical", href: absoluteUrl(`/speakers/${params.slug}`) }],
       scripts: [

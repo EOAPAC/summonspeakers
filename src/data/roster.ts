@@ -48,6 +48,12 @@ export type RosterPage = {
   total: number;
   page: number;
   pageCount: number;
+  /**
+   * Where the matching speakers are, biggest first. Real figures for the topic
+   * pages to quote — concrete numbers are what makes a category page worth
+   * citing rather than a list of names.
+   */
+  states: { name: string; count: number }[];
 };
 
 export const emptyFilters: RosterFilters = {
@@ -98,10 +104,21 @@ export function queryRoster(filters: RosterFilters): RosterPage {
   const page = Math.min(Math.max(1, filters.page), pageCount);
   const start = (page - 1) * size;
 
+  const stateCounts = new Map<string, number>();
+  for (const e of matches) {
+    for (const i of e.s) {
+      const name = rosterStates[i];
+      if (name) stateCounts.set(name, (stateCounts.get(name) ?? 0) + 1);
+    }
+  }
+
   return {
     total: matches.length,
     page,
     pageCount,
+    states: [...stateCounts.entries()]
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name)),
     rows: matches.slice(start, start + size).map((e) => ({
       name: e.name,
       slug: e.slug,

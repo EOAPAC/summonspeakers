@@ -8,7 +8,7 @@ import { ButtonLink } from "@/components/Button";
 import { getTopic, speakers } from "@/data/speakers";
 import type { RosterGender } from "@/data/roster";
 import { fetchRoster } from "@/lib/roster.server";
-import { absoluteUrl } from "@/lib/site";
+import { absoluteUrl, ogImageMeta } from "@/lib/site";
 
 const faqs = [
   {
@@ -74,7 +74,7 @@ export const Route = createFileRoute("/speakers/")({
     const total = loaderData?.roster.rosterCount ?? 0;
     const filtered = Object.keys(match.search).length > 0;
     const description = total
-      ? `Search ${total.toLocaleString("en-AU")} speakers by category, location and gender. Every full profile publishes a fee band, so you can shortlist inside your budget before contacting anyone.`
+      ? `Search ${total.toLocaleString("en-AU")} speakers by category, location and gender. Every full profile publishes a fee band, so you can shortlist on budget.`
       : "Search the SummonSpeakers roster by category, location and gender.";
     return {
       meta: [
@@ -86,6 +86,7 @@ export const Route = createFileRoute("/speakers/")({
           content: "Every speaker, every fee band, filterable in seconds.",
         },
         { property: "og:url", content: absoluteUrl("/speakers") },
+        ...ogImageMeta("speakers"),
         // Faceted views are near-duplicates of the base list; keep them
         // crawlable for discovery but out of the index.
         ...(filtered ? [{ name: "robots", content: "noindex,follow" }] : []),

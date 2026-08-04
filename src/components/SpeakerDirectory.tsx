@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { SpeakerCard } from "./SpeakerCard";
 import type { Speaker } from "@/data/speakers";
-import { topics as allTopics } from "@/data/speakers";
+import { featuredTopics as allTopics } from "@/data/speakers";
 
 /**
  * Match when the speaker's band overlaps the filter band at all.

@@ -18,5 +18,44 @@ export function absoluteUrl(path: string): string {
   return `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
-/** Social share card. Referenced from the root route so every page inherits it. */
-export const OG_IMAGE = absoluteUrl("/og-default.png");
+/** Fallback share card, inherited from the root route by anything without its own. */
+export const OG_IMAGE = absoluteUrl("/og/default.png");
+
+/**
+ * Per-page share card, pre-rendered by scripts/build-og-images.ts.
+ * Pass the card slug; unknown slugs would 404, so only pass ones the script emits.
+ */
+export function ogImage(slug: string): string {
+  return absoluteUrl(`/og/${slug}.png`);
+}
+
+/** The three og:image tags a page needs, so callers cannot set width without height. */
+export function ogImageMeta(slug: string) {
+  const url = ogImage(slug);
+  return [
+    { property: "og:image", content: url },
+    { property: "og:image:width", content: "1200" },
+    { property: "og:image:height", content: "630" },
+    { name: "twitter:image", content: url },
+  ];
+}
+
+const BRAND = "SummonSpeakers";
+/** Google truncates around 60 characters; past that the tail is wasted. */
+const TITLE_LIMIT = 60;
+
+/**
+ * Compose "<lead> | SummonSpeakers", falling back through shorter leads until
+ * one fits. Data-driven titles blow the limit unpredictably — a speaker's name
+ * plus their role plus a fee band ran to 92 characters — so the caller supplies
+ * candidates from most to least informative and this picks the best that fits.
+ */
+export function pageTitle(...leads: string[]): string {
+  const suffix = ` | ${BRAND}`;
+  for (const lead of leads) {
+    if (lead && lead.length + suffix.length <= TITLE_LIMIT) return lead + suffix;
+  }
+  // Nothing fit: trim the last (shortest) candidate rather than drop the brand.
+  const last = leads[leads.length - 1] ?? BRAND;
+  return last.slice(0, TITLE_LIMIT - suffix.length - 1).trimEnd() + "…" + suffix;
+}

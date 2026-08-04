@@ -5,7 +5,7 @@ import { ButtonLink } from "@/components/Button";
 import { ClosingCta } from "@/components/ClosingCta";
 import { ROSTER_COUNT } from "@/data/roster-facets";
 import { speakers } from "@/data/speakers";
-import { absoluteUrl } from "@/lib/site";
+import { absoluteUrl, ogImageMeta } from "@/lib/site";
 
 const values = [
   {
@@ -56,6 +56,7 @@ export const Route = createFileRoute("/about")({
         content: "Trust is the product. Why we publish every speaker fee upfront.",
       },
       { property: "og:url", content: absoluteUrl("/about") },
+      ...ogImageMeta("about"),
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/about") }],
     scripts: [

@@ -13,19 +13,53 @@ import {
   type TopicDef,
 } from "@/data/speakers";
 import { feeAnswerForTopic } from "@/data/fees";
+import type { RosterPage } from "@/data/roster";
 import { fetchRoster } from "@/lib/roster.server";
-import { absoluteUrl } from "@/lib/site";
+import { SITE_URL, absoluteUrl, ogImageMeta, pageTitle } from "@/lib/site";
 
 /** Roster speakers shown inline. The rest are one click away on /speakers. */
 const PREVIEW_SIZE = 24;
 
-function faqsFor(name: string) {
+/**
+ * Every answer is grounded in data on the page — the roster count, the real
+ * state breakdown, the published bands — so nothing here is a claim we cannot
+ * substantiate from src/data.
+ */
+function faqsFor(name: string, roster: RosterPage | null) {
   const feeAnswer = feeAnswerForTopic(name);
+  const phrase = topicPhrase(name);
+  const singular = topicPhraseSingular(name);
+  const top = roster?.states.slice(0, 3) ?? [];
+
   return [
-    ...(feeAnswer ? [{ q: `How much do ${topicPhrase(name)} cost?`, a: feeAnswer }] : []),
+    ...(feeAnswer ? [{ q: `How much do ${phrase} cost?`, a: feeAnswer }] : []),
     {
-      q: `How do I book a ${topicPhraseSingular(name)}?`,
+      q: `How do I book a ${singular}?`,
       a: `Send an enquiry with your date, audience size and theme. We confirm availability and the exact fee within one business day, then you book directly through us. There is no bureau markup, and cancellation is free up to 14 days before your event.`,
+    },
+    ...(roster && roster.total > 0
+      ? [
+          {
+            q: `How many ${phrase} are on SummonSpeakers?`,
+            a: `${roster.total.toLocaleString("en-AU")} ${phrase} are listed. You can filter them by location and gender on the roster, and every speaker with a full profile publishes a fee band rather than quoting on application.`,
+          },
+        ]
+      : []),
+    ...(top.length
+      ? [
+          {
+            q: `Where are your ${phrase} based?`,
+            a: `Most are in ${top.map((t) => `${t.name} (${t.count})`).join(", ")}. Travel and accommodation outside a speaker's home state are quoted separately at cost, so booking locally is usually the cheaper option.`,
+          },
+        ]
+      : []),
+    {
+      q: `Can ${phrase} present virtually?`,
+      a: `Many can. A virtual keynote is usually priced at roughly half to two-thirds of the same speaker's in-person band, because there is no travel and less time away. Say in your enquiry that the session is virtual and we will confirm who is set up for it.`,
+    },
+    {
+      q: `How quickly will I get a shortlist?`,
+      a: `Within one business day. The shortlist names specific ${phrase}, states each fee, and says plainly when someone sits outside your budget rather than letting you find out later.`,
     },
   ];
 }
@@ -87,11 +121,19 @@ export const Route = createFileRoute("/topics/$slug")({
       : `${t.heading} with fees shown upfront. Compare fee bands, topics and availability, then book directly with no bureau markup.`;
     return {
       meta: [
-        { title: `${t.heading} — fees shown upfront | SummonSpeakers` },
+        {
+          title: pageTitle(
+            `${t.heading} — Fees Shown Upfront`,
+            `${t.heading} — Published Fees`,
+            t.heading,
+          ),
+        },
         { name: "description", content: description },
         { property: "og:title", content: `${t.heading} | SummonSpeakers` },
         { property: "og:description", content: description },
         { property: "og:url", content: absoluteUrl(`/topics/${params.slug}`) },
+        // Each category has its own pre-rendered card naming the category.
+        ...ogImageMeta(`topic-${params.slug}`),
       ],
       links: [{ rel: "canonical", href: absoluteUrl(`/topics/${params.slug}`) }],
       scripts: [
@@ -105,7 +147,35 @@ export const Route = createFileRoute("/topics/$slug")({
             ]),
           ),
         },
-        { type: "application/ld+json", children: JSON.stringify(faqJsonLd(faqsFor(t.name))) },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify(faqJsonLd(faqsFor(t.name, loaderData.roster))),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            name: t.heading,
+            description,
+            url: absoluteUrl(`/topics/${params.slug}`),
+            isPartOf: { "@type": "WebSite", name: "SummonSpeakers", url: SITE_URL },
+            ...(total
+              ? {
+                  mainEntity: {
+                    "@type": "ItemList",
+                    name: t.heading,
+                    numberOfItems: total,
+                    itemListElement: (loaderData.roster?.rows ?? []).slice(0, 24).map((r, i) => ({
+                      "@type": "ListItem",
+                      position: i + 1,
+                      item: { "@type": "Person", name: r.name, knowsAbout: r.categories },
+                    })),
+                  },
+                }
+              : {}),
+          }),
+        },
       ],
     };
   },
@@ -130,10 +200,32 @@ function TopicPage() {
         <h1 className="display max-w-[16ch] text-[length:var(--display-lg)]">{topic.heading}</h1>
         <p className="mt-8 max-w-[64ch] text-lg text-[var(--ink-2)]">{topic.blurb}</p>
         {roster && roster.total > 0 && (
-          <p className="label-mono mt-8 text-[var(--ink-3)]">
-            {roster.total.toLocaleString("en-AU")} {phrase.toUpperCase()} · {speakers.length} WITH
-            PUBLISHED FEES
-          </p>
+          <dl className="mt-10 grid gap-8 border-t border-[var(--line)] pt-8 sm:grid-cols-3">
+            <div>
+              <dt className="label-mono text-[var(--ink-3)]">On the roster</dt>
+              <dd className="mt-3 text-2xl font-semibold tracking-[-0.03em]">
+                {roster.total.toLocaleString("en-AU")}
+              </dd>
+            </div>
+            {/* Omitted rather than shown as a zero on the imported categories,
+                none of which has a full profile yet. */}
+            {speakers.length > 0 && (
+              <div>
+                <dt className="label-mono text-[var(--ink-3)]">Fees published</dt>
+                <dd className="mt-3 text-2xl font-semibold tracking-[-0.03em]">
+                  {speakers.length}
+                </dd>
+              </div>
+            )}
+            {roster.states[0] && (
+              <div>
+                <dt className="label-mono text-[var(--ink-3)]">Most based in</dt>
+                <dd className="mt-3 text-2xl font-semibold tracking-[-0.03em]">
+                  {roster.states[0].name} ({roster.states[0].count})
+                </dd>
+              </div>
+            )}
+          </dl>
         )}
       </section>
 
@@ -147,20 +239,27 @@ function TopicPage() {
         </div>
       </section>
 
-      <section className="container-x pb-24">
-        <Eyebrow>Fees published</Eyebrow>
-        <div className="mt-10">
-          <SpeakerDirectory speakers={speakers} lockedTopic={topic.name} />
-        </div>
-      </section>
+      {/* The 28 imported-category pages have no full profiles yet, and an empty
+          "0 speakers, widen your filters" block on each of them reads as broken. */}
+      {speakers.length > 0 && (
+        <section className="container-x pb-24">
+          <Eyebrow>Fees published</Eyebrow>
+          <div className="mt-10">
+            <SpeakerDirectory speakers={speakers} lockedTopic={topic.name} />
+          </div>
+        </section>
+      )}
 
       {roster && roster.rows.length > 0 && (
         <section className="rule-open container-x section-y">
-          <Eyebrow>Also on the roster</Eyebrow>
-          <h2 className="display mt-6 text-[length:var(--display-md)]">More {phrase}</h2>
+          <Eyebrow>{speakers.length > 0 ? "Also on the roster" : "On the roster"}</Eyebrow>
+          <h2 className="display mt-6 text-[length:var(--display-md)]">
+            {speakers.length > 0 ? `More ${phrase}` : `Browse all ${phrase}`}
+          </h2>
           <p className="mt-8 max-w-[58ch] text-[var(--ink-2)]">
-            These speakers are on our roster without a published fee band yet. Send an enquiry and
-            we confirm the exact fee within one business day.
+            {speakers.length > 0
+              ? "These speakers are on our roster without a published fee band yet. Send an enquiry and we confirm the exact fee within one business day."
+              : "Every speaker below is on our roster. None publishes a fee band yet, so send an enquiry and we confirm the exact fee within one business day."}
           </p>
           <div className="mt-10">
             <RosterRows rows={roster.rows} />
@@ -200,7 +299,7 @@ function TopicPage() {
       )}
 
       <section className="container-x pb-24">
-        <FAQ items={faqsFor(topic.name)} />
+        <FAQ items={faqsFor(topic.name, roster)} />
       </section>
 
       <ClosingCta />

@@ -3,7 +3,7 @@ import { Page } from "@/components/Page";
 import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { ClosingCta } from "@/components/ClosingCta";
 import { caseStudies } from "@/data/editorial";
-import { absoluteUrl } from "@/lib/site";
+import { absoluteUrl, ogImageMeta } from "@/lib/site";
 
 export const Route = createFileRoute("/case-studies/")({
   head: () => ({
@@ -20,6 +20,7 @@ export const Route = createFileRoute("/case-studies/")({
         content: "Real briefs, real speakers, real fees, and the time each booking took.",
       },
       { property: "og:url", content: absoluteUrl("/case-studies") },
+      ...ogImageMeta("case-studies"),
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/case-studies") }],
     scripts: [

@@ -4,7 +4,7 @@ import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { EnquiryFlow } from "@/components/EnquiryFlow";
 import { getSpeaker } from "@/data/speakers";
 import { fetchRosterSpeakerName } from "@/lib/roster.server";
-import { absoluteUrl } from "@/lib/site";
+import { absoluteUrl, ogImageMeta } from "@/lib/site";
 
 export const Route = createFileRoute("/get-matched")({
   // Omit the key when there is no speaker rather than defaulting to "" —
@@ -28,11 +28,11 @@ export const Route = createFileRoute("/get-matched")({
 
   head: () => ({
     meta: [
-      { title: "Get matched with speakers in one business day | SummonSpeakers" },
+      { title: "Get a Speaker Shortlist in 1 Day | SummonSpeakers" },
       {
         name: "description",
         content:
-          "Tell us about your event in about two minutes. We'll send a shortlist of matched speakers with fees within one business day. Free to enquire, no account needed.",
+          "Tell us about your event in two minutes. We send a shortlist of matched speakers, with fees, within one business day. Free, and no account needed.",
       },
       { property: "og:title", content: "Get matched | SummonSpeakers" },
       {
@@ -40,6 +40,7 @@ export const Route = createFileRoute("/get-matched")({
         content: "A shortlist of matched speakers, with fees, within one business day.",
       },
       { property: "og:url", content: absoluteUrl("/get-matched") },
+      ...ogImageMeta("get-matched"),
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/get-matched") }],
     scripts: [

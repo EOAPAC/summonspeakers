@@ -6,7 +6,7 @@ import { FeeBand } from "@/components/FeeBand";
 import { ClosingCta } from "@/components/ClosingCta";
 import { getCaseStudy, type CaseStudy } from "@/data/editorial";
 import { getSpeaker } from "@/data/speakers";
-import { absoluteUrl } from "@/lib/site";
+import { absoluteUrl, ogImageMeta, pageTitle } from "@/lib/site";
 
 export const Route = createFileRoute("/case-studies/$slug")({
   loader: ({ params }): { study: CaseStudy } => {
@@ -26,12 +26,13 @@ export const Route = createFileRoute("/case-studies/$slug")({
     const c = loaderData.study;
     return {
       meta: [
-        { title: `${c.headline} | SummonSpeakers` },
-        { name: "description", content: c.summary },
+        { title: pageTitle(c.headline, `${c.client} case study`) },
+        { name: "description", content: c.summary.slice(0, 158) },
         { property: "og:title", content: c.headline },
         { property: "og:description", content: c.summary },
         { property: "og:type", content: "article" },
         { property: "og:url", content: absoluteUrl(`/case-studies/${params.slug}`) },
+        ...ogImageMeta("case-studies"),
       ],
       links: [{ rel: "canonical", href: absoluteUrl(`/case-studies/${params.slug}`) }],
       scripts: [

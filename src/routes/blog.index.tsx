@@ -3,16 +3,16 @@ import { Page, Eyebrow } from "@/components/Page";
 import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { ClosingCta } from "@/components/ClosingCta";
 import { posts } from "@/data/editorial";
-import { absoluteUrl } from "@/lib/site";
+import { absoluteUrl, ogImageMeta } from "@/lib/site";
 
 export const Route = createFileRoute("/blog/")({
   head: () => ({
     meta: [
-      { title: "The journal — speaker fees, briefing and event planning | SummonSpeakers" },
+      { title: "Speaker Fees & Booking Guides | SummonSpeakers" },
       {
         name: "description",
         content:
-          "Cost guides, briefing notes and planning advice from the team that sees what speakers actually charge.",
+          "Cost guides, briefing notes and event planning advice from the team that sees what speakers actually charge. Written for the people who book the room.",
       },
       { property: "og:title", content: "The journal | SummonSpeakers" },
       {
@@ -20,6 +20,7 @@ export const Route = createFileRoute("/blog/")({
         content: "Notes on booking speakers well, from the people who publish the fees.",
       },
       { property: "og:url", content: absoluteUrl("/blog") },
+      ...ogImageMeta("blog"),
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/blog") }],
     scripts: [

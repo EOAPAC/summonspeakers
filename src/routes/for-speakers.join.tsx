@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Page } from "@/components/Page";
 import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { Button } from "@/components/Button";
-import { absoluteUrl } from "@/lib/site";
+import { absoluteUrl, ogImageMeta } from "@/lib/site";
 
 export const Route = createFileRoute("/for-speakers/join")({
   head: () => ({
@@ -20,6 +20,7 @@ export const Route = createFileRoute("/for-speakers/join")({
         content: "Create your speaker listing and start receiving direct enquiries.",
       },
       { property: "og:url", content: absoluteUrl("/for-speakers/join") },
+      ...ogImageMeta("for-speakers"),
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/for-speakers/join") }],
     scripts: [

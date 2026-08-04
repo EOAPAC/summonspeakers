@@ -4,7 +4,16 @@ import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { ButtonLink } from "@/components/Button";
 import { ClosingCta } from "@/components/ClosingCta";
 import { getPost, relatedPosts, type Post } from "@/data/editorial";
-import { absoluteUrl } from "@/lib/site";
+import { absoluteUrl, ogImageMeta, pageTitle } from "@/lib/site";
+
+/**
+ * Several deks are short enough to be truncated-looking in a SERP. Pad only the
+ * ones under the useful floor, and never past the point Google cuts.
+ */
+function metaDescription(dek: string): string {
+  const tail = " Published fee bands on every speaker profile.";
+  return (dek.length < 120 ? dek + tail : dek).slice(0, 158);
+}
 
 export const Route = createFileRoute("/blog/$slug")({
   loader: ({ params }): { post: Post } => {
@@ -24,12 +33,13 @@ export const Route = createFileRoute("/blog/$slug")({
     const p = loaderData.post;
     return {
       meta: [
-        { title: `${p.title} | SummonSpeakers` },
-        { name: "description", content: p.dek },
+        { title: pageTitle(p.title) },
+        { name: "description", content: metaDescription(p.dek) },
         { property: "og:title", content: p.title },
         { property: "og:description", content: p.dek },
         { property: "og:type", content: "article" },
         { property: "og:url", content: absoluteUrl(`/blog/${params.slug}`) },
+        ...ogImageMeta("blog"),
       ],
       links: [{ rel: "canonical", href: absoluteUrl(`/blog/${params.slug}`) }],
       scripts: [

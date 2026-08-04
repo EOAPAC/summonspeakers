@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Page, FAQ, faqJsonLd, Eyebrow } from "@/components/Page";
 import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { ClosingCta } from "@/components/ClosingCta";
-import { absoluteUrl } from "@/lib/site";
+import { absoluteUrl, ogImageMeta } from "@/lib/site";
 
 const steps = [
   {
@@ -57,6 +57,7 @@ export const Route = createFileRoute("/how-it-works")({
         content: "From brief to booking in four steps, with fees shown at every stage.",
       },
       { property: "og:url", content: absoluteUrl("/how-it-works") },
+      ...ogImageMeta("how-it-works"),
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/how-it-works") }],
     scripts: [

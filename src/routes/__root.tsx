@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { OG_IMAGE, SITE_URL } from "../lib/site";
+import { organisationJsonLd, webSiteJsonLd } from "../lib/schema";
 
 function NotFoundComponent() {
   return (
@@ -102,6 +103,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+    ],
+    // Sitewide entity data. Every page inherits it, which is what lets AI
+    // systems tie the individual pages back to one verifiable organisation.
+    scripts: [
+      { type: "application/ld+json", children: JSON.stringify(organisationJsonLd()) },
+      { type: "application/ld+json", children: JSON.stringify(webSiteJsonLd()) },
     ],
   }),
 

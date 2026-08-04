@@ -3,7 +3,7 @@ import { Page, FAQ, faqJsonLd, Eyebrow } from "@/components/Page";
 import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { ClosingCta } from "@/components/ClosingCta";
 import { feeTiers, feeColumns } from "@/data/fees";
-import { absoluteUrl } from "@/lib/site";
+import { absoluteUrl, ogImageMeta } from "@/lib/site";
 
 const faqs = [
   {
@@ -34,7 +34,7 @@ export const Route = createFileRoute("/speaker-fees")({
       {
         name: "description",
         content:
-          "Keynote speaker fees by tier and topic, published in plain numbers. Emerging speakers from $3k, established from $9k, celebrity names from $35k. No fee on application.",
+          "Keynote speaker fees by tier and topic, in plain numbers. Emerging from $3,000, established from $9,000, celebrity names from $35,000. No fee on application.",
       },
       { property: "og:title", content: "How much does a keynote speaker cost?" },
       {
@@ -42,6 +42,7 @@ export const Route = createFileRoute("/speaker-fees")({
         content: "A published fee guide by speaker tier and topic. No sales call required.",
       },
       { property: "og:url", content: absoluteUrl("/speaker-fees") },
+      ...ogImageMeta("speaker-fees"),
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/speaker-fees") }],
     scripts: [
