@@ -1,0 +1,339 @@
+/**
+ * Generates the placeholder portraits for the 12 full-profile speakers via
+ * Runware, writing WEBP files into public/speakers/ and a manifest the
+ * components read.
+ *
+ * Run once, commit the output. Same reasoning as build-og-images.ts: this is
+ * SSR, so calling an image API per request would be a per-visitor cost for an
+ * asset that never changes.
+ *
+ *   RUNWARE_API_KEY=... bun run build:portraits
+ *   bun run build:portraits --dry-run     # print prompts, call nothing
+ *   bun run build:portraits --force       # regenerate files that already exist
+ *   bun run build:portraits --only=daniel-hsu,priya-raman
+ *
+ * ── Why there are no reference images here ──────────────────────────────────
+ * These twelve are invented personas, not real people, so every prompt is
+ * text-only. Nothing conditions on a photograph of anyone, which means no real
+ * person's likeness can come out the other end. Do not add referenceImages,
+ * ipAdapters or photoMaker to this script: those exist to reproduce a specific
+ * real face, and pointing them at a named individual is a different activity
+ * with different consent requirements. If a real speaker joins the roster and
+ * wants a portrait, take the photo they supply.
+ *
+ * ── Why nothing is inferred from a surname ──────────────────────────────────
+ * The briefs below deliberately carry no ethnicity or appearance guesses read
+ * off a name. Where a persona's presentation matters it is stated explicitly in
+ * the brief by a human, and the only demographic signal taken from the repo is
+ * the "Female speakers" topic tag, which is authored data. Everything else is
+ * left to the model.
+ */
+
+import { mkdir, readdir, writeFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+
+import { speakers } from "../src/data/speakers";
+
+const API = "https://api.runware.ai/v1";
+const MODEL = "runware:100@1";
+const OUT_DIR = join(import.meta.dir, "..", "public", "speakers");
+const MANIFEST = join(import.meta.dir, "..", "src", "data", "speaker-portraits.ts");
+
+/** 4:5, and both multiples of 64 as the API requires. */
+const WIDTH = 1024;
+const HEIGHT = 1280;
+
+const MAX_RETRIES = 3;
+
+type Brief = {
+  /** Wardrobe and setting, chosen to suit the speaking topic. */
+  setting: string;
+  /**
+   * Optional explicit presentation notes. Left undefined for most personas so
+   * the model decides; fill one in by hand if a specific persona is wanted.
+   */
+  presentation?: string;
+};
+
+/**
+ * Per-persona direction. Keyed by slug so a missing entry is a loud failure
+ * rather than a silently generic portrait.
+ */
+const BRIEFS: Record<string, Brief> = {
+  "dr-maya-ellison": { setting: "charcoal blazer, plain mid-grey studio backdrop" },
+  "james-okoro": { setting: "open-collar navy shirt, softly blurred arena interior" },
+  "sarah-lindqvist": { setting: "minimal black roll-neck, cool pale-grey studio backdrop" },
+  "priya-raman": { setting: "tailored deep-blue jacket, warm neutral studio backdrop" },
+  "michael-toure": { setting: "soft grey suit without a tie, plain warm-grey backdrop" },
+  "helena-brandt": { setting: "technical outdoor jacket, softly blurred cold daylight backdrop" },
+  "daniel-hsu": { setting: "slate crew-neck under a light jacket, cool neutral backdrop" },
+  "grace-oyelaran": { setting: "structured emerald jacket, plain warm-grey backdrop" },
+  "andres-molina": { setting: "light wool jacket over an open shirt, soft cream backdrop" },
+  "nina-castellan": { setting: "broadcast-ready dark jacket, softly blurred stage lighting" },
+  "omar-haddad": { setting: "crisp white shirt and dark jacket, plain neutral backdrop" },
+  "robert-ainsley": { setting: "formal dark suit and muted tie, deep grey studio backdrop" },
+};
+
+const NEGATIVE =
+  "cartoon, illustration, painting, 3d render, cgi, deformed, disfigured, extra fingers, " +
+  "extra limbs, blurry face, out of focus face, watermark, text, logo, signature, " +
+  "oversaturated, plastic skin, waxy skin, airbrushed, uncanny, two heads, crowd, " +
+  "multiple people, nsfw";
+
+/** "a" or "an", so roles like "inclusive leadership speaker" read correctly. */
+function article(phrase: string): string {
+  return /^[aeiou]/i.test(phrase) ? "an" : "a";
+}
+
+function prompt(slug: string, name: string, role: string, isFemale: boolean): string {
+  const brief = BRIEFS[slug];
+  if (!brief) throw new Error(`No portrait brief for "${slug}". Add one to BRIEFS.`);
+  const subject = brief.presentation ?? (isFemale ? "a woman" : "a man");
+  const roleText = role.toLowerCase();
+  return [
+    `professional corporate headshot photograph of ${subject}`,
+    `${article(roleText)} ${roleText}`,
+    brief.setting,
+    "head and shoulders, facing camera, calm confident expression, mouth closed",
+    "soft key light with a gentle fill, shallow depth of field",
+    "85mm portrait lens, natural skin texture with visible pores, photorealistic, editorial quality",
+  ].join(", ");
+}
+
+/**
+ * Deterministic per-slug seed, so a rerun reproduces the same faces and a
+ * regenerated set does not silently reshuffle who looks like whom.
+ */
+function seedFor(slug: string): number {
+  let h = 2166136261;
+  for (const ch of slug) {
+    h ^= ch.charCodeAt(0);
+    h = Math.imul(h, 16777619);
+  }
+  return Math.abs(h) % 2_147_483_647;
+}
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+type Generated = { imageURL: string; cost: number };
+
+async function generate(key: string, body: unknown, label: string): Promise<Generated> {
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    let res: Response;
+    try {
+      res = await fetch(API, {
+        method: "POST",
+        headers: { "content-type": "application/json", authorization: `Bearer ${key}` },
+        body: JSON.stringify(body),
+      });
+    } catch (cause) {
+      // A network-level failure is worth one more try; a blocked host is not
+      // going to unblock itself, so say which it looked like.
+      if (attempt === MAX_RETRIES) {
+        throw new Error(
+          `${label}: could not reach ${API} after ${MAX_RETRIES} attempts. ` +
+            `If this is a 403 on CONNECT, the host is blocked by egress policy — ` +
+            `run this where api.runware.ai is reachable.`,
+          { cause },
+        );
+      }
+      await sleep(2000 * 2 ** (attempt - 1));
+      continue;
+    }
+
+    if (res.status === 429 || res.status >= 500) {
+      if (attempt === MAX_RETRIES)
+        throw new Error(`${label}: ${res.status} after ${MAX_RETRIES} attempts`);
+      // Honour Retry-After when the API sends one rather than guessing.
+      const retryAfter = Number(res.headers.get("retry-after"));
+      await sleep(
+        Number.isFinite(retryAfter) && retryAfter > 0
+          ? retryAfter * 1000
+          : 2000 * 2 ** (attempt - 1),
+      );
+      continue;
+    }
+
+    const text = await res.text();
+    if (!res.ok) throw new Error(`${label}: ${res.status} ${text.slice(0, 400)}`);
+
+    const json = JSON.parse(text) as {
+      data?: { imageURL?: string; cost?: number; NSFWContent?: boolean }[];
+      errors?: { message?: string }[];
+    };
+    if (json.errors?.length) {
+      throw new Error(`${label}: ${json.errors.map((e) => e.message ?? "unknown").join("; ")}`);
+    }
+    const first = json.data?.[0];
+    if (!first?.imageURL) throw new Error(`${label}: response carried no imageURL`);
+    if (first.NSFWContent) throw new Error(`${label}: flagged NSFW, not saved`);
+    return { imageURL: first.imageURL, cost: first.cost ?? 0 };
+  }
+  throw new Error(`${label}: exhausted retries`);
+}
+
+async function download(url: string, dest: string, label: string): Promise<number> {
+  // Re-hosted rather than hotlinked: the Runware URL is temporary, and the
+  // site should not depend on a third party staying up to render a face.
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`${label}: download failed with ${res.status}`);
+  const bytes = new Uint8Array(await res.arrayBuffer());
+  await writeFile(dest, bytes);
+  return bytes.byteLength;
+}
+
+/** Extensions a portrait may have. WEBP is what this script writes; the others
+ *  are here so a photo supplied by a real speaker can be dropped in as-is. */
+const IMAGE_EXT = [".webp", ".png", ".jpg", ".jpeg", ".avif"];
+
+async function writeManifest(): Promise<number> {
+  const files = existsSync(OUT_DIR) ? await readdir(OUT_DIR) : [];
+  const entries = files
+    .filter((f) => IMAGE_EXT.some((e) => f.toLowerCase().endsWith(e)))
+    .sort()
+    .map((f) => [f.slice(0, f.lastIndexOf(".")), `/speakers/${f}`] as const);
+
+  // A file whose name matches no speaker is a typo'd slug, and it would sit
+  // there silently doing nothing. Say so rather than quietly ignoring it.
+  const known = new Set(speakers.map((s) => s.slug));
+  for (const [slug] of entries) {
+    if (!known.has(slug))
+      console.warn(`warn   ${slug} is not a speaker slug — no profile will use it`);
+  }
+
+  await writeFile(
+    MANIFEST,
+    `// GENERATED by scripts/build-speaker-portraits.ts — do not edit by hand.
+// Regenerate with: bun run build:portraits --manifest-only
+//
+// Small on purpose: safe to import from client components. Maps the speakers
+// that have a portrait in public/speakers/ to its path, so a profile without one
+// renders the hatch placeholder during SSR rather than a broken image.
+
+const PORTRAITS: Readonly<Record<string, string>> = ${JSON.stringify(
+      Object.fromEntries(entries),
+      null,
+      2,
+    )};
+
+/** Public path to a speaker's portrait, or null when there is not one yet. */
+export function portraitFor(slug: string): string | null {
+  return PORTRAITS[slug] ?? null;
+}
+
+/**
+ * Alt text for a generated portrait. Says the image is generated, because these
+ * twelve profiles are placeholders and the face belongs to nobody.
+ */
+export function portraitAlt(name: string): string {
+  return \`Portrait of \${name}, keynote speaker (AI-generated placeholder image)\`;
+}
+
+export const PORTRAIT_COUNT = ${entries.length};
+`,
+  );
+  return entries.length;
+}
+
+async function main(): Promise<void> {
+  const args = process.argv.slice(2);
+  const dryRun = args.includes("--dry-run");
+  const force = args.includes("--force");
+  const onlyArg = args.find((a) => a.startsWith("--only="));
+  const only = onlyArg ? new Set(onlyArg.slice("--only=".length).split(",")) : null;
+
+  // Rebuilds the manifest from whatever is already in public/speakers/ without
+  // generating anything. Needed because the portraits may not come from this
+  // script at all — a real speaker's own photo, or another image API.
+  if (args.includes("--manifest-only")) {
+    const n = await writeManifest();
+    console.log(`${n} portrait(s) in the manifest`);
+    return;
+  }
+
+  const key = process.env["RUNWARE_API_KEY"];
+  if (!key && !dryRun) {
+    console.error(
+      "RUNWARE_API_KEY is not set.\n\n" +
+        "This script only needs the key where it runs — the generated files are\n" +
+        "committed, so the deployed site never calls Runware. Export it for one run:\n\n" +
+        "  RUNWARE_API_KEY=... bun run build:portraits\n\n" +
+        "Use --dry-run to check the prompts without a key.",
+    );
+    process.exit(1);
+  }
+
+  await mkdir(OUT_DIR, { recursive: true });
+
+  const targets = speakers.filter((s) => !only || only.has(s.slug));
+  if (only) {
+    const unknown = [...only].filter((s) => !speakers.some((sp) => sp.slug === s));
+    if (unknown.length) throw new Error(`--only named unknown slugs: ${unknown.join(", ")}`);
+  }
+
+  let made = 0;
+  let skipped = 0;
+  let totalCost = 0;
+  const failures: string[] = [];
+
+  for (const s of targets) {
+    const dest = join(OUT_DIR, `${s.slug}.webp`);
+    if (existsSync(dest) && !force) {
+      skipped++;
+      console.log(`skip   ${s.slug} (exists — pass --force to redo)`);
+      continue;
+    }
+
+    const isFemale = s.topics.includes("Female speakers");
+    const positivePrompt = prompt(s.slug, s.name, s.role, isFemale);
+    const seed = seedFor(s.slug);
+
+    if (dryRun) {
+      console.log(`\n── ${s.slug}  (seed ${seed})\n${positivePrompt}`);
+      made++;
+      continue;
+    }
+
+    const body = [
+      {
+        taskType: "imageInference",
+        taskUUID: crypto.randomUUID(),
+        model: MODEL,
+        positivePrompt,
+        negativePrompt: NEGATIVE,
+        width: WIDTH,
+        height: HEIGHT,
+        numberResults: 1,
+        outputType: "URL",
+        outputFormat: "WEBP",
+        includeCost: true,
+        checkNSFW: true,
+        seed,
+      },
+    ];
+
+    try {
+      const { imageURL, cost } = await generate(key as string, body, s.slug);
+      const bytes = await download(imageURL, dest, s.slug);
+      totalCost += cost;
+      made++;
+      console.log(`ok     ${s.slug}  ${(bytes / 1024).toFixed(0)}KB  $${cost.toFixed(4)}`);
+    } catch (err) {
+      failures.push(`${s.slug}: ${err instanceof Error ? err.message : String(err)}`);
+      console.error(`FAIL   ${s.slug}: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+
+  const inManifest = dryRun ? -1 : await writeManifest();
+
+  console.log(
+    `\n${dryRun ? "[dry run] " : ""}${made} generated, ${skipped} skipped, ${failures.length} failed` +
+      (dryRun ? "" : `\n${inManifest} portrait(s) in the manifest, $${totalCost.toFixed(4)} spent`),
+  );
+
+  // A partial run should not look like a clean one to CI or to a human skimming.
+  if (failures.length) process.exit(1);
+}
+
+await main();

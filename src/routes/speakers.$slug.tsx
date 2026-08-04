@@ -5,6 +5,7 @@ import { FeeBand } from "@/components/FeeBand";
 import { Pill } from "@/components/Pill";
 import { ButtonLink } from "@/components/Button";
 import { SpeakerCard } from "@/components/SpeakerCard";
+import { Portrait } from "@/components/Portrait";
 import { getSpeaker, speakers, type Speaker } from "@/data/speakers";
 import { formatFee } from "@/lib/fee";
 import { absoluteUrl, pageTitle, ogImageMeta } from "@/lib/site";
@@ -129,9 +130,13 @@ function SpeakerProfile() {
       />
 
       <section className="container-x grid gap-12 pb-16 pt-10 md:grid-cols-[1fr_1fr] md:items-start">
-        <div className="hatch aspect-[4/5] rounded-[var(--radius-media)]">
-          <span className="label-mono block p-6 text-[var(--ink-2)]">{s.name}</span>
-        </div>
+        <Portrait
+          slug={s.slug}
+          name={s.name}
+          className="aspect-[4/5] w-full rounded-[var(--radius-media)]"
+          fallbackLabel={s.name}
+          sizes="(min-width: 768px) 50vw, 100vw"
+        />
         <div>
           <h1 className="display text-[length:var(--display-md)]">{s.name}</h1>
           <p className="mt-6 text-xl tracking-[-0.02em] text-[var(--ink-2)]">{s.tagline}</p>

@@ -128,6 +128,7 @@ should catch it.
 | ----------------------------------------------------------- | ---------------------------------------------------------- |
 | `src/data/roster.generated.ts`, `src/data/roster-facets.ts` | `bun run import:roster <csv>`                              |
 | `public/og/*.png`                                           | `bun run build:og`                                         |
+| `public/speakers/*`, `src/data/speaker-portraits.ts`        | `bun run build:portraits` (needs `RUNWARE_API_KEY`)        |
 | `public/favicon.ico`, `public/*icon*.png`                   | `bun run build:favicons` (edit `public/favicon.svg` first) |
 | `src/routeTree.gen.ts`                                      | the router plugin, on dev or build                         |
 
@@ -197,10 +198,17 @@ returns `{ ok: true }`. Both `/get-matched` and `/for-speakers/join` show a
 success state without persisting anything or sending any email. Every enquiry
 submitted to the live site so far is gone.
 
-**No speaker portraits.** Every card and profile renders the `hatch`
-placeholder. A `RUNWARE_API_KEY` is set in Vercel but nothing reads it. If it
-gets wired up, generate images once into `public/` rather than calling the API
-per request; this is SSR, so a per-request call is a per-visitor cost.
+**No speaker portraits, though the wiring exists.** `Portrait.tsx` reads
+`src/data/speaker-portraits.ts` and renders an `<img>` when a speaker has one,
+`hatch` when not. The manifest is currently empty, so all 12 profiles show
+`hatch`. `bun run build:portraits` generates them via Runware.
+
+Two things about that script. It needs `RUNWARE_API_KEY` and network access to
+`api.runware.ai` **only where it runs** — the output is committed, so the
+deployed site never calls Runware and the key does not need to be in Vercel or
+Supabase at all. And it is text-prompt only: the 12 profiles are invented
+personas, so nothing conditions on a photograph of a real person. Do not add
+`referenceImages`, `ipAdapters` or `photoMaker` pointed at a named individual.
 
 **`/about` claims a "4.9 average event rating" with no source.** Either find the
 data or remove the number.
