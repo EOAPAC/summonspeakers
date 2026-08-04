@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SpeakersRouteImport } from './routes/speakers'
 import { Route as SpeakersIndexRouteImport } from './routes/speakers.index'
+import { Route as SpeakersSlugRouteImport } from './routes/speakers.$slug'
+import { Route as TopicsSlugRouteImport } from './routes/topics.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,33 +30,57 @@ const SpeakersIndexRoute = SpeakersIndexRouteImport.update({
   path: '/',
   getParentRoute: () => SpeakersRoute,
 } as any)
+const SpeakersSlugRoute = SpeakersSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => SpeakersRoute,
+} as any)
+const TopicsSlugRoute = TopicsSlugRouteImport.update({
+  id: '/topics/$slug',
+  path: '/topics/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/speakers': typeof SpeakersRouteWithChildren
+  '/speakers/$slug': typeof SpeakersSlugRoute
+  '/topics/$slug': typeof TopicsSlugRoute
   '/speakers/': typeof SpeakersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/speakers/$slug': typeof SpeakersSlugRoute
+  '/topics/$slug': typeof TopicsSlugRoute
   '/speakers': typeof SpeakersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/speakers': typeof SpeakersRouteWithChildren
+  '/speakers/$slug': typeof SpeakersSlugRoute
+  '/topics/$slug': typeof TopicsSlugRoute
   '/speakers/': typeof SpeakersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/speakers' | '/speakers/'
+  fullPaths:
+    '/' | '/speakers' | '/speakers/$slug' | '/topics/$slug' | '/speakers/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/speakers'
-  id: '__root__' | '/' | '/speakers' | '/speakers/'
+  to: '/' | '/speakers/$slug' | '/topics/$slug' | '/speakers'
+  id:
+    | '__root__'
+    | '/'
+    | '/speakers'
+    | '/speakers/$slug'
+    | '/topics/$slug'
+    | '/speakers/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SpeakersRoute: typeof SpeakersRouteWithChildren
+  TopicsSlugRoute: typeof TopicsSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -80,14 +106,30 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SpeakersIndexRouteImport
       parentRoute: typeof SpeakersRoute
     }
+    '/speakers/$slug': {
+      id: '/speakers/$slug'
+      path: '/$slug'
+      fullPath: '/speakers/$slug'
+      preLoaderRoute: typeof SpeakersSlugRouteImport
+      parentRoute: typeof SpeakersRoute
+    }
+    '/topics/$slug': {
+      id: '/topics/$slug'
+      path: '/topics/$slug'
+      fullPath: '/topics/$slug'
+      preLoaderRoute: typeof TopicsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 interface SpeakersRouteChildren {
+  SpeakersSlugRoute: typeof SpeakersSlugRoute
   SpeakersIndexRoute: typeof SpeakersIndexRoute
 }
 
 const SpeakersRouteChildren: SpeakersRouteChildren = {
+  SpeakersSlugRoute: SpeakersSlugRoute,
   SpeakersIndexRoute: SpeakersIndexRoute,
 }
 
@@ -98,6 +140,7 @@ const SpeakersRouteWithChildren = SpeakersRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SpeakersRoute: SpeakersRouteWithChildren,
+  TopicsSlugRoute: TopicsSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
