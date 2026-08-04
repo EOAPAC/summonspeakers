@@ -5,7 +5,7 @@ import { FeeBand } from "@/components/FeeBand";
 import { Pill } from "@/components/Pill";
 import { ButtonLink } from "@/components/Button";
 import { SpeakerCard } from "@/components/SpeakerCard";
-import { getSpeaker, speakers } from "@/data/speakers";
+import { getSpeaker, speakers, type Speaker } from "@/data/speakers";
 import { formatFee } from "@/lib/fee";
 
 function faqsFor(name: string, fee: string) {
@@ -22,7 +22,7 @@ function faqsFor(name: string, fee: string) {
 }
 
 export const Route = createFileRoute("/speakers/$slug")({
-  loader: ({ params }) => {
+  loader: ({ params }): { speaker: Speaker } => {
     const speaker = getSpeaker(params.slug);
     if (!speaker) throw notFound();
     return { speaker };
