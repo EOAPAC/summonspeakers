@@ -10,7 +10,6 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
 import { OG_IMAGE, SITE_URL } from "../lib/site";
 import { organisationJsonLd, webSiteJsonLd } from "../lib/schema";
 
@@ -37,10 +36,12 @@ function NotFoundComponent() {
 }
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
-  console.error(error);
   const router = useRouter();
+  // Production React does not rethrow boundary-caught errors to window.onerror,
+  // so without this the failure leaves no trace at all. Logging in an effect
+  // rather than in render keeps it to once per error under StrictMode.
   useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
+    console.error(error);
   }, [error]);
 
   return (
@@ -102,7 +103,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      // SVG first for browsers that take it, .ico as the fallback. Both are
+      // generated from public/favicon.svg by scripts/build-favicons.ts.
+      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+      { rel: "icon", href: "/favicon.ico", sizes: "48x48" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png", sizes: "180x180" },
+      { rel: "manifest", href: "/site.webmanifest" },
     ],
     // Sitewide entity data. Every page inherits it, which is what lets AI
     // systems tie the individual pages back to one verifiable organisation.

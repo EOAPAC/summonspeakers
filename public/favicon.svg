@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="SummonSpeakers">
+  <rect width="512" height="512" fill="#fff"/>
+  <g fill="#000">
+    <!-- speaker -->
+    <circle cx="243" cy="140" r="57"/>
+    <path d="M155 285v-24a66 66 0 0 1 66-66h44a66 66 0 0 1 66 66v24z"/>
+    <!-- microphone on a boom arm -->
+    <circle cx="337" cy="152" r="26"/>
+    <path d="M330 166c30 15 51 44 54 79h-30c-3-24-17-44-38-54z"/>
+    <!-- lectern: desk bar with tapered ends -->
+    <path d="M78 262h356a10 10 0 0 1 9 14l-31 82h-33l18-68H97l18 68H82L51 276a10 10 0 0 1 9-14z"/>
+    <!-- lectern front panel -->
+    <path d="M176 296h160a12 12 0 0 1 12 13l-10 88a12 12 0 0 1-12 11H186a12 12 0 0 1-12-11l-10-88a12 12 0 0 1 12-13z"/>
+  </g>
+</svg>
