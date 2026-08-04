@@ -39,7 +39,7 @@ export function Portrait({
   return (
     <img
       src={src}
-      alt={portraitAlt(name)}
+      alt={portraitAlt(slug, name)}
       width={1024}
       height={1280}
       loading="lazy"

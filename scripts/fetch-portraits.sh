@@ -50,12 +50,13 @@ fi
 mkdir -p public/speakers
 
 echo "Downloading 12 portraits…"
-ok=0; fail=0
+ok=0; fail=0; got=()
 for pair in "${PAIRS[@]}"; do
   slug="${pair%%|*}"; file="${pair#*|}"
   dest="public/speakers/$slug.png"
   if curl -fsSL --retry 3 --retry-delay 2 --max-time 180 -o "$dest" "$CDN/$file"; then
     echo "  ok    $slug  ($(du -h "$dest" | cut -f1))"
+    got+=("$dest")
     ok=$((ok+1))
   else
     echo "  FAIL  $slug" >&2
@@ -76,7 +77,11 @@ fi
 # size the site displays them at.
 echo
 echo "Converting to WEBP…"
-bun run to:webp public/speakers --width=1024
+# Only the files just downloaded. The .plate.png monogram graphics in this
+# directory are flat art that lossy WEBP inflates rather than compresses, and
+# to:webp would correctly decline them — but there is no reason to spend a
+# Chromium launch each finding that out.
+bun run to:webp "${got[@]}" --width=1024
 
 echo
 echo "Wiring them up…"

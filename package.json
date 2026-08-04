@@ -17,6 +17,7 @@
     "build:og": "bun scripts/build-og-images.ts",
     "build:favicons": "bun scripts/build-favicons.ts",
     "build:portraits": "bun scripts/build-speaker-portraits.ts",
+    "build:plates": "bun scripts/build-speaker-plates.ts",
     "to:webp": "bun scripts/png-to-webp.ts",
     "import:roster": "bun scripts/import-roster.ts"
   },
