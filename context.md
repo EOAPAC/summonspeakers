@@ -3,7 +3,8 @@
 Reference material for the codebase. Read this before making changes. Behavioural
 rules live in `instructions.md`.
 
-Last verified against `main` at commit `abca09d`, 4 August 2026.
+Last verified against `main` at commit `2926959`, 4 August 2026, plus the
+Supabase backend work of 5 August 2026 (see Backend below).
 
 ## What the site is
 
@@ -75,7 +76,7 @@ third-party API key gets called from a server function. There is no need for an
 | `bun run dev`                 | Vite dev server                                      |
 | `bun run build`               | Production build to `.vercel/output`                 |
 | `bun run lint`                | eslint with prettier                                 |
-| `bun test`                    | 14 tests, bun's built-in runner                      |
+| `bun test`                    | 35 tests, bun's built-in runner                     |
 | `bun run import:roster <csv>` | Regenerates the roster from a CSV                    |
 | `bun run build:og`            | Rasterises the 44 OG cards via Chromium              |
 | `bun run build:favicons`      | Rasterises the favicon set from `public/favicon.svg` |
@@ -192,11 +193,6 @@ speaker imagery exists anywhere on the site.
 
 Read this before writing copy or making a claim on a page.
 
-**Enquiries are discarded.** `src/lib/enquiries.ts` validates, waits 600ms and
-returns `{ ok: true }`. Both `/get-matched` and `/for-speakers/join` show a
-success state without persisting anything or sending any email. Every enquiry
-submitted to the live site so far is gone.
-
 **No speaker portraits.** Every card and profile renders the `hatch`
 placeholder. A `RUNWARE_API_KEY` is set in Vercel but nothing reads it. If it
 gets wired up, generate images once into `public/` rather than calling the API
@@ -208,23 +204,55 @@ data or remove the number.
 **No client error telemetry.** The root error boundary logs to console. The
 previous reporting only worked inside the Lovable editor and was removed.
 
-**No database.** The Supabase project attached to the account is empty and
-nothing in the repo reads any `SUPABASE` variable. The two `VITE_SUPABASE_*`
-variables in Vercel are Lovable scaffold leftovers and should be deleted.
-
 **30 pages are under 800 words.** Thin content on pages that are meant to rank.
+
+## Backend (Supabase + Resend)
+
+Wired up 5 August 2026. Enquiries and speaker listings persist to Supabase and
+notify by email; see the Backend section in `AGENTS.md` for the module map.
+
+- **Schema and RLS** live in `supabase/migrations/`. Apply once per project
+  (SQL editor or `supabase db push`). The migration creates the README data
+  model — `speakers`, `topics`, `speaker_topics`, `testimonials`,
+  `past_clients`, `enquiries` — plus the `speaker-media` storage bucket.
+  Published speakers are publicly readable; enquiries are insert-only for
+  everyone but the service role; a signed-in speaker can write their own
+  listing but cannot promote it past `pending_review`.
+- **Auth** runs on `/for-speakers/join` via the browser client in
+  `src/lib/supabase-auth.ts` (Google, and `azure` for Microsoft). The listing
+  posts its access token and `submitListing` verifies it server-side, linking
+  the row to the speaker as `owner_id`. The email-only path creates an
+  unclaimed listing the admin chases. Planners never need an account.
+- **Email** is `src/lib/email.server.ts`, one POST to Resend. Best-effort
+  after the insert: a Resend outage must not lose a saved enquiry.
+- The site still renders from committed data. With the backend env vars
+  absent, pages render normally but submission endpoints throw — a loud
+  failure the form surfaces, not a fake success.
+- The two `VITE_SUPABASE_*` variables in Vercel were Lovable scaffold
+  leftovers; they are now load-bearing and need real values (anon key, not the
+  service key). The integration-managed duplicate key names stay as they are —
+  renaming breaks Supabase's rotation.
 
 ## Environment variables
 
-Only one is read by the code: `VITE_SITE_URL`, optional, no trailing slash,
-falling back to `https://summonspeakers.com`.
+`VITE_SITE_URL` — optional, no trailing slash, falling back to
+`https://summonspeakers.com`. `VITE_SUPABASE_URL` and
+`VITE_SUPABASE_ANON_KEY` — public by design; the anon key ships in every
+Supabase browser app and the RLS policies are the enforcement. These three are
+the only `VITE_` variables CI permits in `src/` or `scripts/`.
+
+Server-only, read from `process.env` inside server functions: `SUPABASE_URL`,
+`SUPABASE_SERVICE_ROLE_KEY` (secret, bypasses RLS), `RESEND_API_KEY` (secret),
+`RESEND_FROM`, `ADMIN_EMAIL`. The full list with placeholders is in
+`.env.example`.
 
 The `VITE_` prefix means Vite inlines the value into the client bundle at build
 time. Verified empirically on this repo: a build with `VITE_FAKE=x` puts `x`
 verbatim into `.vercel/output/static/assets/index-*.js`, while an unprefixed
-variable does not appear there at all. `VITE_SITE_URL` is prefixed deliberately
-because a public canonical URL is not a secret. CI asserts that no other `VITE_`
-variable is read anywhere in `src/` or `scripts/`.
+variable does not appear there at all. The service-role key and Resend key must
+stay unprefixed; verified again when the backend landed — a build holding fake
+values for both kept them out of `.vercel/output/static` while the anon key
+appeared, as designed.
 
 Set Node 22 in Vercel. Vite 8 needs 20.19+ or 22.12+, and `package.json` pins
 the floor at 22.12.
@@ -234,7 +262,8 @@ the floor at 22.12.
 |          |                                                                                                                                                                                 |
 | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Vercel   | Hosting, domain, DNS                                                                                                                                                            |
-| Supabase | Project exists, empty, unused by the code                                                                                                                                       |
+| Supabase | Database, auth and storage. Enquiries and listings persist here; schema in `supabase/migrations/`                                                                               |
+| Resend   | Transactional email: enquiry confirmation to the planner, notifications to `ADMIN_EMAIL`                                                                                        |
 | Runware  | Key set in Vercel, nothing reads it                                                                                                                                             |
 | Lovable  | Origin of the scaffold. `@lovable.dev/vite-tanstack-config` is still the build config. Its `gpt-engineer-app[bot]` still has push access to the repo and 102 commits on `main`. |
 
@@ -243,14 +272,16 @@ dependency, which is load-bearing.
 
 ## Outstanding items
 
-Code, decided but not built: persist enquiries, wire Runware, source or remove
+Code, decided but not built: wire Runware, source or remove
 the 4.9 rating, expand the 30 thin pages.
 
 Browser-only, cannot be done from a Claude Code session: flip the apex/www
 redirect, revoke Lovable's GitHub App, enable secret scanning and push
-protection, delete the two `VITE_SUPABASE_*` variables, set Node 22, enable
-branch protection requiring a PR and the `check` job, enable auto-delete of
-merged branches.
+protection, run `supabase/migrations/20260805000000_init.sql` against the
+project, set real values for the Supabase and Resend variables in Vercel
+(`.env.example` lists them), enable the Google and Azure auth providers, set
+Node 22, enable branch protection requiring a PR and the `check` job, enable
+auto-delete of merged branches.
 
 Decided and settled: keep both gender filter options (booking for a women's
 event is a real use case); leave the integration-managed duplicate key names
