@@ -16,6 +16,7 @@
     "format": "prettier --write .",
     "build:og": "bun scripts/build-og-images.ts",
     "build:favicons": "bun scripts/build-favicons.ts",
+    "build:portraits": "bun scripts/build-speaker-portraits.ts",
     "import:roster": "bun scripts/import-roster.ts"
   },
   "dependencies": {
