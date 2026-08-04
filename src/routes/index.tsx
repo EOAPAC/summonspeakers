@@ -117,24 +117,32 @@ function Home() {
         <ul className="mt-10 border-t border-[var(--line)]">
           {topics.map((t, i) => (
             <li key={t.slug} className="border-b border-[var(--line)]">
-              <Link
-                to="/topics/$slug"
-                params={{ slug: t.slug }}
-                className="group grid min-h-[88px] grid-cols-[auto_1fr_auto] items-center gap-6 py-6"
-              >
-                <span className="label-mono text-[var(--ink-3)]">
-                  {String(i + 1).padStart(2, "0")}
+            <Link
+              to="/topics/$slug"
+              params={{ slug: t.slug }}
+              className="group grid min-h-[88px] grid-cols-[auto_1fr_auto] items-center gap-6 py-6 md:grid-cols-[auto_1fr_1fr_auto] md:items-start md:gap-8"
+            >
+              <span className="label-mono text-[var(--ink-3)]">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span className="flex flex-col gap-1 md:hidden">
+                <span className="display inline-block text-[length:var(--display-md)] transition-transform duration-500 [transition-timing-function:var(--ease)] group-hover:translate-x-3">
+                  {t.name}
                 </span>
-                <span className="flex flex-col gap-1 md:flex-row md:items-baseline md:gap-8">
-                  <span className="display inline-block text-[length:var(--display-md)] transition-transform duration-500 [transition-timing-function:var(--ease)] group-hover:translate-x-3">
-                    {t.name}
-                  </span>
-                  <span className="max-w-[46ch] text-sm text-[var(--ink-2)]">{t.blurb.split(".")[0]}.</span>
+                <span className="max-w-[46ch] text-sm text-[var(--ink-2)]">
+                  {t.blurb.split(".")[0]}.
                 </span>
-                <span aria-hidden="true" className="text-2xl">
-                  →
-                </span>
-              </Link>
+              </span>
+              <span className="display hidden text-[length:var(--display-md)] transition-transform duration-500 [transition-timing-function:var(--ease)] group-hover:translate-x-3 md:block">
+                {t.name}
+              </span>
+              <span className="hidden max-w-[46ch] self-start pt-2 text-sm text-[var(--ink-2)] md:block">
+                {t.blurb.split(".")[0]}.
+              </span>
+              <span aria-hidden="true" className="self-center text-2xl">
+                →
+              </span>
+            </Link>
             </li>
           ))}
         </ul>
