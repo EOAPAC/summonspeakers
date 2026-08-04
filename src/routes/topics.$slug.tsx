@@ -12,9 +12,7 @@ function faqsFor(name: string) {
   const lower = name.toLowerCase();
   const feeAnswer = feeAnswerForTopic(name);
   return [
-    ...(feeAnswer
-      ? [{ q: `How much do ${lower} speakers cost?`, a: feeAnswer }]
-      : []),
+    ...(feeAnswer ? [{ q: `How much do ${lower} speakers cost?`, a: feeAnswer }] : []),
     {
       q: `How do I book a ${lower} speaker?`,
       a: `Send an enquiry with your date, audience size and theme. We confirm availability and the exact fee within one business day, then you book directly through us. There is no bureau markup, and cancellation is free up to 14 days before your event.`,
@@ -31,7 +29,10 @@ export const Route = createFileRoute("/topics/$slug")({
   head: ({ loaderData, params }) => {
     if (!loaderData) {
       return {
-        meta: [{ title: "Topic unavailable | SummonSpeakers" }, { name: "robots", content: "noindex" }],
+        meta: [
+          { title: "Topic unavailable | SummonSpeakers" },
+          { name: "robots", content: "noindex" },
+        ],
       };
     }
     const t = loaderData.topic;

@@ -85,8 +85,8 @@ function Home() {
         </p>
 
         <p className="mt-10 max-w-[48ch] text-lg text-[var(--ink-2)] md:max-w-none">
-          Browse, compare and book professional speakers directly. No bureau markup, no
-          guessing what they cost.
+          Browse, compare and book professional speakers directly. No bureau markup, no guessing
+          what they cost.
         </p>
         <div className="mt-10 flex flex-wrap items-center gap-8">
           <ButtonLink to="/get-matched">Get matched</ButtonLink>
@@ -97,9 +97,7 @@ function Home() {
             Browse speakers <span aria-hidden="true">→</span>
           </Link>
         </div>
-        <p className="label-mono mt-6 text-[var(--ink-3)]">
-          Free to enquire, no obligation
-        </p>
+        <p className="label-mono mt-6 text-[var(--ink-3)]">Free to enquire, no obligation</p>
 
         <div className="hairline-top mt-20 pt-8">
           <Eyebrow>Trusted by event teams at</Eyebrow>
@@ -118,32 +116,32 @@ function Home() {
         <ul className="mt-10 border-t border-[var(--line)]">
           {topics.map((t, i) => (
             <li key={t.slug} className="border-b border-[var(--line)]">
-            <Link
-              to="/topics/$slug"
-              params={{ slug: t.slug }}
-              className="group grid min-h-[88px] grid-cols-[auto_1fr_auto] items-center gap-6 py-6 md:grid-cols-[auto_1fr_1fr_auto] md:items-start md:gap-8"
-            >
-              <span className="label-mono text-[var(--ink-3)]">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <span className="flex flex-col gap-1 md:hidden">
-                <span className="display inline-block text-[length:var(--display-md)] transition-transform duration-500 [transition-timing-function:var(--ease)] group-hover:translate-x-3">
+              <Link
+                to="/topics/$slug"
+                params={{ slug: t.slug }}
+                className="group grid min-h-[88px] grid-cols-[auto_1fr_auto] items-center gap-6 py-6 md:grid-cols-[auto_1fr_1fr_auto] md:items-start md:gap-8"
+              >
+                <span className="label-mono text-[var(--ink-3)]">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span className="flex flex-col gap-1 md:hidden">
+                  <span className="display inline-block text-[length:var(--display-md)] transition-transform duration-500 [transition-timing-function:var(--ease)] group-hover:translate-x-3">
+                    {t.name}
+                  </span>
+                  <span className="max-w-[46ch] text-sm text-[var(--ink-2)]">
+                    {t.blurb.split(".")[0]}.
+                  </span>
+                </span>
+                <span className="display hidden text-[length:var(--display-md)] transition-transform duration-500 [transition-timing-function:var(--ease)] group-hover:translate-x-3 md:block">
                   {t.name}
                 </span>
-                <span className="max-w-[46ch] text-sm text-[var(--ink-2)]">
+                <span className="hidden max-w-[46ch] self-start pt-2 text-sm text-[var(--ink-2)] md:block">
                   {t.blurb.split(".")[0]}.
                 </span>
-              </span>
-              <span className="display hidden text-[length:var(--display-md)] transition-transform duration-500 [transition-timing-function:var(--ease)] group-hover:translate-x-3 md:block">
-                {t.name}
-              </span>
-              <span className="hidden max-w-[46ch] self-start pt-2 text-sm text-[var(--ink-2)] md:block">
-                {t.blurb.split(".")[0]}.
-              </span>
-              <span aria-hidden="true" className="self-center text-2xl">
-                →
-              </span>
-            </Link>
+                <span aria-hidden="true" className="self-center text-2xl">
+                  →
+                </span>
+              </Link>
             </li>
           ))}
         </ul>

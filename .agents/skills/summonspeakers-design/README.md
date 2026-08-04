@@ -36,21 +36,20 @@ Both audiences share one emotional need: **confidence**. Every interface decisio
 
 ### Colour
 
-| Token | Value | Role |
-| --- | --- | --- |
-| `--ink` | `#000000` | Primary text, buttons, key rules |
-| `--ink-2` | `#525252` | Secondary text, captions |
-| `--ink-3` | `#737373` | Tertiary text, placeholders |
-| `--surface` | `#ffffff` | Page background |
-| `--surface-alt` | `#ededed` | Subtle fills, tags, hover states |
-| `--footer` | `#0a0a0a` | Dark footer surface |
-| `--line` | `rgba(0,0,0,0.10)` | Hairlines, dividers |
-| `--line-2` | `rgba(0,0,0,0.18)` | Input borders |
-| `--line-on-dark` | `rgba(255,255,255,0.10)` | Dividers on dark surfaces |
-| `--warning` | `#7a2e1c` | Errors and destructive actions |
-| `--accent` | `#000000` | Primary action fill (ink) |
-| `--accent-hover` | `#ffffff` | Hover accent |
-
+| Token            | Value                    | Role                             |
+| ---------------- | ------------------------ | -------------------------------- |
+| `--ink`          | `#000000`                | Primary text, buttons, key rules |
+| `--ink-2`        | `#525252`                | Secondary text, captions         |
+| `--ink-3`        | `#737373`                | Tertiary text, placeholders      |
+| `--surface`      | `#ffffff`                | Page background                  |
+| `--surface-alt`  | `#ededed`                | Subtle fills, tags, hover states |
+| `--footer`       | `#0a0a0a`                | Dark footer surface              |
+| `--line`         | `rgba(0,0,0,0.10)`       | Hairlines, dividers              |
+| `--line-2`       | `rgba(0,0,0,0.18)`       | Input borders                    |
+| `--line-on-dark` | `rgba(255,255,255,0.10)` | Dividers on dark surfaces        |
+| `--warning`      | `#7a2e1c`                | Errors and destructive actions   |
+| `--accent`       | `#000000`                | Primary action fill (ink)        |
+| `--accent-hover` | `#ffffff`                | Hover accent                     |
 
 ### Typography
 
@@ -61,13 +60,13 @@ Both audiences share one emotional need: **confidence**. Every interface decisio
 
 Display sizes:
 
-| Token | Value |
-| --- | --- |
-| `--display-hero` | `clamp(44px, 9vw, 150px)` |
-| `--display-cta` | `clamp(48px, 11vw, 170px)` |
-| `--display-lg` | `clamp(32px, 5vw, 72px)` |
-| `--display-md` | `clamp(28px, 5vw, 60px)` |
-| `--display-sm` | `clamp(24px, 3vw, 34px)` |
+| Token            | Value                      |
+| ---------------- | -------------------------- |
+| `--display-hero` | `clamp(44px, 9vw, 150px)`  |
+| `--display-cta`  | `clamp(48px, 11vw, 170px)` |
+| `--display-lg`   | `clamp(32px, 5vw, 72px)`   |
+| `--display-md`   | `clamp(28px, 5vw, 60px)`   |
+| `--display-sm`   | `clamp(24px, 3vw, 34px)`   |
 
 ### Spacing
 
@@ -75,44 +74,44 @@ Base grid: 4px. Tokens `--space-1` (4px) through `--space-12` (96px).
 
 Layout tokens:
 
-| Token | Value |
-| --- | --- |
-| `--pad-inline` | `clamp(20px, 6vw, 96px)` |
-| `--sec-pad` | `clamp(64px, 9vw, 140px)` |
-| `--sec-pad-lg` | `clamp(90px, 13vw, 200px)` |
-| `--container` | `1440px` |
-| `--container-narrow` | `720px` |
-| `--measure` | `34ch` |
-| `--measure-lead` | `44ch` |
+| Token                | Value                      |
+| -------------------- | -------------------------- |
+| `--pad-inline`       | `clamp(20px, 6vw, 96px)`   |
+| `--sec-pad`          | `clamp(64px, 9vw, 140px)`  |
+| `--sec-pad-lg`       | `clamp(90px, 13vw, 200px)` |
+| `--container`        | `1440px`                   |
+| `--container-narrow` | `720px`                    |
+| `--measure`          | `34ch`                     |
+| `--measure-lead`     | `44ch`                     |
 
 ### Radius
 
-| Token | Value |
-| --- | --- |
-| `--radius-sm` | `8px` |
-| `--radius-md` | `14px` |
-| `--radius-lg` | `18px` |
-| `--radius-xl` | `24px` |
-| `--radius-pill` | `9999px` |
-| `--radius-card` | `18px` |
-| `--radius-media` | `14px` |
+| Token            | Value    |
+| ---------------- | -------- |
+| `--radius-sm`    | `8px`    |
+| `--radius-md`    | `14px`   |
+| `--radius-lg`    | `18px`   |
+| `--radius-xl`    | `24px`   |
+| `--radius-pill`  | `9999px` |
+| `--radius-card`  | `18px`   |
+| `--radius-media` | `14px`   |
 
 ### Elevation
 
-| Token | Value |
-| --- | --- |
-| `--elev-1` | `none` |
-| `--elev-2` | `0 8px 30px rgba(0,0,0,0.08)` |
+| Token      | Value                          |
+| ---------- | ------------------------------ |
+| `--elev-1` | `none`                         |
+| `--elev-2` | `0 8px 30px rgba(0,0,0,0.08)`  |
 | `--elev-3` | `0 18px 60px rgba(0,0,0,0.14)` |
 
 ### Motion
 
-| Token | Value |
-| --- | --- |
-| `--ease` | `cubic-bezier(0.16, 1, 0.3, 1)` |
-| `--dur-base` | `500ms` |
-| `--dur-slow` | `1000ms` |
-| `--dur-nav` | `900ms` |
+| Token        | Value                           |
+| ------------ | ------------------------------- |
+| `--ease`     | `cubic-bezier(0.16, 1, 0.3, 1)` |
+| `--dur-base` | `500ms`                         |
+| `--dur-slow` | `1000ms`                        |
+| `--dur-nav`  | `900ms`                         |
 
 Use `prefers-reduced-motion: reduce` to disable transitions and animations.
 

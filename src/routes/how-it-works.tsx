@@ -40,7 +40,6 @@ const faqs = [
     q: "What if we're not sure what we want yet?",
     a: "Send the enquiry anyway. Roughly half the briefs we get name a theme rather than a speaker, and the shortlist is usually more useful when you haven't already narrowed it. Tell us the audience and what you want them to leave thinking.",
   },
-
 ];
 
 export const Route = createFileRoute("/how-it-works")({

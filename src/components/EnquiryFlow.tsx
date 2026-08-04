@@ -73,8 +73,10 @@ export function EnquiryFlow({ speakerSlug }: { speakerSlug?: string | undefined 
   const [done, setDone] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const set = (k: keyof Values) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
-    setValues((v) => ({ ...v, [k]: e.target.value }));
+  const set =
+    (k: keyof Values) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
+      setValues((v) => ({ ...v, [k]: e.target.value }));
 
   function validateStep(n: number) {
     const next: Partial<Record<keyof Values, string>> = {};
@@ -120,8 +122,8 @@ export function EnquiryFlow({ speakerSlug }: { speakerSlug?: string | undefined 
         <p className="label-mono text-[var(--ink-3)]">Enquiry received</p>
         <h1 className="display mt-6 text-[length:var(--display-lg)]">Thank you</h1>
         <p className="mt-8 text-lg text-[var(--ink-2)]">
-          We'll send a shortlist of matched speakers to your inbox within one business day. Fees
-          are included, so you can compare before you reply.
+          We'll send a shortlist of matched speakers to your inbox within one business day. Fees are
+          included, so you can compare before you reply.
         </p>
         <div className="mt-10">
           <Link
@@ -146,9 +148,7 @@ export function EnquiryFlow({ speakerSlug }: { speakerSlug?: string | undefined 
           />
         ))}
       </div>
-      <p className="label-mono mt-4 text-[var(--ink-3)]">
-        STEP {step} OF 3 · ABOUT TWO MINUTES
-      </p>
+      <p className="label-mono mt-4 text-[var(--ink-3)]">STEP {step} OF 3 · ABOUT TWO MINUTES</p>
 
       {step > 1 && (
         <button

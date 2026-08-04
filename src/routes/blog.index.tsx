@@ -9,9 +9,16 @@ export const Route = createFileRoute("/blog/")({
   head: () => ({
     meta: [
       { title: "The journal — speaker fees, briefing and event planning | SummonSpeakers" },
-      { name: "description", content: "Cost guides, briefing notes and planning advice from the team that sees what speakers actually charge." },
+      {
+        name: "description",
+        content:
+          "Cost guides, briefing notes and planning advice from the team that sees what speakers actually charge.",
+      },
       { property: "og:title", content: "The journal | SummonSpeakers" },
-      { property: "og:description", content: "Notes on booking speakers well, from the people who publish the fees." },
+      {
+        property: "og:description",
+        content: "Notes on booking speakers well, from the people who publish the fees.",
+      },
       { property: "og:url", content: absoluteUrl("/blog") },
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/blog") }],
@@ -41,8 +48,8 @@ function BlogIndex() {
       <section className="container-x pb-16 pt-10">
         <h1 className="display max-w-[14ch] text-[length:var(--display-lg)]">The journal</h1>
         <p className="mt-8 max-w-[58ch] text-lg text-[var(--ink-2)]">
-          Cost guides, briefing notes and planning advice for the people who book the room,
-          written by the team that sees what speakers actually charge.
+          Cost guides, briefing notes and planning advice for the people who book the room, written
+          by the team that sees what speakers actually charge.
         </p>
       </section>
 
@@ -69,7 +76,9 @@ function BlogIndex() {
                 className="group grid gap-3 py-8 transition-colors duration-500 [transition-timing-function:var(--ease)] hover:bg-ink hover:text-surface md:grid-cols-[1fr_1.2fr_auto] md:items-baseline md:gap-12 md:px-4"
               >
                 <h2 className="text-xl font-semibold tracking-[-0.03em]">{p.title}</h2>
-                <p className="text-[var(--ink-2)] group-hover:text-[rgba(255,255,255,0.72)]">{p.dek}</p>
+                <p className="text-[var(--ink-2)] group-hover:text-[rgba(255,255,255,0.72)]">
+                  {p.dek}
+                </p>
                 <span className="label-mono whitespace-nowrap text-[var(--ink-3)] group-hover:text-[rgba(255,255,255,0.72)]">
                   {p.read_minutes} min
                 </span>

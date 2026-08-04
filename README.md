@@ -213,43 +213,60 @@ Hero: "Get booked for more paid speaking engagements." Benefits: a profile that 
 The visual system is **monochrome editorial**. Import these tokens as CSS variables and map them into the Tailwind theme; do not introduce new colours.
 
 ```css
-
 /* colour — black, white, two greys. No brand hue by design. */
 
---color-ink:#000; --color-ink-2:#525252; --color-ink-3:#737373;
+--color-ink: #000;
+--color-ink-2: #525252;
+--color-ink-3: #737373;
 
---color-surface:#FFF; --color-surface-alt:#EDEDED; --color-footer:#0A0A0A;
+--color-surface: #fff;
+--color-surface-alt: #ededed;
+--color-footer: #0a0a0a;
 
---line:rgba(0,0,0,.10); --line-2:rgba(0,0,0,.18); --line-on-dark:rgba(255,255,255,.10);
+--line: rgba(0, 0, 0, 0.1);
+--line-2: rgba(0, 0, 0, 0.18);
+--line-on-dark: rgba(255, 255, 255, 0.1);
 
---color-accent:#000; --color-accent-hover:#FFF;   /* primary inverts on hover */
+--color-accent: #000;
+--color-accent-hover: #fff; /* primary inverts on hover */
 
---color-warning:#7A2E1C;                          /* inline form errors only */
+--color-warning: #7a2e1c; /* inline form errors only */
 
 /* type — one grotesque + one mono */
 
---font-body:"Hanken Grotesk",Inter,system-ui,sans-serif;
+--font-body: "Hanken Grotesk", Inter, system-ui, sans-serif;
 
---font-mono:"IBM Plex Mono",ui-monospace,monospace;
+--font-mono: "IBM Plex Mono", ui-monospace, monospace;
 
---display-hero:clamp(44px,9vw,150px); --display-cta:clamp(48px,11vw,170px);
+--display-hero: clamp(44px, 9vw, 150px);
+--display-cta: clamp(48px, 11vw, 170px);
 
---display-lg:clamp(32px,5vw,72px);   --display-md:clamp(28px,5vw,60px);
+--display-lg: clamp(32px, 5vw, 72px);
+--display-md: clamp(28px, 5vw, 60px);
 
---tracking-display:-0.05em; --tracking-body:-0.02em; --tracking-mono:0.10em;
+--tracking-display: -0.05em;
+--tracking-body: -0.02em;
+--tracking-mono: 0.1em;
 
---leading-display:0.90; --leading-cta:0.86;
+--leading-display: 0.9;
+--leading-cta: 0.86;
 
 /* shape, rhythm, motion */
 
---radius-pill:9999px; --radius-card:18px; --radius-media:14px; --radius-sm:8px;
+--radius-pill: 9999px;
+--radius-card: 18px;
+--radius-media: 14px;
+--radius-sm: 8px;
 
---pad-inline:clamp(20px,6vw,96px); --sec-pad:clamp(64px,9vw,140px);
+--pad-inline: clamp(20px, 6vw, 96px);
+--sec-pad: clamp(64px, 9vw, 140px);
 
---ease:cubic-bezier(.16,1,.3,1); --dur-base:500ms; --dur-slow:1000ms;
+--ease: cubic-bezier(0.16, 1, 0.3, 1);
+--dur-base: 500ms;
+--dur-slow: 1000ms;
 
---hit-primary:56px; --hit-min:44px;
-
+--hit-primary: 56px;
+--hit-min: 44px;
 ```
 
 **Rules that make it look right:**

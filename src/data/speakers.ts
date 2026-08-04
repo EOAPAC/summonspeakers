@@ -12,7 +12,13 @@ export type Speaker = {
   location: string;
   topics: string[];
   showreel_url: string | null;
-  testimonials: { quote: string; author_name: string; author_role: string; company: string; result?: string }[];
+  testimonials: {
+    quote: string;
+    author_name: string;
+    author_role: string;
+    company: string;
+    result?: string;
+  }[];
   past_clients: string[];
 };
 
@@ -350,8 +356,7 @@ export const speakers: Speaker[] = [
     name: "Andrés Molina",
     role: "Futurist & economics keynote speaker",
     tagline: "Reads the next decade through supply chains and demographics.",
-    bio_short:
-      "An economist who explains long-term shifts in language a sales team can act on.",
+    bio_short: "An economist who explains long-term shifts in language a sales team can act on.",
     bio_long: [
       "Andrés Molina spent twelve years forecasting for multinationals before moving to the stage. He builds each talk around the two or three forces that will actually reach the audience's industry.",
       "He is a frequent opener for industry association conferences.",
@@ -379,8 +384,7 @@ export const speakers: Speaker[] = [
     name: "Nina Castellan",
     role: "Celebrity keynote speaker & broadcaster",
     tagline: "Twenty years on national television, now on conference stages.",
-    bio_short:
-      "A household-name broadcaster who hosts and headlines large corporate events.",
+    bio_short: "A household-name broadcaster who hosts and headlines large corporate events.",
     bio_long: [
       "Nina Castellan spent two decades presenting national current affairs and now headlines large conferences, awards nights and gala dinners.",
       "She offers both a keynote and a hosting package, and is often booked for both on the same day.",
@@ -408,8 +412,7 @@ export const speakers: Speaker[] = [
     name: "Omar Haddad",
     role: "Sales performance keynote speaker",
     tagline: "Rebuilt three sales organisations, and shows the maths behind it.",
-    bio_short:
-      "A revenue leader who talks about pipeline discipline rather than motivation.",
+    bio_short: "A revenue leader who talks about pipeline discipline rather than motivation.",
     bio_long: [
       "Omar Haddad has led sales organisations through two turnarounds and one hypergrowth period. His keynote is built around a single diagnostic: where deals actually stall.",
       "He suits sales kick-offs, revenue summits and partner conferences.",

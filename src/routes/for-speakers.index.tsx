@@ -23,9 +23,21 @@ const benefits = [
 ];
 
 const steps = [
-  { n: "01", h: "Create your listing", p: "Photo, topics, fee band, showreel. About fifteen minutes." },
-  { n: "02", h: "We review it", p: "One editor checks the profile reads well and the fee band is clear. Usually two business days." },
-  { n: "03", h: "You start receiving enquiries", p: "Matched briefs arrive by email. You decide which to take." },
+  {
+    n: "01",
+    h: "Create your listing",
+    p: "Photo, topics, fee band, showreel. About fifteen minutes.",
+  },
+  {
+    n: "02",
+    h: "We review it",
+    p: "One editor checks the profile reads well and the fee band is clear. Usually two business days.",
+  },
+  {
+    n: "03",
+    h: "You start receiving enquiries",
+    p: "Matched briefs arrive by email. You decide which to take.",
+  },
 ];
 
 export const Route = createFileRoute("/for-speakers/")({

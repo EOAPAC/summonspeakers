@@ -16,7 +16,12 @@ export const Route = createFileRoute("/case-studies/$slug")({
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) {
-      return { meta: [{ title: "Case study unavailable | SummonSpeakers" }, { name: "robots", content: "noindex" }] };
+      return {
+        meta: [
+          { title: "Case study unavailable | SummonSpeakers" },
+          { name: "robots", content: "noindex" },
+        ],
+      };
     }
     const c = loaderData.study;
     return {
@@ -62,17 +67,23 @@ function CaseStudyDetail() {
 
       <section className="container-x pb-12 pt-10">
         <Eyebrow>{study.client}</Eyebrow>
-        <h1 className="display mt-6 max-w-[18ch] text-[length:var(--display-md)]">{study.headline}</h1>
+        <h1 className="display mt-6 max-w-[18ch] text-[length:var(--display-md)]">
+          {study.headline}
+        </h1>
         <p className="mt-8 max-w-[56ch] text-lg text-[var(--ink-2)]">{study.summary}</p>
 
         <dl className="mt-14 grid gap-10 border-t border-[var(--ink)] pt-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <dd className="text-[length:var(--display-sm)] font-semibold tracking-[-0.03em]">{study.result.value}</dd>
+            <dd className="text-[length:var(--display-sm)] font-semibold tracking-[-0.03em]">
+              {study.result.value}
+            </dd>
             <dt className="label-mono mt-3 text-[var(--ink-3)]">{study.result.label}</dt>
           </div>
           {study.metrics.map((m) => (
             <div key={m.label}>
-              <dd className="text-[length:var(--display-sm)] font-semibold tracking-[-0.03em]">{m.value}</dd>
+              <dd className="text-[length:var(--display-sm)] font-semibold tracking-[-0.03em]">
+                {m.value}
+              </dd>
               <dt className="label-mono mt-3 text-[var(--ink-3)]">{m.label}</dt>
             </div>
           ))}
@@ -109,7 +120,12 @@ function CaseStudyDetail() {
                 />
               </div>
               <div className="mt-8">
-                <ButtonLink to="/speakers/$slug" params={{ slug: speaker.slug }} variant="ghost" className="w-full">
+                <ButtonLink
+                  to="/speakers/$slug"
+                  params={{ slug: speaker.slug }}
+                  variant="ghost"
+                  className="w-full"
+                >
                   View profile
                 </ButtonLink>
               </div>

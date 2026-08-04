@@ -31,7 +31,10 @@ export const Route = createFileRoute("/speakers/$slug")({
   head: ({ loaderData, params }) => {
     if (!loaderData) {
       return {
-        meta: [{ title: "Speaker unavailable | SummonSpeakers" }, { name: "robots", content: "noindex" }],
+        meta: [
+          { title: "Speaker unavailable | SummonSpeakers" },
+          { name: "robots", content: "noindex" },
+        ],
       };
     }
     const s = loaderData.speaker;
@@ -107,7 +110,11 @@ function SpeakerProfile() {
   return (
     <Page>
       <Breadcrumbs
-        items={[{ label: "Home", to: "/" }, { label: "Speakers", to: "/speakers" }, { label: s.name }]}
+        items={[
+          { label: "Home", to: "/" },
+          { label: "Speakers", to: "/speakers" },
+          { label: s.name },
+        ]}
       />
 
       <section className="container-x grid gap-12 pb-16 pt-10 md:grid-cols-[1fr_1fr] md:items-start">
@@ -174,7 +181,10 @@ function SpeakerProfile() {
         <h2 className="label-mono text-[var(--ink-3)]">What organisers say</h2>
         <div className="mt-10 grid gap-8 md:grid-cols-3">
           {s.testimonials.map((t) => (
-            <figure key={t.author_name} className="rounded-[var(--radius-card)] border border-[var(--line)] p-8">
+            <figure
+              key={t.author_name}
+              className="rounded-[var(--radius-card)] border border-[var(--line)] p-8"
+            >
               <blockquote className="text-lg tracking-[-0.02em]">“{t.quote}”</blockquote>
               <figcaption className="mt-6 text-sm text-[var(--ink-2)]">
                 <span className="block font-semibold text-ink">{t.author_name}</span>

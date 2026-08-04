@@ -12,7 +12,11 @@ export const feeBands = {
   Motivational: { emerging: "$3k – $7k", established: "$9k – $18k", celebrity: "$35k – $75k" },
   Leadership: { emerging: "$4k – $8k", established: "$12k – $22k", celebrity: "$40k – $90k" },
   Business: { emerging: "$4k – $9k", established: "$10k – $20k", celebrity: "$35k – $80k" },
-  "Futurist & AI": { emerging: "$5k – $10k", established: "$15k – $30k", celebrity: "$45k – $120k" },
+  "Futurist & AI": {
+    emerging: "$5k – $10k",
+    established: "$15k – $30k",
+    celebrity: "$45k – $120k",
+  },
 } satisfies Record<string, Bands>;
 
 export type FeeColumn = keyof typeof feeBands;

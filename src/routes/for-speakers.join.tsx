@@ -115,8 +115,8 @@ function Join() {
             </div>
             {submitted ? (
               <p role="status" className="text-lg">
-                Thank you. Your listing is with our editor and we'll be in touch within two
-                business days.
+                Thank you. Your listing is with our editor and we'll be in touch within two business
+                days.
               </p>
             ) : (
               <Button type="submit">Submit for review</Button>
