@@ -129,7 +129,7 @@ function SpeakerFees() {
         <FAQ items={faqs} />
       </section>
 
-      <ClosingCta />
+      <ClosingCta heading="Get the exact fee." />
     </Page>
   );
 }
