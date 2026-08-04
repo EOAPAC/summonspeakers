@@ -1,6 +1,9 @@
 /*
  * SummonSpeakers — monochrome editorial design tokens
  * Import this file in any prototype, mock, or production stylesheet.
+ *
+ * Source of truth is src/styles.css. There is no brand hue: the primary
+ * action is ink and inverts to white on hover. Never add an accent colour.
  */
 
 @font-face {
@@ -47,7 +50,6 @@
   --warning: #7a2e1c;
   --accent: #000000;
   --accent-hover: #ffffff;
-  
 
   /* Typography */
   --font-body: "Hanken Grotesk Variable", "Hanken Grotesk", system-ui, sans-serif;
@@ -102,7 +104,7 @@
   --hit-primary: 56px;
   --hit-min: 44px;
 
-  /* Elevation */
+  /* Elevation — the system is flat. elev-2/3 are for overlays only. */
   --elev-1: none;
   --elev-2: 0 8px 30px rgba(0, 0, 0, 0.08);
   --elev-3: 0 18px 60px rgba(0, 0, 0, 0.14);
@@ -206,7 +208,6 @@ body {
   background-color: var(--surface-alt);
 }
 
-
 .on-ink {
   background-color: var(--ink);
   color: var(--surface);
@@ -224,11 +225,11 @@ body {
   border-radius: var(--radius-pill);
   background: var(--ink);
   color: var(--surface);
+  border: 1px solid var(--ink);
   font-family: var(--font-body);
   font-weight: 600;
   letter-spacing: var(--tracking-body);
   text-decoration: none;
-  border: 1px solid var(--ink);
   cursor: pointer;
   transition: background var(--dur-base) var(--ease), color var(--dur-base) var(--ease);
 }
@@ -237,7 +238,6 @@ body {
   background: var(--surface);
   color: var(--ink);
 }
-
 
 .btn-secondary {
   display: inline-flex;
@@ -272,8 +272,8 @@ body {
   min-height: var(--hit-min);
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-pill);
-  background: transparent;
   border: 1px solid var(--line-2);
+  background: transparent;
   color: var(--ink);
   font-family: var(--font-mono-stack);
   text-transform: uppercase;
