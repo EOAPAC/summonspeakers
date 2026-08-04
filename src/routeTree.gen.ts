@@ -10,33 +10,93 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as GetMatchedRouteImport } from './routes/get-matched'
+import { Route as SpeakersRouteImport } from './routes/speakers'
+import { Route as SpeakersIndexRouteImport } from './routes/speakers.index'
+import { Route as SpeakersSlugRouteImport } from './routes/speakers.$slug'
+import { Route as TopicsSlugRouteImport } from './routes/topics.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GetMatchedRoute = GetMatchedRouteImport.update({
+  id: '/get-matched',
+  path: '/get-matched',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SpeakersRoute = SpeakersRouteImport.update({
+  id: '/speakers',
+  path: '/speakers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SpeakersIndexRoute = SpeakersIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SpeakersRoute,
+} as any)
+const SpeakersSlugRoute = SpeakersSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => SpeakersRoute,
+} as any)
+const TopicsSlugRoute = TopicsSlugRouteImport.update({
+  id: '/topics/$slug',
+  path: '/topics/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/get-matched': typeof GetMatchedRoute
+  '/speakers': typeof SpeakersRouteWithChildren
+  '/speakers/$slug': typeof SpeakersSlugRoute
+  '/topics/$slug': typeof TopicsSlugRoute
+  '/speakers/': typeof SpeakersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/get-matched': typeof GetMatchedRoute
+  '/speakers/$slug': typeof SpeakersSlugRoute
+  '/topics/$slug': typeof TopicsSlugRoute
+  '/speakers': typeof SpeakersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/get-matched': typeof GetMatchedRoute
+  '/speakers': typeof SpeakersRouteWithChildren
+  '/speakers/$slug': typeof SpeakersSlugRoute
+  '/topics/$slug': typeof TopicsSlugRoute
+  '/speakers/': typeof SpeakersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/get-matched'
+    | '/speakers'
+    | '/speakers/$slug'
+    | '/topics/$slug'
+    | '/speakers/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/get-matched' | '/speakers/$slug' | '/topics/$slug' | '/speakers'
+  id:
+    | '__root__'
+    | '/'
+    | '/get-matched'
+    | '/speakers'
+    | '/speakers/$slug'
+    | '/topics/$slug'
+    | '/speakers/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  GetMatchedRoute: typeof GetMatchedRoute
+  SpeakersRoute: typeof SpeakersRouteWithChildren
+  TopicsSlugRoute: typeof TopicsSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,22 +108,64 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/get-matched': {
+      id: '/get-matched'
+      path: '/get-matched'
+      fullPath: '/get-matched'
+      preLoaderRoute: typeof GetMatchedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/speakers': {
+      id: '/speakers'
+      path: '/speakers'
+      fullPath: '/speakers'
+      preLoaderRoute: typeof SpeakersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/speakers/': {
+      id: '/speakers/'
+      path: '/'
+      fullPath: '/speakers/'
+      preLoaderRoute: typeof SpeakersIndexRouteImport
+      parentRoute: typeof SpeakersRoute
+    }
+    '/speakers/$slug': {
+      id: '/speakers/$slug'
+      path: '/$slug'
+      fullPath: '/speakers/$slug'
+      preLoaderRoute: typeof SpeakersSlugRouteImport
+      parentRoute: typeof SpeakersRoute
+    }
+    '/topics/$slug': {
+      id: '/topics/$slug'
+      path: '/topics/$slug'
+      fullPath: '/topics/$slug'
+      preLoaderRoute: typeof TopicsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface SpeakersRouteChildren {
+  SpeakersSlugRoute: typeof SpeakersSlugRoute
+  SpeakersIndexRoute: typeof SpeakersIndexRoute
+}
+
+const SpeakersRouteChildren: SpeakersRouteChildren = {
+  SpeakersSlugRoute: SpeakersSlugRoute,
+  SpeakersIndexRoute: SpeakersIndexRoute,
+}
+
+const SpeakersRouteWithChildren = SpeakersRoute._addFileChildren(
+  SpeakersRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  GetMatchedRoute: GetMatchedRoute,
+  SpeakersRoute: SpeakersRouteWithChildren,
+  TopicsSlugRoute: TopicsSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

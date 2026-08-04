@@ -1,24 +1,196 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Page, Eyebrow } from "@/components/Page";
+import { ButtonLink } from "@/components/Button";
+import { SpeakerCard } from "@/components/SpeakerCard";
+import { ClosingCta } from "@/components/ClosingCta";
+import { speakers, topics } from "@/data/speakers";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "Book keynote speakers with fees shown upfront | SummonSpeakers" },
+      {
+        name: "description",
+        content:
+          "Browse, compare and book professional speakers directly. No bureau markup, no guessing what they cost. Get a matched shortlist in one business day.",
+      },
+      { property: "og:title", content: "Book the keynote speaker your event deserves" },
+      {
+        property: "og:description",
+        content: "Compare speakers and their fees upfront, then book directly.",
+      },
+      { property: "og:url", content: "/" },
+    ],
+    links: [{ rel: "canonical", href: "/" }],
+  }),
+  component: Home,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+const clients = ["NORTHBRIDGE", "ARDENT HEALTH", "MERIDIAN", "HAVENLINE", "PALEWOOD"];
+
+const benefits = [
+  {
+    n: "01",
+    h: "Transparent fees",
+    p: "Every speaker publishes a fee band. You can build a shortlist that fits the budget before you speak to anyone.",
+  },
+  {
+    n: "02",
+    h: "Direct booking",
+    p: "You deal with the speaker, not a middleman adding twenty per cent. The relationship is yours from the first email.",
+  },
+  {
+    n: "03",
+    h: "Matched to your brief",
+    p: "Tell us the date, the audience and the theme. We send a shortlist within one business day.",
+  },
+];
+
+const homeTestimonials = [
+  {
+    quote:
+      "We saw the fees, picked three names and had a signed contract by Friday. It used to take a month.",
+    result: "Booked in one afternoon",
+    name: "Elena Marsh",
+    role: "Head of People",
+    company: "Northbridge Group",
+  },
+  {
+    quote:
+      "The shortlist actually matched the brief. Two of the three were people we would never have found ourselves.",
+    result: "Shortlist in 24 hours",
+    name: "Tom Verity",
+    role: "Events Director",
+    company: "Ardent Health",
+  },
+  {
+    quote: "No sales call, no markup, no fee on application. Just the number.",
+    result: "Saved 22% on bureau quote",
+    name: "Priya Nandan",
+    role: "Conference Producer",
+    company: "Meridian Events",
+  },
+];
+
+function Home() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <Page>
+      <section className="container-x pb-20 pt-16 md:pt-24">
+        <h1 className="display max-w-[15ch] text-[length:var(--display-hero)]">
+          Book the keynote speaker your event deserves — with fees shown upfront.
+        </h1>
+        <p className="mt-10 max-w-[48ch] text-lg text-[var(--ink-2)]">
+          Browse, compare and book professional speakers directly. No bureau markup, no
+          guessing what they cost.
+        </p>
+        <div className="mt-10 flex flex-wrap items-center gap-8">
+          <ButtonLink to="/get-matched">Get matched</ButtonLink>
+          <Link
+            to="/speakers"
+            className="inline-flex min-h-[44px] items-center gap-2 text-base underline decoration-[var(--line-2)] underline-offset-4 hover:decoration-ink"
+          >
+            Browse speakers <span aria-hidden="true">→</span>
+          </Link>
+        </div>
+        <div className="hairline-top mt-20 pt-8">
+          <Eyebrow>Trusted by event teams at</Eyebrow>
+          <ul className="mt-6 flex flex-wrap gap-x-12 gap-y-4">
+            {clients.map((c) => (
+              <li key={c} className="label-mono text-[var(--ink-3)]">
+                {c}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <section className="rule-open container-x section-y">
+        <Eyebrow>Browse by category</Eyebrow>
+        <ul className="mt-10 border-t border-[var(--line)]">
+          {topics.map((t, i) => (
+            <li key={t.slug} className="border-b border-[var(--line)]">
+              <Link
+                to="/topics/$slug"
+                params={{ slug: t.slug }}
+                className="group grid min-h-[88px] grid-cols-[auto_1fr_auto] items-center gap-6 py-6"
+              >
+                <span className="label-mono text-[var(--ink-3)]">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span className="flex flex-col gap-1 md:flex-row md:items-baseline md:gap-8">
+                  <span className="display inline-block text-[length:var(--display-md)] transition-transform duration-500 [transition-timing-function:var(--ease)] group-hover:translate-x-3">
+                    {t.name}
+                  </span>
+                  <span className="max-w-[46ch] text-sm text-[var(--ink-2)]">{t.blurb.split(".")[0]}.</span>
+                </span>
+                <span aria-hidden="true" className="text-2xl">
+                  →
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="rule-open container-x section-y">
+        <Eyebrow>Why planners choose us</Eyebrow>
+        <div className="mt-12 grid gap-12 md:grid-cols-3">
+          {benefits.map((b) => (
+            <div key={b.n} className="hairline-top pt-6">
+              <p className="label-mono text-[var(--ink-3)]">{b.n}</p>
+              <h2 className="mt-6 text-2xl font-semibold tracking-[-0.03em]">{b.h}</h2>
+              <p className="mt-4 text-[var(--ink-2)]">{b.p}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="rule-open container-x section-y">
+        <Eyebrow>What planners say</Eyebrow>
+        <div className="mt-12 grid gap-8 md:grid-cols-3">
+          {homeTestimonials.map((t) => (
+            <figure
+              key={t.name}
+              className="flex flex-col justify-between rounded-[var(--radius-card)] border border-[var(--line)] p-8"
+            >
+              <blockquote className="text-lg tracking-[-0.02em]">“{t.quote}”</blockquote>
+              <div className="mt-8">
+                <span className="label-mono inline-block rounded-full border border-[var(--line-2)] px-3 py-2">
+                  {t.result}
+                </span>
+                <figcaption className="mt-6 flex items-center gap-4">
+                  <span aria-hidden="true" className="hatch size-12 rounded-full" />
+                  <span className="text-sm">
+                    <span className="block font-semibold">{t.name}</span>
+                    <span className="block text-[var(--ink-2)]">
+                      {t.role}, {t.company}
+                    </span>
+                  </span>
+                </figcaption>
+              </div>
+            </figure>
+          ))}
+        </div>
+      </section>
+
+      <section className="rule-open container-x section-y">
+        <div className="flex items-end justify-between gap-6">
+          <h2 className="display text-[length:var(--display-md)]">Featured speakers</h2>
+          <Link
+            to="/speakers"
+            className="hidden min-h-[44px] items-center gap-2 text-sm underline underline-offset-4 md:inline-flex"
+          >
+            All speakers <span aria-hidden="true">→</span>
+          </Link>
+        </div>
+        <div className="mt-12 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
+          {speakers.slice(0, 4).map((s) => (
+            <SpeakerCard key={s.slug} speaker={s} />
+          ))}
+        </div>
+      </section>
+
+      <ClosingCta />
+    </Page>
   );
 }
