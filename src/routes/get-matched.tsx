@@ -5,7 +5,7 @@ import { EnquiryFlow } from "@/components/EnquiryFlow";
 
 export const Route = createFileRoute("/get-matched")({
   validateSearch: (search: Record<string, unknown>) => ({
-    speaker: typeof search['speaker'] === "string" ? (search['speaker'] as string) : undefined,
+    speaker: typeof search['speaker'] === "string" ? (search['speaker'] as string) : "",
   }),
   head: () => ({
     meta: [
