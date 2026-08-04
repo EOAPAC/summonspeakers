@@ -46,7 +46,7 @@ export const Route = createFileRoute("/case-studies/$slug")({
 });
 
 function CaseStudyDetail() {
-  const { study } = Route.useLoaderData();
+  const { study } = Route.useLoaderData() as { study: CaseStudy };
   const speaker = getSpeaker(study.speaker_slug);
 
   return (
@@ -108,7 +108,7 @@ function CaseStudyDetail() {
                 />
               </div>
               <div className="mt-8">
-                <ButtonLink to="/speakers/$slug" params={{ slug: speaker.slug }} variant="ghost" className="w-full">
+                <ButtonLink to="/speakers/$slug" params={{ slug: speaker.slug } as never} variant="ghost" className="w-full">
                   View profile
                 </ButtonLink>
               </div>

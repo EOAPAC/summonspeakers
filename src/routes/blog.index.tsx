@@ -30,7 +30,7 @@ export const Route = createFileRoute("/blog/")({
 });
 
 function BlogIndex() {
-  const lead = posts.find((p) => p.featured) ?? posts[0];
+  const lead = posts.find((p) => p.featured) ?? posts[0]!;
   const rest = posts.filter((p) => p.slug !== lead.slug);
 
   return (
