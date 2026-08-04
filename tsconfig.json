@@ -5,7 +5,10 @@
     "jsx": "react-jsx",
     "module": "ESNext",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "types": ["vite/client"],
+    // "bun" is here for the bun:test imports in *.test.ts. It pulls in Bun's
+    // globals, which are only real on the server and in tests — not in the
+    // browser — so it is not a licence to reach for Bun APIs in components.
+    "types": ["vite/client", "bun"],
 
     "moduleResolution": "Bundler",
     "allowImportingTsExtensions": true,

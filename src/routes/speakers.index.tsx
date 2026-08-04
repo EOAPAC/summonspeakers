@@ -8,7 +8,7 @@ import { ButtonLink } from "@/components/Button";
 import { getTopic, speakers } from "@/data/speakers";
 import type { RosterGender } from "@/data/roster";
 import { fetchRoster } from "@/lib/roster.server";
-import { absoluteUrl, ogImageMeta } from "@/lib/site";
+import { absoluteUrl, ogImageMeta, pageTitle } from "@/lib/site";
 
 const faqs = [
   {
@@ -24,6 +24,16 @@ const faqs = [
     a: "Speakers with a full profile publish a fee band. The wider roster is searchable by category, location and gender while we confirm each speaker's current rate, so send an enquiry and we come back with the exact figure within one business day.",
   },
 ];
+
+/** A facet is active — as distinct from any query parameter being present. */
+function isFaceted(s: RosterSearch): boolean {
+  return Boolean(s.topic || s.category || s.state || s.gender || s.q);
+}
+
+/** A facet is active, or we are past the first page. */
+function isNarrowed(s: RosterSearch): boolean {
+  return isFaceted(s) || (s.page !== undefined && s.page > 1);
+}
 
 export const Route = createFileRoute("/speakers/")({
   // Defaults are omitted rather than defaulted, so /speakers never redirects to
@@ -72,26 +82,45 @@ export const Route = createFileRoute("/speakers/")({
 
   head: ({ loaderData, match }) => {
     const total = loaderData?.roster.rosterCount ?? 0;
-    const filtered = Object.keys(match.search).length > 0;
+    const s = match.search;
+
+    // Checked field by field rather than with Object.keys, which counted any
+    // parameter at all — so a newsletter link to /speakers?utm_source=… was
+    // telling Google not to index the main speakers page.
+    const faceted = isFaceted(s);
+
+    // Pagination is not a near-duplicate the way a facet is: page 3 lists 60
+    // speakers that appear on no other page, and noindexing it would put most
+    // of the roster beyond reach. So it stays indexable with its own canonical
+    // and its own title, rather than 35 pages all claiming to be page 1.
+    const pageNo = s.page && s.page > 1 ? s.page : 0;
+    const canonicalPath = faceted || !pageNo ? "/speakers" : `/speakers?page=${pageNo}`;
+    const titleLead = pageNo
+      ? `All Speakers — page ${pageNo}`
+      : "All Speakers — fees shown upfront";
+
     const description = total
       ? `Search ${total.toLocaleString("en-AU")} speakers by category, location and gender. Every full profile publishes a fee band, so you can shortlist on budget.`
       : "Search the SummonSpeakers roster by category, location and gender.";
     return {
       meta: [
-        { title: "All Speakers — fees shown upfront | SummonSpeakers" },
-        { name: "description", content: description },
+        { title: pageTitle(titleLead) },
+        {
+          name: "description",
+          content: pageNo ? `Page ${pageNo} of the roster. ${description}` : description,
+        },
         { property: "og:title", content: "All Speakers | SummonSpeakers" },
         {
           property: "og:description",
           content: "Every speaker, every fee band, filterable in seconds.",
         },
-        { property: "og:url", content: absoluteUrl("/speakers") },
+        { property: "og:url", content: absoluteUrl(canonicalPath) },
         ...ogImageMeta("speakers"),
         // Faceted views are near-duplicates of the base list; keep them
         // crawlable for discovery but out of the index.
-        ...(filtered ? [{ name: "robots", content: "noindex,follow" }] : []),
+        ...(faceted ? [{ name: "robots", content: "noindex,follow" }] : []),
       ],
-      links: [{ rel: "canonical", href: absoluteUrl("/speakers") }],
+      links: [{ rel: "canonical", href: absoluteUrl(canonicalPath) }],
       scripts: [
         {
           type: "application/ld+json",
@@ -112,7 +141,11 @@ export const Route = createFileRoute("/speakers/")({
 function SpeakersIndex() {
   const { roster, topicLabel } = Route.useLoaderData();
   const search = Route.useSearch();
-  const unfiltered = Object.keys(search).length === 0;
+  // Named fields rather than Object.keys, which also counted tracking
+  // parameters: arriving on /speakers?utm_source=… hid the featured cards for no
+  // reason. Page 2 onwards counts as filtered, since featured cards sitting
+  // above a mid-roster page read as part of that page's results.
+  const unfiltered = !isNarrowed(search);
 
   return (
     <Page>
