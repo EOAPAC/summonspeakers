@@ -113,6 +113,7 @@
   --pad-inline: clamp(20px, 6vw, 96px);
   --sec-pad: clamp(64px, 9vw, 140px);
   --sec-pad-lg: clamp(90px, 13vw, 200px);
+  --head-gap: clamp(40px, 6vw, 72px);
   --container: 1440px;
   --container-narrow: 720px;
   --measure: 34ch;
@@ -132,6 +133,7 @@
   --accent-hover: #ffffff;
 
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 200ms;
   --dur-base: 500ms;
   --dur-slow: 1000ms;
   --dur-nav: 900ms;
@@ -201,6 +203,14 @@
   letter-spacing: var(--tracking-mono);
   font-size: 0.6875rem;
   line-height: 1;
+}
+
+@utility label-mono-lg {
+  font-family: var(--font-mono-stack);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-mono);
+  font-size: 0.875rem;
+  line-height: 1.4;
 }
 
 @utility hairline-top {

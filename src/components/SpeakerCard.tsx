@@ -20,9 +20,10 @@ export function SpeakerCard({ speaker }: { speaker: Speaker }) {
       }}
       className="group block cursor-pointer text-left"
     >
-      <div className="relative overflow-hidden rounded-[var(--radius-media)] hatch aspect-[4/3]">
+      <div className="relative overflow-hidden rounded-[var(--radius-media)] aspect-[4/3]">
+        <div className="hatch absolute inset-0 transition-transform duration-1000 [transition-timing-function:var(--ease)] group-hover:scale-[1.04]" />
         <div className="absolute inset-0 flex items-end p-4">
-          <span className="label-mono text-[var(--ink-2)]">{speaker.name}</span>
+          <span className="label-mono text-[var(--ink-3)]">Speaker portrait</span>
         </div>
         <span
           aria-hidden="true"
@@ -30,7 +31,6 @@ export function SpeakerCard({ speaker }: { speaker: Speaker }) {
         >
           ↗
         </span>
-        <div className="absolute inset-0 scale-100 transition-transform duration-1000 [transition-timing-function:var(--ease)] group-hover:scale-[1.04]" />
       </div>
       <div className="hairline-top mt-4 flex items-baseline justify-between gap-4 pt-3">
         <div>
