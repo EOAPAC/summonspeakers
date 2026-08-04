@@ -14,13 +14,17 @@ function coerceFilters(input: unknown): RosterFilters {
   const raw = (input ?? {}) as Partial<Record<keyof RosterFilters, unknown>>;
   const gender = raw.gender;
   const page = Number(raw.page);
+  const pageSize = Number(raw.pageSize);
   return {
-    category: typeof raw.category === "string" ? raw.category : emptyFilters.category,
+    categories: Array.isArray(raw.categories)
+      ? raw.categories.filter((c): c is string => typeof c === "string")
+      : emptyFilters.categories,
     state: typeof raw.state === "string" ? raw.state : emptyFilters.state,
     gender:
       gender === "female" || gender === "male" ? (gender as RosterGender) : emptyFilters.gender,
     q: typeof raw.q === "string" ? raw.q : emptyFilters.q,
     page: Number.isFinite(page) && page >= 1 ? Math.floor(page) : 1,
+    ...(Number.isFinite(pageSize) && pageSize >= 1 ? { pageSize: Math.floor(pageSize) } : {}),
   };
 }
 

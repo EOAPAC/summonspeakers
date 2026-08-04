@@ -5,7 +5,7 @@ import { SpeakerCard } from "@/components/SpeakerCard";
 import { RosterDirectory, type RosterSearch } from "@/components/RosterDirectory";
 import { ClosingCta } from "@/components/ClosingCta";
 import { ButtonLink } from "@/components/Button";
-import { speakers } from "@/data/speakers";
+import { getTopic, speakers } from "@/data/speakers";
 import type { RosterGender } from "@/data/roster";
 import { fetchRoster } from "@/lib/roster.server";
 import { absoluteUrl } from "@/lib/site";
@@ -33,6 +33,7 @@ export const Route = createFileRoute("/speakers/")({
     const gender = search["gender"];
     const page = Number(search["page"]);
     const out: RosterSearch = {};
+    if (str("topic")) out.topic = str("topic");
     if (str("category")) out.category = str("category");
     if (str("state")) out.state = str("state");
     if (gender === "female" || gender === "male") out.gender = gender as RosterGender;
@@ -43,17 +44,31 @@ export const Route = createFileRoute("/speakers/")({
 
   // Without loaderDeps the loader would not re-run when a filter changes.
   loaderDeps: ({ search }) => search,
-  loader: async ({ deps }) => ({
-    roster: await fetchRoster({
-      data: {
-        category: deps.category ?? "",
-        state: deps.state ?? "",
-        gender: deps.gender ?? "any",
-        q: deps.q ?? "",
-        page: deps.page ?? 1,
-      },
-    }),
-  }),
+  loader: async ({ deps }) => {
+    // `topic` expands to that topic's whole mapping, so a "see all 808" link
+    // from a multi-category topic page lands on exactly 808 results.
+    //
+    // An unrecognised topic falls back to the unfiltered roster, unlike an
+    // unrecognised category, which matches nothing. The asymmetry is deliberate:
+    // a category can be hand-typed into the URL, so silently ignoring it would
+    // mislead, whereas a topic slug only ever comes from our own links, and a
+    // stale one should degrade to a usable page rather than an empty one.
+    const topic = deps.topic ? getTopic(deps.topic) : undefined;
+    const categories = topic?.roster?.categories ?? (deps.category ? [deps.category] : []);
+    const gender = topic?.roster?.gender ?? deps.gender ?? "any";
+    return {
+      roster: await fetchRoster({
+        data: {
+          categories,
+          state: deps.state ?? "",
+          gender,
+          q: deps.q ?? "",
+          page: deps.page ?? 1,
+        },
+      }),
+      topicLabel: topic?.name ?? null,
+    };
+  },
 
   head: ({ loaderData, match }) => {
     const total = loaderData?.roster.rosterCount ?? 0;
@@ -94,7 +109,7 @@ export const Route = createFileRoute("/speakers/")({
 });
 
 function SpeakersIndex() {
-  const { roster } = Route.useLoaderData();
+  const { roster, topicLabel } = Route.useLoaderData();
   const search = Route.useSearch();
   const unfiltered = Object.keys(search).length === 0;
 
@@ -136,7 +151,7 @@ function SpeakersIndex() {
         <Eyebrow>The full roster</Eyebrow>
         <h2 className="display mt-6 text-[length:var(--display-md)]">Search every speaker</h2>
         <div className="mt-10">
-          <RosterDirectory data={roster} search={search} />
+          <RosterDirectory data={roster} search={search} topicLabel={topicLabel ?? undefined} />
         </div>
       </section>
 

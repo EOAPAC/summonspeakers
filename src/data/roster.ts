@@ -14,8 +14,14 @@ export const ROSTER_PAGE_SIZE = 60;
 export type RosterGender = "any" | "female" | "male";
 
 export type RosterFilters = {
-  /** Category label, or "" for all. */
-  category: string;
+  /**
+   * Category labels, OR-matched. Empty means all.
+   *
+   * A list rather than one label because the site's topics do not map 1:1 onto
+   * the CSV's categories — "Futurist & AI" covers both "Technology, Future &
+   * Innovation" and "AI".
+   */
+  categories: string[];
   /** State label, or "" for anywhere. */
   state: string;
   gender: RosterGender;
@@ -23,6 +29,8 @@ export type RosterFilters = {
   q: string;
   /** 1-based. */
   page: number;
+  /** Rows per page. Topic pages show a shorter preview than /speakers. */
+  pageSize?: number;
 };
 
 export type RosterRow = {
@@ -43,7 +51,7 @@ export type RosterPage = {
 };
 
 export const emptyFilters: RosterFilters = {
-  category: "",
+  categories: [],
   state: "",
   gender: "any",
   q: "",
@@ -61,7 +69,9 @@ function locationLabel(stateIdx: number[], city: string | undefined): string {
 }
 
 export function queryRoster(filters: RosterFilters): RosterPage {
-  const wantCategory = filters.category ? categoryId.get(filters.category) : undefined;
+  const wantCategories = filters.categories
+    .map((c) => categoryId.get(c))
+    .filter((id): id is number => id !== undefined);
   const wantState = filters.state ? stateId.get(filters.state) : undefined;
   const wantGender = filters.gender === "female" ? 1 : filters.gender === "male" ? 2 : 0;
   const needle = filters.q.trim().toLowerCase();
@@ -70,28 +80,29 @@ export function queryRoster(filters: RosterFilters): RosterPage {
   // rather than being silently ignored — otherwise a typo'd URL would look
   // like an unfiltered result set.
   const impossible =
-    (filters.category !== "" && wantCategory === undefined) ||
+    (filters.categories.length > 0 && wantCategories.length === 0) ||
     (filters.state !== "" && wantState === undefined);
 
   const matches = impossible
     ? []
     : roster.filter((e) => {
-        if (wantCategory !== undefined && !e.c.includes(wantCategory)) return false;
+        if (wantCategories.length && !wantCategories.some((id) => e.c.includes(id))) return false;
         if (wantState !== undefined && !e.s.includes(wantState)) return false;
         if (wantGender !== 0 && e.g !== wantGender) return false;
         if (needle && !e.name.toLowerCase().includes(needle)) return false;
         return true;
       });
 
-  const pageCount = Math.max(1, Math.ceil(matches.length / ROSTER_PAGE_SIZE));
+  const size = filters.pageSize ?? ROSTER_PAGE_SIZE;
+  const pageCount = Math.max(1, Math.ceil(matches.length / size));
   const page = Math.min(Math.max(1, filters.page), pageCount);
-  const start = (page - 1) * ROSTER_PAGE_SIZE;
+  const start = (page - 1) * size;
 
   return {
     total: matches.length,
     page,
     pageCount,
-    rows: matches.slice(start, start + ROSTER_PAGE_SIZE).map((e) => ({
+    rows: matches.slice(start, start + size).map((e) => ({
       name: e.name,
       slug: e.slug,
       categories: e.c.map((i) => rosterCategories[i]).filter((c): c is string => Boolean(c)),

@@ -28,6 +28,21 @@ export type TopicDef = {
   heading: string;
   blurb: string;
   kind: "topic" | "audience" | "event" | "location";
+  /**
+   * How this topic reaches the imported roster. The site's topics and the CSV's
+   * categories were authored separately and do not line up, so the mapping is
+   * explicit rather than inferred from the name.
+   *
+   * Omit it when no honest mapping exists — /topics/keynote is the case: the
+   * roster has no "Keynote" category because very nearly every speaker on it is
+   * a keynote speaker, so mapping it would just duplicate /speakers.
+   */
+  roster?: {
+    /** Roster category labels, OR-matched. */
+    categories?: string[];
+    /** Locks the roster query to one gender, for /topics/female-speakers. */
+    gender?: "female" | "male";
+  };
 };
 
 export const topics: TopicDef[] = [
@@ -38,6 +53,7 @@ export const topics: TopicDef[] = [
     blurb:
       "Leadership speakers help executive teams and emerging managers lead through change with clarity. Every fee below is published upfront, so you can shortlist within your budget before you make contact.",
     kind: "topic",
+    roster: { categories: ["Leadership"] },
   },
   {
     slug: "motivational",
@@ -46,6 +62,7 @@ export const topics: TopicDef[] = [
     blurb:
       "Motivational speakers open and close conferences with a story that people repeat afterwards. Browse fees, availability and topics, then enquire directly — there is no bureau in the middle.",
     kind: "topic",
+    roster: { categories: ["Motivational", "Inspirational"] },
   },
   {
     slug: "business",
@@ -54,6 +71,7 @@ export const topics: TopicDef[] = [
     blurb:
       "Business speakers cover strategy, growth, customer experience and operating models. Fees are shown as bands so you know the cost before the conversation starts.",
     kind: "topic",
+    roster: { categories: ["Business"] },
   },
   {
     slug: "futurist-ai",
@@ -62,6 +80,7 @@ export const topics: TopicDef[] = [
     blurb:
       "Futurist and AI speakers explain what is actually changing, and what your teams should do about it next quarter. Compare fees and formats side by side.",
     kind: "topic",
+    roster: { categories: ["Technology, Future & Innovation", "AI"] },
   },
   {
     slug: "resilience",
@@ -70,6 +89,7 @@ export const topics: TopicDef[] = [
     blurb:
       "Resilience speakers work with teams carrying a heavy quarter, a restructure or a long delivery. Fees are published on every profile, so you can shortlist before you make contact.",
     kind: "topic",
+    roster: { categories: ["Resilience"] },
   },
   {
     slug: "keynote",
@@ -86,6 +106,7 @@ export const topics: TopicDef[] = [
     blurb:
       "Female keynote speakers across leadership, resilience, business and technology. Every profile lists a fee band and current availability.",
     kind: "topic",
+    roster: { gender: "female" },
   },
 ];
 
@@ -472,6 +493,34 @@ export function getSpeaker(slug: string) {
 
 export function getTopic(slug: string) {
   return topics.find((t) => t.slug === slug);
+}
+
+/**
+ * Lower-case a topic name for use mid-sentence, keeping acronyms intact so
+ * "Futurist & AI" reads as "futurist & AI" and not "futurist & ai".
+ */
+function midSentence(name: string): string {
+  return name
+    .split(" ")
+    .map((word) => (/^[A-Z0-9&]+$/.test(word) && word.length <= 4 ? word : word.toLowerCase()))
+    .join(" ");
+}
+
+/**
+ * "Leadership" -> "leadership speakers"; "Female speakers" -> "female speakers".
+ *
+ * Some topic names already carry the noun, so appending it unconditionally read
+ * as "female speakers speakers".
+ */
+export function topicPhrase(name: string): string {
+  const phrase = midSentence(name);
+  return /\bspeakers?$/i.test(phrase) ? phrase : `${phrase} speakers`;
+}
+
+/** Singular form, for "how do I book a … speaker?". */
+export function topicPhraseSingular(name: string): string {
+  const phrase = midSentence(name);
+  return /\bspeakers$/i.test(phrase) ? phrase.replace(/s$/, "") : `${phrase} speaker`;
 }
 
 /**

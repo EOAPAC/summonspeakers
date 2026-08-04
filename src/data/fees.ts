@@ -1,3 +1,5 @@
+import { topicPhrase } from "./speakers";
+
 /**
  * Single source of truth for published fee bands.
  *
@@ -51,8 +53,11 @@ const floor = (band: string) => spell(band.split("–")[0]!.trim());
 export function feeAnswerForTopic(topicName: string): string | null {
   const b = bandsForTopic(topicName);
   if (!b) return null;
+  // Sentence-cased phrase, so a topic already ending in "speakers" does not
+  // become "Female speakers speakers on SummonSpeakers…".
+  const phrase = topicPhrase(topicName).replace(/^./, (c) => c.toUpperCase());
   return (
-    `${topicName} speakers on SummonSpeakers run from ${floor(b.emerging)} for emerging voices ` +
+    `${phrase} on SummonSpeakers run from ${floor(b.emerging)} for emerging voices ` +
     `to ${spell(b.established)} for established names with a book or a track record. ` +
     `Recognisable, broadcast-level names start around ${floor(b.celebrity)}. ` +
     `Every band on this page is published, so you can shortlist inside your budget before contacting anyone.`

@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 
+import { RosterRows } from "./RosterRows";
 import { rosterCategories, rosterStates } from "@/data/roster-facets";
 import type { RosterGender, RosterPage } from "@/data/roster";
 
@@ -10,6 +11,14 @@ export type RosterSearch = {
   gender?: RosterGender;
   q?: string;
   page?: number;
+  /**
+   * A topic slug, which expands server-side to that topic's full category
+   * mapping. Needed because a topic can span several roster categories —
+   * "Motivational" covers both Motivational and Inspirational — and a single
+   * `category` value cannot express that, which made "See all 808" land on a
+   * page showing 625.
+   */
+  topic?: string;
 };
 
 const controlClass =
@@ -35,20 +44,36 @@ function tidy(search: RosterSearch): RosterSearch {
  * shareable and server-rendered. Each change navigates; the loader re-queries on
  * the server, which is how the 2,131-row dataset stays out of the browser.
  */
-export function RosterDirectory({ data, search }: { data: RosterPage; search: RosterSearch }) {
+export function RosterDirectory({
+  data,
+  search,
+  topicLabel,
+}: {
+  data: RosterPage;
+  search: RosterSearch;
+  /** Display name for an active `topic` param, shown as a removable chip. */
+  topicLabel?: string | undefined;
+}) {
   const navigate = useNavigate();
   const { rows, total, page, pageCount } = data;
   const [draftQuery, setDraftQuery] = useState(search.q ?? "");
 
   // Any filter change resets to page 1 — staying on page 9 of a result set that
-  // now has two pages just shows an empty list.
+  // now has two pages just shows an empty list. Picking a category also drops an
+  // active topic, since the two would otherwise both constrain the query.
   const withFilters = (next: Partial<RosterSearch>): RosterSearch =>
-    tidy({ ...search, ...next, ...("page" in next ? {} : { page: 1 }) });
+    tidy({
+      ...search,
+      ...("category" in next ? { topic: "" } : {}),
+      ...next,
+      ...("page" in next ? {} : { page: 1 }),
+    });
 
   const apply = (next: Partial<RosterSearch>) =>
     navigate({ to: "/speakers", search: withFilters(next) });
 
   const active = [
+    topicLabel ? { label: topicLabel, clear: withFilters({ topic: "" }) } : null,
     search.category ? { label: search.category, clear: withFilters({ category: "" }) } : null,
     search.state ? { label: search.state, clear: withFilters({ state: "" }) } : null,
     search.gender && search.gender !== "any"
@@ -185,30 +210,7 @@ export function RosterDirectory({ data, search }: { data: RosterPage; search: Ro
           and we&rsquo;ll shortlist for you.
         </p>
       ) : (
-        <ul className="border-t border-[var(--ink)]">
-          {rows.map((r) => (
-            <li
-              key={r.slug}
-              className="grid gap-3 border-b border-[var(--line)] py-6 md:grid-cols-[1.1fr_1.4fr_auto] md:items-baseline md:gap-8"
-            >
-              <p className="text-lg font-semibold tracking-[-0.02em]">{r.name}</p>
-              <div>
-                <p className="text-sm text-[var(--ink-2)]">
-                  {r.categories.slice(0, 4).join(" · ") || "Category to be confirmed"}
-                  {r.categories.length > 4 && ` +${r.categories.length - 4} more`}
-                </p>
-                {r.location && <p className="label-mono mt-2 text-[var(--ink-3)]">{r.location}</p>}
-              </div>
-              <Link
-                to="/get-matched"
-                search={{ speaker: r.slug }}
-                className="label-mono inline-flex min-h-[44px] items-center gap-2 justify-self-start rounded-full border border-[var(--line-2)] px-4 transition-colors duration-500 [transition-timing-function:var(--ease)] hover:bg-ink hover:text-surface"
-              >
-                Enquire <span aria-hidden="true">→</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <RosterRows rows={rows} />
       )}
 
       {pageCount > 1 && (
