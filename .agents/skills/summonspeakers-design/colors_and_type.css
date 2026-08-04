@@ -231,7 +231,9 @@ body {
   letter-spacing: var(--tracking-body);
   text-decoration: none;
   cursor: pointer;
-  transition: background var(--dur-base) var(--ease), color var(--dur-base) var(--ease);
+  transition:
+    background var(--dur-base) var(--ease),
+    color var(--dur-base) var(--ease);
 }
 
 .btn-primary:hover {
@@ -279,7 +281,9 @@ body {
   text-transform: uppercase;
   letter-spacing: var(--tracking-mono);
   font-size: 0.6875rem;
-  transition: background var(--dur-base) var(--ease), color var(--dur-base) var(--ease);
+  transition:
+    background var(--dur-base) var(--ease),
+    color var(--dur-base) var(--ease);
 }
 
 .pill:hover {
@@ -292,7 +296,9 @@ body {
   background: var(--surface);
   border: 1px solid var(--line);
   overflow: hidden;
-  transition: transform var(--dur-base) var(--ease), border-color var(--dur-base) var(--ease);
+  transition:
+    transform var(--dur-base) var(--ease),
+    border-color var(--dur-base) var(--ease);
 }
 
 .card:hover {

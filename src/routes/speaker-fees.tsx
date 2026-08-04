@@ -3,6 +3,7 @@ import { Page, FAQ, faqJsonLd, Eyebrow } from "@/components/Page";
 import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { ClosingCta } from "@/components/ClosingCta";
 import { feeTiers, feeColumns } from "@/data/fees";
+import { absoluteUrl, ogImageMeta } from "@/lib/site";
 
 const faqs = [
   {
@@ -26,7 +27,6 @@ const faqs = [
 const tiers = feeTiers;
 const cols = feeColumns;
 
-
 export const Route = createFileRoute("/speaker-fees")({
   head: () => ({
     meta: [
@@ -34,16 +34,17 @@ export const Route = createFileRoute("/speaker-fees")({
       {
         name: "description",
         content:
-          "Keynote speaker fees by tier and topic, published in plain numbers. Emerging speakers from $3k, established from $9k, celebrity names from $35k. No fee on application.",
+          "Keynote speaker fees by tier and topic, in plain numbers. Emerging from $3,000, established from $9,000, celebrity names from $35,000. No fee on application.",
       },
       { property: "og:title", content: "How much does a keynote speaker cost?" },
       {
         property: "og:description",
         content: "A published fee guide by speaker tier and topic. No sales call required.",
       },
-      { property: "og:url", content: "/speaker-fees" },
+      { property: "og:url", content: absoluteUrl("/speaker-fees") },
+      ...ogImageMeta("speaker-fees"),
     ],
-    links: [{ rel: "canonical", href: "/speaker-fees" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/speaker-fees") }],
     scripts: [
       {
         type: "application/ld+json",
@@ -70,14 +71,14 @@ function SpeakerFees() {
         </h1>
         <div className="mt-10 max-w-[64ch] space-y-6 text-lg text-[var(--ink-2)]">
           <p>
-            Most professional keynote speakers charge between $3,000 and $120,000. The range is
-            wide because it covers a local practitioner speaking for 45 minutes and a broadcast
-            name headlining a 3,000-seat conference.
+            Most professional keynote speakers charge between $3,000 and $120,000. The range is wide
+            because it covers a local practitioner speaking for 45 minutes and a broadcast name
+            headlining a 3,000-seat conference.
           </p>
           <p>
-            Most agencies will not publish these numbers. They ask you to call, quote a fee with
-            20 to 30 per cent added, and keep the speaker's real rate to themselves. We publish
-            the bands instead, so you can plan a budget before you speak to anyone.
+            Most agencies will not publish these numbers. They ask you to call, quote a fee with 20
+            to 30 per cent added, and keep the speaker's real rate to themselves. We publish the
+            bands instead, so you can plan a budget before you speak to anyone.
           </p>
         </div>
       </section>
@@ -119,9 +120,9 @@ function SpeakerFees() {
         </div>
         <p className="mt-8 max-w-[60ch] text-sm text-[var(--ink-2)]">
           Ranges are for a single in-person keynote of up to 60 minutes, excluding travel and
-          accommodation. Emerging speakers are strong practitioners early in their speaking
-          career. Established speakers have a book, a track record or a research base. Celebrity
-          speakers are known outside their industry.
+          accommodation. Emerging speakers are strong practitioners early in their speaking career.
+          Established speakers have a book, a track record or a research base. Celebrity speakers
+          are known outside their industry.
         </p>
       </section>
 

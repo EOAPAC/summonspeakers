@@ -1,10 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Page, FAQ, faqJsonLd } from "@/components/Page";
+import { Page, FAQ, faqJsonLd, Eyebrow } from "@/components/Page";
 import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
-import { SpeakerDirectory } from "@/components/SpeakerDirectory";
+import { SpeakerCard } from "@/components/SpeakerCard";
+import { RosterDirectory, type RosterSearch } from "@/components/RosterDirectory";
 import { ClosingCta } from "@/components/ClosingCta";
 import { ButtonLink } from "@/components/Button";
-import { speakers } from "@/data/speakers";
+import { getTopic, speakers } from "@/data/speakers";
+import type { RosterGender } from "@/data/roster";
+import { fetchRoster } from "@/lib/roster.server";
+import { absoluteUrl, ogImageMeta } from "@/lib/site";
 
 const faqs = [
   {
@@ -15,51 +19,141 @@ const faqs = [
     q: "How do I book a speaker?",
     a: "Send an enquiry with your date, audience size and topic. We reply within one business day with a shortlist and confirmed fees, then you book directly with the speaker through us.",
   },
+  {
+    q: "Why do some speakers not show a fee?",
+    a: "Speakers with a full profile publish a fee band. The wider roster is searchable by category, location and gender while we confirm each speaker's current rate, so send an enquiry and we come back with the exact figure within one business day.",
+  },
 ];
 
 export const Route = createFileRoute("/speakers/")({
-  head: () => ({
-    meta: [
-      { title: "All Speakers — fees shown upfront | SummonSpeakers" },
-      {
-        name: "description",
-        content:
-          "Browse every speaker on SummonSpeakers with published fee bands, topics, locations and availability. Filter and enquire directly.",
-      },
-      { property: "og:title", content: "All Speakers | SummonSpeakers" },
-      {
-        property: "og:description",
-        content: "Every speaker, every fee band, filterable in seconds.",
-      },
-      { property: "og:url", content: "/speakers" },
-    ],
-    links: [{ rel: "canonical", href: "/speakers" }],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify(
-          breadcrumbJsonLd([
-            { name: "Home", item: "/" },
-            { name: "Speakers", item: "/speakers" },
-          ]),
-        ),
-      },
-      { type: "application/ld+json", children: JSON.stringify(faqJsonLd(faqs)) },
-    ],
-  }),
+  // Defaults are omitted rather than defaulted, so /speakers never redirects to
+  // /speakers?category=&state=&gender=any.
+  validateSearch: (search: Record<string, unknown>): RosterSearch => {
+    const str = (key: string) => (typeof search[key] === "string" ? (search[key] as string) : "");
+    const gender = search["gender"];
+    const page = Number(search["page"]);
+    const out: RosterSearch = {};
+    if (str("topic")) out.topic = str("topic");
+    if (str("category")) out.category = str("category");
+    if (str("state")) out.state = str("state");
+    if (gender === "female" || gender === "male") out.gender = gender as RosterGender;
+    if (str("q")) out.q = str("q");
+    if (Number.isFinite(page) && page > 1) out.page = Math.floor(page);
+    return out;
+  },
+
+  // Without loaderDeps the loader would not re-run when a filter changes.
+  loaderDeps: ({ search }) => search,
+  loader: async ({ deps }) => {
+    // `topic` expands to that topic's whole mapping, so a "see all 808" link
+    // from a multi-category topic page lands on exactly 808 results.
+    //
+    // An unrecognised topic falls back to the unfiltered roster, unlike an
+    // unrecognised category, which matches nothing. The asymmetry is deliberate:
+    // a category can be hand-typed into the URL, so silently ignoring it would
+    // mislead, whereas a topic slug only ever comes from our own links, and a
+    // stale one should degrade to a usable page rather than an empty one.
+    const topic = deps.topic ? getTopic(deps.topic) : undefined;
+    const categories = topic?.roster?.categories ?? (deps.category ? [deps.category] : []);
+    const gender = topic?.roster?.gender ?? deps.gender ?? "any";
+    return {
+      roster: await fetchRoster({
+        data: {
+          categories,
+          state: deps.state ?? "",
+          gender,
+          q: deps.q ?? "",
+          page: deps.page ?? 1,
+        },
+      }),
+      topicLabel: topic?.name ?? null,
+    };
+  },
+
+  head: ({ loaderData, match }) => {
+    const total = loaderData?.roster.rosterCount ?? 0;
+    const filtered = Object.keys(match.search).length > 0;
+    const description = total
+      ? `Search ${total.toLocaleString("en-AU")} speakers by category, location and gender. Every full profile publishes a fee band, so you can shortlist on budget.`
+      : "Search the SummonSpeakers roster by category, location and gender.";
+    return {
+      meta: [
+        { title: "All Speakers — fees shown upfront | SummonSpeakers" },
+        { name: "description", content: description },
+        { property: "og:title", content: "All Speakers | SummonSpeakers" },
+        {
+          property: "og:description",
+          content: "Every speaker, every fee band, filterable in seconds.",
+        },
+        { property: "og:url", content: absoluteUrl("/speakers") },
+        ...ogImageMeta("speakers"),
+        // Faceted views are near-duplicates of the base list; keep them
+        // crawlable for discovery but out of the index.
+        ...(filtered ? [{ name: "robots", content: "noindex,follow" }] : []),
+      ],
+      links: [{ rel: "canonical", href: absoluteUrl("/speakers") }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify(
+            breadcrumbJsonLd([
+              { name: "Home", item: "/" },
+              { name: "Speakers", item: "/speakers" },
+            ]),
+          ),
+        },
+        { type: "application/ld+json", children: JSON.stringify(faqJsonLd(faqs)) },
+      ],
+    };
+  },
   component: SpeakersIndex,
 });
 
 function SpeakersIndex() {
+  const { roster, topicLabel } = Route.useLoaderData();
+  const search = Route.useSearch();
+  const unfiltered = Object.keys(search).length === 0;
+
   return (
     <Page>
       <Breadcrumbs items={[{ label: "Home", to: "/" }, { label: "Speakers" }]} />
       <section className="container-x pb-16 pt-10">
         <h1 className="display max-w-[16ch] text-[length:var(--display-lg)]">All speakers</h1>
         <p className="mt-8 max-w-[60ch] text-lg text-[var(--ink-2)]">
-          Every speaker here publishes a fee band. Filter by topic, budget, location and
-          availability, then enquire directly — there is no bureau taking a cut in the middle.
+          {roster.rosterCount.toLocaleString("en-AU")} speakers, searchable by category, location
+          and gender. Every full profile publishes a fee band, so you can shortlist inside your
+          budget before you contact anyone.
         </p>
+      </section>
+
+      {/* Hidden once a filter is on: the featured cards are not filtered, so
+          leaving them above a filtered roster reads as a broken result set. */}
+      {unfiltered && (
+        <section className="rule-open container-x section-y">
+          <div className="flex items-end justify-between gap-6">
+            <div>
+              <Eyebrow>Fees published</Eyebrow>
+              <h2 className="display mt-6 text-[length:var(--display-md)]">Full profiles</h2>
+            </div>
+          </div>
+          <p className="mt-8 max-w-[58ch] text-[var(--ink-2)]">
+            These speakers publish a fee band, a biography and organiser references. Everyone else
+            on the roster is available on enquiry.
+          </p>
+          <div className="mt-12 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
+            {speakers.map((s) => (
+              <SpeakerCard key={s.slug} speaker={s} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section className="rule-open container-x section-y">
+        <Eyebrow>The full roster</Eyebrow>
+        <h2 className="display mt-6 text-[length:var(--display-md)]">Search every speaker</h2>
+        <div className="mt-10">
+          <RosterDirectory data={roster} search={search} topicLabel={topicLabel ?? undefined} />
+        </div>
       </section>
 
       <section className="container-x pb-8">
@@ -70,10 +164,6 @@ function SpeakersIndex() {
           </p>
           <ButtonLink to="/get-matched">Get matched</ButtonLink>
         </div>
-      </section>
-
-      <section className="container-x pb-24">
-        <SpeakerDirectory speakers={speakers} />
       </section>
 
       <section className="container-x pb-24">

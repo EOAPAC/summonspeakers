@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { createLink, type LinkComponent } from "@tanstack/react-router";
 import type { ComponentProps, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
@@ -48,16 +48,25 @@ export function Button({
   );
 }
 
-export function ButtonLink({
+function ButtonAnchor({
   variant = "primary",
   className,
   children,
   ...props
-}: ComponentProps<typeof Link> & { variant?: Variant; children?: ReactNode }) {
+}: ComponentProps<"a"> & { variant?: Variant; children?: ReactNode }) {
   return (
-    <Link className={cn(base, variants[variant], className)} {...props}>
+    <a className={cn(base, variants[variant], className)} {...props}>
       {children}
       {arrow(variant)}
-    </Link>
+    </a>
   );
 }
+
+// Built with createLink rather than by wrapping <Link> directly. A plain
+// wrapper widens `to`/`params`/`search` to the non-generic Link signature,
+// which is why every call site previously needed an `as never` cast.
+const ButtonLinkImpl = createLink(ButtonAnchor);
+
+export const ButtonLink: LinkComponent<typeof ButtonAnchor> = (props) => (
+  <ButtonLinkImpl {...props} />
+);

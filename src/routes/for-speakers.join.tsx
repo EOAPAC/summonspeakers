@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Page } from "@/components/Page";
 import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { Button } from "@/components/Button";
+import { absoluteUrl, ogImageMeta } from "@/lib/site";
 
 export const Route = createFileRoute("/for-speakers/join")({
   head: () => ({
@@ -18,9 +19,10 @@ export const Route = createFileRoute("/for-speakers/join")({
         property: "og:description",
         content: "Create your speaker listing and start receiving direct enquiries.",
       },
-      { property: "og:url", content: "/for-speakers/join" },
+      { property: "og:url", content: absoluteUrl("/for-speakers/join") },
+      ...ogImageMeta("for-speakers"),
     ],
-    links: [{ rel: "canonical", href: "/for-speakers/join" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/for-speakers/join") }],
     scripts: [
       {
         type: "application/ld+json",
@@ -114,8 +116,8 @@ function Join() {
             </div>
             {submitted ? (
               <p role="status" className="text-lg">
-                Thank you. Your listing is with our editor and we'll be in touch within two
-                business days.
+                Thank you. Your listing is with our editor and we'll be in touch within two business
+                days.
               </p>
             ) : (
               <Button type="submit">Submit for review</Button>

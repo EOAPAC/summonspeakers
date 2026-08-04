@@ -32,6 +32,9 @@ const budgets = ["Under $10k", "$10k – $20k", "$20k – $35k", "$35k+", "Not s
 const fieldBase =
   "min-h-[56px] w-full rounded-[var(--radius-sm)] border border-[var(--line-2)] bg-surface px-4 text-base";
 
+/** Names already offered by the topic and profile option groups. */
+const knownNames = new Set<string>([...topics.map((t) => t.name), ...speakers.map((s) => s.name)]);
+
 function Field({
   id,
   label,
@@ -61,20 +64,29 @@ function Field({
   );
 }
 
-export function EnquiryFlow({ speakerSlug }: { speakerSlug?: string }) {
-  const preset = speakerSlug ? speakers.find((s) => s.slug === speakerSlug) : undefined;
+/**
+ * `presetName` is resolved by the route loader, which looks the slug up in the
+ * full profiles and then the wider roster — so a roster speaker with no profile
+ * page still arrives here with their name filled in.
+ */
+export function EnquiryFlow({
+  presetName = "",
+  presetSlug = "",
+}: {
+  presetName?: string | undefined;
+  presetSlug?: string | undefined;
+}) {
   const [step, setStep] = useState(1);
-  const [values, setValues] = useState<Values>({
-    ...empty,
-    topic_or_speaker: preset ? preset.name : "",
-  });
+  const [values, setValues] = useState<Values>({ ...empty, topic_or_speaker: presetName });
   const [errors, setErrors] = useState<Partial<Record<keyof Values, string>>>({});
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const set = (k: keyof Values) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
-    setValues((v) => ({ ...v, [k]: e.target.value }));
+  const set =
+    (k: keyof Values) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
+      setValues((v) => ({ ...v, [k]: e.target.value }));
 
   function validateStep(n: number) {
     const next: Partial<Record<keyof Values, string>> = {};
@@ -100,13 +112,12 @@ export function EnquiryFlow({ speakerSlug }: { speakerSlug?: string }) {
     setSubmitting(true);
     setSubmitError(null);
     try {
-      await submitEnquiry({
-        data: {
-          ...values,
-          audience_size: values.audience_size,
-          speaker_slug: preset?.slug ?? null,
-        },
-      });
+      // Resolve the slug from what is actually selected, not from the speaker
+      // the visitor happened to arrive from — they may have changed it since.
+      const profile = speakers.find((s) => s.name === values.topic_or_speaker);
+      const speaker_slug =
+        profile?.slug ?? (values.topic_or_speaker === presetName ? presetSlug || null : null);
+      await submitEnquiry({ data: { ...values, speaker_slug } });
       setDone(true);
     } catch {
       setSubmitError("We couldn't send that. Try again, or email hello@summonspeakers.com.");
@@ -121,8 +132,8 @@ export function EnquiryFlow({ speakerSlug }: { speakerSlug?: string }) {
         <p className="label-mono text-[var(--ink-3)]">Enquiry received</p>
         <h1 className="display mt-6 text-[length:var(--display-lg)]">Thank you</h1>
         <p className="mt-8 text-lg text-[var(--ink-2)]">
-          We'll send a shortlist of matched speakers to your inbox within one business day. Fees
-          are included, so you can compare before you reply.
+          We'll send a shortlist of matched speakers to your inbox within one business day. Fees are
+          included, so you can compare before you reply.
         </p>
         <div className="mt-10">
           <Link
@@ -147,9 +158,7 @@ export function EnquiryFlow({ speakerSlug }: { speakerSlug?: string }) {
           />
         ))}
       </div>
-      <p className="label-mono mt-4 text-[var(--ink-3)]">
-        STEP {step} OF 3 · ABOUT TWO MINUTES
-      </p>
+      <p className="label-mono mt-4 text-[var(--ink-3)]">STEP {step} OF 3 · ABOUT TWO MINUTES</p>
 
       {step > 1 && (
         <button
@@ -203,12 +212,19 @@ export function EnquiryFlow({ speakerSlug }: { speakerSlug?: string }) {
               aria-describedby={errors.topic_or_speaker ? "topic_or_speaker-error" : undefined}
             >
               <option value="">Choose a topic or a speaker</option>
+              {/* A roster speaker has no entry in the lists below, so add one —
+                  otherwise the select would render blank despite a valid value. */}
+              {presetName && !knownNames.has(presetName) && (
+                <optgroup label="Your selection">
+                  <option>{presetName}</option>
+                </optgroup>
+              )}
               <optgroup label="Topics">
                 {topics.map((t) => (
                   <option key={t.slug}>{t.name}</option>
                 ))}
               </optgroup>
-              <optgroup label="Speakers">
+              <optgroup label="Speakers with published fees">
                 {speakers.map((s) => (
                   <option key={s.slug}>{s.name}</option>
                 ))}

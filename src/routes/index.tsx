@@ -1,14 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Page, Eyebrow } from "@/components/Page";
 import { ButtonLink } from "@/components/Button";
 import { SpeakerCard } from "@/components/SpeakerCard";
 import { ClosingCta } from "@/components/ClosingCta";
-import { speakers, topics } from "@/data/speakers";
+import { featuredTopics, speakers } from "@/data/speakers";
+import { absoluteUrl, ogImageMeta } from "@/lib/site";
+import { serviceJsonLd } from "@/lib/schema";
+import { Page, Eyebrow, FAQ, faqJsonLd } from "@/components/Page";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Book keynote speakers with fees shown upfront | SummonSpeakers" },
+      { title: "Keynote Speakers, Fees Shown Upfront | SummonSpeakers" },
       {
         name: "description",
         content:
@@ -19,12 +21,48 @@ export const Route = createFileRoute("/")({
         property: "og:description",
         content: "Compare speakers and their fees upfront, then book directly.",
       },
-      { property: "og:url", content: "/" },
+      { property: "og:url", content: absoluteUrl("/") },
+      ...ogImageMeta("default"),
     ],
-    links: [{ rel: "canonical", href: "/" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/") }],
+    scripts: [
+      { type: "application/ld+json", children: JSON.stringify(serviceJsonLd()) },
+      { type: "application/ld+json", children: JSON.stringify(faqJsonLd(homeFaqs)) },
+    ],
   }),
   component: Home,
 });
+
+/**
+ * Answers written to be quotable on their own, because that is the form AI
+ * assistants extract. Every figure here is stated elsewhere on the site too.
+ */
+const homeFaqs = [
+  {
+    q: "What is SummonSpeakers?",
+    a: "SummonSpeakers is a speaker booking marketplace that publishes every speaker's fee band upfront. Planners browse the roster, compare fees before making contact, and book directly with the speaker. We add no markup to the fee you are quoted.",
+  },
+  {
+    q: "How much does a keynote speaker cost?",
+    a: "Professional keynote speakers cost between $3,000 and $120,000. Emerging speakers start around $3,000, established names with a book or research base sit between $9,000 and $30,000, and broadcast-level names start near $35,000. Every band is published on the speaker fees page.",
+  },
+  {
+    q: "Is SummonSpeakers free to use?",
+    a: "Yes. Enquiring is free, there is no account to create, and you are committed to nothing until you sign a booking. Speakers pay a flat listing fee, so we earn nothing from your booking and nothing extra when a fee is higher.",
+  },
+  {
+    q: "How is this different from a speaker bureau?",
+    a: "A traditional bureau adds 20 to 30 per cent to the speaker's fee and usually will not disclose the fee until you have had a sales call. SummonSpeakers publishes the band before you enquire and takes no percentage, so the number you see is the number you budget.",
+  },
+  {
+    q: "Who uses SummonSpeakers?",
+    a: "Conference producers, event managers, HR and people teams, and association directors — anyone responsible for filling a stage on a fixed budget. Most briefs we receive name a theme rather than a speaker.",
+  },
+  {
+    q: "What happens if a speaker cancels?",
+    a: "We find a replacement of the same calibre at the same fee, or you receive a full refund. If you need to cancel, that is free up to 14 days before your event.",
+  },
+];
 
 const clients = ["NORTHBRIDGE", "ARDENT HEALTH", "MERIDIAN", "HAVENLINE", "PALEWOOD"];
 
@@ -84,8 +122,8 @@ function Home() {
         </p>
 
         <p className="mt-10 max-w-[48ch] text-lg text-[var(--ink-2)] md:max-w-none">
-          Browse, compare and book professional speakers directly. No bureau markup, no
-          guessing what they cost.
+          Browse, compare and book professional speakers directly. No bureau markup, no guessing
+          what they cost.
         </p>
         <div className="mt-10 flex flex-wrap items-center gap-8">
           <ButtonLink to="/get-matched">Get matched</ButtonLink>
@@ -96,9 +134,7 @@ function Home() {
             Browse speakers <span aria-hidden="true">→</span>
           </Link>
         </div>
-        <p className="label-mono mt-6 text-[var(--ink-3)]">
-          Free to enquire, no obligation
-        </p>
+        <p className="label-mono mt-6 text-[var(--ink-3)]">Free to enquire, no obligation</p>
 
         <div className="hairline-top mt-20 pt-8">
           <Eyebrow>Trusted by event teams at</Eyebrow>
@@ -115,34 +151,34 @@ function Home() {
       <section className="rule-open container-x section-y">
         <Eyebrow>Browse by category</Eyebrow>
         <ul className="mt-10 border-t border-[var(--line)]">
-          {topics.map((t, i) => (
+          {featuredTopics.map((t, i) => (
             <li key={t.slug} className="border-b border-[var(--line)]">
-            <Link
-              to="/topics/$slug"
-              params={{ slug: t.slug }}
-              className="group grid min-h-[88px] grid-cols-[auto_1fr_auto] items-center gap-6 py-6 md:grid-cols-[auto_1fr_1fr_auto] md:items-start md:gap-8"
-            >
-              <span className="label-mono text-[var(--ink-3)]">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <span className="flex flex-col gap-1 md:hidden">
-                <span className="display inline-block text-[length:var(--display-md)] transition-transform duration-500 [transition-timing-function:var(--ease)] group-hover:translate-x-3">
+              <Link
+                to="/topics/$slug"
+                params={{ slug: t.slug }}
+                className="group grid min-h-[88px] grid-cols-[auto_1fr_auto] items-center gap-6 py-6 md:grid-cols-[auto_1fr_1fr_auto] md:items-start md:gap-8"
+              >
+                <span className="label-mono text-[var(--ink-3)]">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span className="flex flex-col gap-1 md:hidden">
+                  <span className="display inline-block text-[length:var(--display-md)] transition-transform duration-500 [transition-timing-function:var(--ease)] group-hover:translate-x-3">
+                    {t.name}
+                  </span>
+                  <span className="max-w-[46ch] text-sm text-[var(--ink-2)]">
+                    {t.blurb.split(".")[0]}.
+                  </span>
+                </span>
+                <span className="display hidden text-[length:var(--display-md)] transition-transform duration-500 [transition-timing-function:var(--ease)] group-hover:translate-x-3 md:block">
                   {t.name}
                 </span>
-                <span className="max-w-[46ch] text-sm text-[var(--ink-2)]">
+                <span className="hidden max-w-[46ch] self-start pt-2 text-sm text-[var(--ink-2)] md:block">
                   {t.blurb.split(".")[0]}.
                 </span>
-              </span>
-              <span className="display hidden text-[length:var(--display-md)] transition-transform duration-500 [transition-timing-function:var(--ease)] group-hover:translate-x-3 md:block">
-                {t.name}
-              </span>
-              <span className="hidden max-w-[46ch] self-start pt-2 text-sm text-[var(--ink-2)] md:block">
-                {t.blurb.split(".")[0]}.
-              </span>
-              <span aria-hidden="true" className="self-center text-2xl">
-                →
-              </span>
-            </Link>
+                <span aria-hidden="true" className="self-center text-2xl">
+                  →
+                </span>
+              </Link>
             </li>
           ))}
         </ul>
@@ -204,6 +240,10 @@ function Home() {
             <SpeakerCard key={s.slug} speaker={s} />
           ))}
         </div>
+      </section>
+
+      <section className="rule-open container-x section-y">
+        <FAQ items={homeFaqs} />
       </section>
 
       <ClosingCta />

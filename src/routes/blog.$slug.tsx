@@ -4,6 +4,16 @@ import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { ButtonLink } from "@/components/Button";
 import { ClosingCta } from "@/components/ClosingCta";
 import { getPost, relatedPosts, type Post } from "@/data/editorial";
+import { absoluteUrl, ogImageMeta, pageTitle } from "@/lib/site";
+
+/**
+ * Several deks are short enough to be truncated-looking in a SERP. Pad only the
+ * ones under the useful floor, and never past the point Google cuts.
+ */
+function metaDescription(dek: string): string {
+  const tail = " Published fee bands on every speaker profile.";
+  return (dek.length < 120 ? dek + tail : dek).slice(0, 158);
+}
 
 export const Route = createFileRoute("/blog/$slug")({
   loader: ({ params }): { post: Post } => {
@@ -13,19 +23,25 @@ export const Route = createFileRoute("/blog/$slug")({
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) {
-      return { meta: [{ title: "Article unavailable | SummonSpeakers" }, { name: "robots", content: "noindex" }] };
+      return {
+        meta: [
+          { title: "Article unavailable | SummonSpeakers" },
+          { name: "robots", content: "noindex" },
+        ],
+      };
     }
     const p = loaderData.post;
     return {
       meta: [
-        { title: `${p.title} | SummonSpeakers` },
-        { name: "description", content: p.dek },
+        { title: pageTitle(p.title) },
+        { name: "description", content: metaDescription(p.dek) },
         { property: "og:title", content: p.title },
         { property: "og:description", content: p.dek },
         { property: "og:type", content: "article" },
-        { property: "og:url", content: `/blog/${params.slug}` },
+        { property: "og:url", content: absoluteUrl(`/blog/${params.slug}`) },
+        ...ogImageMeta("blog"),
       ],
-      links: [{ rel: "canonical", href: `/blog/${params.slug}` }],
+      links: [{ rel: "canonical", href: absoluteUrl(`/blog/${params.slug}`) }],
       scripts: [
         {
           type: "application/ld+json",
@@ -48,7 +64,7 @@ export const Route = createFileRoute("/blog/$slug")({
             articleSection: p.category,
             author: { "@type": "Organization", name: "SummonSpeakers" },
             publisher: { "@type": "Organization", name: "SummonSpeakers" },
-            mainEntityOfPage: `/blog/${p.slug}`,
+            mainEntityOfPage: absoluteUrl(`/blog/${p.slug}`),
           }),
         },
       ],
@@ -74,7 +90,9 @@ function BlogPost() {
       <article>
         <header className="container-x pb-12 pt-10">
           <Eyebrow>{post.category}</Eyebrow>
-          <h1 className="display mt-6 max-w-[18ch] text-[length:var(--display-md)]">{post.title}</h1>
+          <h1 className="display mt-6 max-w-[18ch] text-[length:var(--display-md)]">
+            {post.title}
+          </h1>
           <p className="mt-8 max-w-[52ch] text-lg text-[var(--ink-2)]">{post.dek}</p>
           <p className="label-mono mt-10 border-t border-[var(--line)] pt-6 text-[var(--ink-3)]">
             By the SummonSpeakers team · {post.date} · {post.read_minutes} min read
@@ -86,14 +104,20 @@ function BlogPost() {
             {post.body.map((block, i) => {
               if (block.kind === "h2") {
                 return (
-                  <h2 key={i} className="mt-14 text-2xl font-semibold tracking-[-0.03em] first:mt-0">
+                  <h2
+                    key={i}
+                    className="mt-14 text-2xl font-semibold tracking-[-0.03em] first:mt-0"
+                  >
                     {block.text}
                   </h2>
                 );
               }
               if (block.kind === "quote") {
                 return (
-                  <blockquote key={i} className="my-12 max-w-[26ch] border-y border-[var(--ink)] py-8 text-[length:var(--display-sm)] tracking-[-0.02em]">
+                  <blockquote
+                    key={i}
+                    className="my-12 max-w-[26ch] border-y border-[var(--ink)] py-8 text-[length:var(--display-sm)] tracking-[-0.02em]"
+                  >
                     {block.text}
                   </blockquote>
                 );
@@ -103,7 +127,9 @@ function BlogPost() {
                   <ul key={i} className="mt-6 grid gap-3">
                     {block.items.map((item) => (
                       <li key={item} className="flex gap-4 text-[var(--ink-2)]">
-                        <span aria-hidden="true" className="text-ink">—</span>
+                        <span aria-hidden="true" className="text-ink">
+                          —
+                        </span>
                         <span>{item}</span>
                       </li>
                     ))}
@@ -132,7 +158,7 @@ function BlogPost() {
 
       <section className="container-x pb-24">
         <div className="rule-open pt-10">
-          <h2 className="display text-[var(--display-md)]">Keep reading</h2>
+          <h2 className="display text-[length:var(--display-md)]">Keep reading</h2>
           <ul className="mt-10 border-t border-[var(--line)]">
             {related.map((r) => (
               <li key={r.slug} className="border-b border-[var(--line)]">
@@ -142,7 +168,9 @@ function BlogPost() {
                   className="group grid gap-3 py-8 transition-colors duration-500 [transition-timing-function:var(--ease)] hover:bg-ink hover:text-surface md:grid-cols-[1fr_1.2fr_auto] md:items-baseline md:gap-12 md:px-4"
                 >
                   <h3 className="text-xl font-semibold tracking-[-0.03em]">{r.title}</h3>
-                  <p className="text-[var(--ink-2)] group-hover:text-[rgba(255,255,255,0.72)]">{r.dek}</p>
+                  <p className="text-[var(--ink-2)] group-hover:text-[rgba(255,255,255,0.72)]">
+                    {r.dek}
+                  </p>
                   <span className="label-mono whitespace-nowrap text-[var(--ink-3)] group-hover:text-[rgba(255,255,255,0.72)]">
                     {r.read_minutes} min
                   </span>

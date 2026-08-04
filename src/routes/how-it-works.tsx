@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Page, FAQ, faqJsonLd, Eyebrow } from "@/components/Page";
 import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { ClosingCta } from "@/components/ClosingCta";
+import { absoluteUrl, ogImageMeta } from "@/lib/site";
 
 const steps = [
   {
@@ -39,7 +40,6 @@ const faqs = [
     q: "What if we're not sure what we want yet?",
     a: "Send the enquiry anyway. Roughly half the briefs we get name a theme rather than a speaker, and the shortlist is usually more useful when you haven't already narrowed it. Tell us the audience and what you want them to leave thinking.",
   },
-
 ];
 
 export const Route = createFileRoute("/how-it-works")({
@@ -56,9 +56,10 @@ export const Route = createFileRoute("/how-it-works")({
         property: "og:description",
         content: "From brief to booking in four steps, with fees shown at every stage.",
       },
-      { property: "og:url", content: "/how-it-works" },
+      { property: "og:url", content: absoluteUrl("/how-it-works") },
+      ...ogImageMeta("how-it-works"),
     ],
-    links: [{ rel: "canonical", href: "/how-it-works" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/how-it-works") }],
     scripts: [
       {
         type: "application/ld+json",

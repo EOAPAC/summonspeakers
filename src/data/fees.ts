@@ -1,3 +1,5 @@
+import { topicPhrase } from "./speakers";
+
 /**
  * Single source of truth for published fee bands.
  *
@@ -12,7 +14,11 @@ export const feeBands = {
   Motivational: { emerging: "$3k – $7k", established: "$9k – $18k", celebrity: "$35k – $75k" },
   Leadership: { emerging: "$4k – $8k", established: "$12k – $22k", celebrity: "$40k – $90k" },
   Business: { emerging: "$4k – $9k", established: "$10k – $20k", celebrity: "$35k – $80k" },
-  "Futurist & AI": { emerging: "$5k – $10k", established: "$15k – $30k", celebrity: "$45k – $120k" },
+  "Futurist & AI": {
+    emerging: "$5k – $10k",
+    established: "$15k – $30k",
+    celebrity: "$45k – $120k",
+  },
 } satisfies Record<string, Bands>;
 
 export type FeeColumn = keyof typeof feeBands;
@@ -44,11 +50,14 @@ const floor = (band: string) => spell(band.split("–")[0]!.trim());
  * The "how much do X speakers cost?" answer, generated from the bands above.
  * Returns null when we publish no bands for the topic — omit rather than guess.
  */
-export function feeAnswerForTopic(topicName: string, lower: string): string | null {
+export function feeAnswerForTopic(topicName: string): string | null {
   const b = bandsForTopic(topicName);
   if (!b) return null;
+  // Sentence-cased phrase, so a topic already ending in "speakers" does not
+  // become "Female speakers speakers on SummonSpeakers…".
+  const phrase = topicPhrase(topicName).replace(/^./, (c) => c.toUpperCase());
   return (
-    `${topicName} speakers on SummonSpeakers run from ${floor(b.emerging)} for emerging voices ` +
+    `${phrase} on SummonSpeakers run from ${floor(b.emerging)} for emerging voices ` +
     `to ${spell(b.established)} for established names with a book or a track record. ` +
     `Recognisable, broadcast-level names start around ${floor(b.celebrity)}. ` +
     `Every band on this page is published, so you can shortlist inside your budget before contacting anyone.`

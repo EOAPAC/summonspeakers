@@ -7,6 +7,7 @@ import { ButtonLink } from "@/components/Button";
 import { SpeakerCard } from "@/components/SpeakerCard";
 import { getSpeaker, speakers, type Speaker } from "@/data/speakers";
 import { formatFee } from "@/lib/fee";
+import { absoluteUrl, pageTitle, ogImageMeta } from "@/lib/site";
 
 function faqsFor(name: string, fee: string) {
   return [
@@ -30,22 +31,36 @@ export const Route = createFileRoute("/speakers/$slug")({
   head: ({ loaderData, params }) => {
     if (!loaderData) {
       return {
-        meta: [{ title: "Speaker unavailable | SummonSpeakers" }, { name: "robots", content: "noindex" }],
+        meta: [
+          { title: "Speaker unavailable | SummonSpeakers" },
+          { name: "robots", content: "noindex" },
+        ],
       };
     }
     const s = loaderData.speaker;
     const fee = formatFee(s.fee_min, s.fee_max, s.fee_on_application);
-    const description = `${s.name} — ${s.role}. Speaking fee ${fee}. ${s.tagline} Enquire directly, no bureau markup.`;
+    const description =
+      `${s.name}, ${s.role.toLowerCase()}. Published speaking fee ${fee}. ${s.tagline}`.slice(
+        0,
+        158,
+      );
     return {
       meta: [
-        { title: `${s.name} — ${s.role} (${fee}) | SummonSpeakers` },
+        {
+          title: pageTitle(
+            `${s.name} — ${s.role} (${fee})`,
+            s.fee_on_application ? `${s.name} — Keynote Speaker` : `${s.name} — Fee ${fee}`,
+            s.name,
+          ),
+        },
         { name: "description", content: description },
         { property: "og:title", content: `${s.name} — ${s.role}` },
         { property: "og:description", content: description },
         { property: "og:type", content: "profile" },
-        { property: "og:url", content: `/speakers/${params.slug}` },
+        { property: "og:url", content: absoluteUrl(`/speakers/${params.slug}`) },
+        ...ogImageMeta("speakers"),
       ],
-      links: [{ rel: "canonical", href: `/speakers/${params.slug}` }],
+      links: [{ rel: "canonical", href: absoluteUrl(`/speakers/${params.slug}`) }],
       scripts: [
         {
           type: "application/ld+json",
@@ -56,7 +71,7 @@ export const Route = createFileRoute("/speakers/$slug")({
             jobTitle: s.role,
             description: s.bio_short,
             knowsAbout: s.topics,
-            url: `/speakers/${s.slug}`,
+            url: absoluteUrl(`/speakers/${s.slug}`),
             makesOffer: {
               "@type": "Offer",
               name: `Keynote speaking engagement with ${s.name}`,
@@ -106,7 +121,11 @@ function SpeakerProfile() {
   return (
     <Page>
       <Breadcrumbs
-        items={[{ label: "Home", to: "/" }, { label: "Speakers", to: "/speakers" }, { label: s.name }]}
+        items={[
+          { label: "Home", to: "/" },
+          { label: "Speakers", to: "/speakers" },
+          { label: s.name },
+        ]}
       />
 
       <section className="container-x grid gap-12 pb-16 pt-10 md:grid-cols-[1fr_1fr] md:items-start">
@@ -132,7 +151,7 @@ function SpeakerProfile() {
             </p>
           </div>
           <div className="mt-10 hidden md:block">
-            <ButtonLink to="/get-matched" search={{ speaker: s.slug } as never}>
+            <ButtonLink to="/get-matched" search={{ speaker: s.slug }}>
               Check availability
             </ButtonLink>
           </div>
@@ -173,7 +192,10 @@ function SpeakerProfile() {
         <h2 className="label-mono text-[var(--ink-3)]">What organisers say</h2>
         <div className="mt-10 grid gap-8 md:grid-cols-3">
           {s.testimonials.map((t) => (
-            <figure key={t.author_name} className="rounded-[var(--radius-card)] border border-[var(--line)] p-8">
+            <figure
+              key={t.author_name}
+              className="rounded-[var(--radius-card)] border border-[var(--line)] p-8"
+            >
               <blockquote className="text-lg tracking-[-0.02em]">“{t.quote}”</blockquote>
               <figcaption className="mt-6 text-sm text-[var(--ink-2)]">
                 <span className="block font-semibold text-ink">{t.author_name}</span>
@@ -233,7 +255,7 @@ function SpeakerProfile() {
       <div className="sticky bottom-0 z-30 border-t border-[var(--line)] bg-surface p-4 shadow-[0_-8px_24px_rgba(0,0,0,0.06)] md:hidden">
         <div className="flex items-center justify-between gap-4">
           <span className="label-mono">{fee}</span>
-          <ButtonLink to="/get-matched" search={{ speaker: s.slug } as never} className="px-6">
+          <ButtonLink to="/get-matched" search={{ speaker: s.slug }} className="px-6">
             Check availability
           </ButtonLink>
         </div>

@@ -19,7 +19,7 @@ export function Eyebrow({ children }: { children: ReactNode }) {
 export function FAQ({ items }: { items: { q: string; a: string }[] }) {
   return (
     <div className="rule-open pt-10">
-      <h2 className="display text-[var(--display-md)]">Questions</h2>
+      <h2 className="display text-[length:var(--display-md)]">Questions</h2>
       <dl className="mt-10 divide-y divide-[var(--line)] border-t border-[var(--line)]">
         {items.map((item) => (
           <div key={item.q} className="grid gap-3 py-8 md:grid-cols-[1fr_1.4fr] md:gap-12">
