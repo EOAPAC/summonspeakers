@@ -16,6 +16,7 @@ import { Route as CaseStudiesRouteImport } from './routes/case-studies'
 import { Route as ForSpeakersRouteImport } from './routes/for-speakers'
 import { Route as GetMatchedRouteImport } from './routes/get-matched'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SpeakerFeesRouteImport } from './routes/speaker-fees'
 import { Route as SpeakersRouteImport } from './routes/speakers'
@@ -62,6 +63,11 @@ const GetMatchedRoute = GetMatchedRouteImport.update({
 const HowItWorksRoute = HowItWorksRouteImport.update({
   id: '/how-it-works',
   path: '/how-it-works',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -133,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/for-speakers': typeof ForSpeakersRouteWithChildren
   '/get-matched': typeof GetMatchedRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/speaker-fees': typeof SpeakerFeesRoute
   '/speakers': typeof SpeakersRouteWithChildren
@@ -151,6 +158,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/get-matched': typeof GetMatchedRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/speaker-fees': typeof SpeakerFeesRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -172,6 +180,7 @@ export interface FileRoutesById {
   '/for-speakers': typeof ForSpeakersRouteWithChildren
   '/get-matched': typeof GetMatchedRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/speaker-fees': typeof SpeakerFeesRoute
   '/speakers': typeof SpeakersRouteWithChildren
@@ -195,6 +204,7 @@ export interface FileRouteTypes {
     | '/for-speakers'
     | '/get-matched'
     | '/how-it-works'
+    | '/robots.txt'
     | '/sitemap.xml'
     | '/speaker-fees'
     | '/speakers'
@@ -213,6 +223,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/get-matched'
     | '/how-it-works'
+    | '/robots.txt'
     | '/sitemap.xml'
     | '/speaker-fees'
     | '/blog/$slug'
@@ -233,6 +244,7 @@ export interface FileRouteTypes {
     | '/for-speakers'
     | '/get-matched'
     | '/how-it-works'
+    | '/robots.txt'
     | '/sitemap.xml'
     | '/speaker-fees'
     | '/speakers'
@@ -255,6 +267,7 @@ export interface RootRouteChildren {
   ForSpeakersRoute: typeof ForSpeakersRouteWithChildren
   GetMatchedRoute: typeof GetMatchedRoute
   HowItWorksRoute: typeof HowItWorksRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SpeakerFeesRoute: typeof SpeakerFeesRoute
   SpeakersRoute: typeof SpeakersRouteWithChildren
@@ -310,6 +323,13 @@ declare module '@tanstack/react-router' {
       path: '/how-it-works'
       fullPath: '/how-it-works'
       preLoaderRoute: typeof HowItWorksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -461,6 +481,7 @@ const rootRouteChildren: RootRouteChildren = {
   ForSpeakersRoute: ForSpeakersRouteWithChildren,
   GetMatchedRoute: GetMatchedRoute,
   HowItWorksRoute: HowItWorksRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SpeakerFeesRoute: SpeakerFeesRoute,
   SpeakersRoute: SpeakersRouteWithChildren,

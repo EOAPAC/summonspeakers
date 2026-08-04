@@ -1,8 +1,10 @@
-# Summon Speakers
+# SummonSpeakers
 
-# SummonSpeakers — Product Requirements (Lovable build brief)
+Speaker marketplace with every fee published upfront. This document is the
+product specification: stack, data model, routes, design tokens and acceptance
+criteria. Where something is deliberately out of scope it says so.
 
-Paste this whole document into Lovable as the project brief. It is written to be built in one pass: stack, data model, routes, design tokens, and acceptance criteria are all specified. Where something is deliberately out of scope it says so — don't build it.
+See [AGENTS.md](AGENTS.md) for repo conventions and the generated files.
 
 ---
 
@@ -40,7 +42,14 @@ The category is dominated by bureaus that hide pricing behind "fee on applicatio
 
 ## 2. Stack
 
-- **Lovable default:** React + Vite + TypeScript + Tailwind + shadcn/ui.
+**Built:** TanStack Start (SSR) with Nitro, on Vite 8 and bun. React 19,
+TypeScript, Tailwind v4. Hosted on Vercel. Speaker and editorial content is
+committed TypeScript under `src/data/`; the 2,131-speaker roster is imported
+from CSV by `bun run import:roster`.
+
+**Not built yet.** Everything below is the intended backend. `src/lib/enquiries.ts`
+is currently a local stub that validates and discards, so no database, auth or
+email service is wired up and no secrets are needed to run the site.
 
 - **Supabase** for Postgres, auth, storage (speaker photos, showreel thumbnails) and row-level security.
 
@@ -351,25 +360,31 @@ Do not build: payments or checkout, speaker calendars/real availability sync, me
 
 - [ ] Lighthouse ≥ 90 on performance and accessibility for `/`, `/topics/leadership`, `/speakers/dr-maya-ellison`.
 
-This project was built with [Lovable](https://lovable.dev).
+## Running it locally
 
-**Live app**: https://summonspeakers.lovable.app
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/f8ac7d9f-3c1a-4f3b-8a24-51b7945b6e00).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+Needs [bun](https://bun.sh) and Node 22.12 or newer (Vite 8 requires it).
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
+bun install
+bun run dev
 ```
+
+Other scripts: `bun run build` (production build), `bun run lint`,
+`bun run format`, and the generators listed in [AGENTS.md](AGENTS.md).
+
+## Deploying
+
+Nitro targets Vercel — `bun run build` writes `.vercel/output` in Build Output
+API v3 format, which Vercel picks up on its own. Leave the output directory
+blank in project settings, and do **not** add an SPA catch-all rewrite: this is
+server-rendered, so rewriting everything to `index.html` would break it.
+
+Project settings that matter:
+
+| Setting         | Value                                                | Why                                                                                                                                                                                                                                                              |
+| --------------- | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `VITE_SITE_URL` | e.g. `https://summonspeakers.com`, no trailing slash | Every canonical, `og:url`, share card and the sitemap resolve against it. `VITE_*` vars are inlined at build time, so it must exist before the build runs — otherwise preview deployments advertise the production canonical. Set it for Production and Preview. |
+| Node version    | 22.x                                                 | Vite 8 needs 20.19+/22.12+. `engines` in `package.json` pins the floor.                                                                                                                                                                                          |
+
+`bun.lock` is committed, so Vercel installs with bun without further
+configuration. No secrets are required until the enquiry backend is wired up.

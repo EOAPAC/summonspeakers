@@ -13,9 +13,9 @@ export type EnquiryInput = {
 /**
  * Enquiry submission.
  *
- * Backend is not connected yet, so this validates and resolves locally.
- * When Lovable Cloud is enabled, swap the body for a server function that
- * inserts into `enquiries` and sends the planner/admin emails.
+ * No backend is connected yet, so this validates and resolves locally — every
+ * enquiry is currently discarded. Replace the body with a server function that
+ * persists the enquiry and sends the planner and admin emails.
  */
 export async function submitEnquiry({ data }: { data: EnquiryInput }) {
   if (!data.work_email || !data.full_name) {
