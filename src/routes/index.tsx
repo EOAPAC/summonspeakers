@@ -76,7 +76,7 @@ function Home() {
   return (
     <Page>
       <section className="container-x pb-20 pt-16 md:pt-24">
-        <h1 className="display max-w-[24ch] text-[length:var(--display-hero)]">
+        <h1 className="display text-[length:clamp(26px,3.6vw,76px)]">
           Book the keynote speaker your event deserves
         </h1>
         <p className="display mt-6 text-[length:var(--display-sm)] text-[var(--ink-2)]">
