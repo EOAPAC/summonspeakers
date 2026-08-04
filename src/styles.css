@@ -48,6 +48,11 @@
   --radius-lg: 18px;
   --radius-xl: 24px;
 
+  --tracking-display: var(--tracking-display);
+  --tracking-tight: var(--tracking-tight);
+  --tracking-snug: var(--tracking-snug);
+  --tracking-body: var(--tracking-body);
+
   --ease-editorial: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -74,12 +79,19 @@
   --display-lg: clamp(32px, 5vw, 72px);
   --display-md: clamp(28px, 5vw, 60px);
   --display-sm: clamp(24px, 3vw, 34px);
+  --display-nav: clamp(48px, 11vw, 150px);
+  --display-xl: clamp(40px, 7vw, 104px);
 
   --tracking-display: -0.05em;
   --tracking-body: -0.02em;
+  --tracking-tight: -0.04em;
+  --tracking-snug: -0.03em;
   --tracking-mono: 0.1em;
   --leading-display: 0.9;
   --leading-cta: 0.86;
+  --leading-heading: 0.95;
+  --leading-snug: 1.35;
+  --leading-normal: 1.5;
 
   --radius-pill: 9999px;
   --radius-card: 18px;
