@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SummonSpeakers — Color Tokens</title>
+  <link rel="stylesheet" href="../colors_and_type.css">
+  <style>
+    .grid { display: grid; gap: 24px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+    .swatch { padding: 24px; border-radius: var(--radius-md); border: 1px solid var(--line); }
+    .swatch-dark { color: #fff; }
+    .token-name { font-family: var(--font-mono-stack); font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+    .token-value { font-size: 14px; color: var(--ink-2); }
+    .swatch-dark .token-value { color: rgba(255,255,255,0.7); }
+  </style>
+</head>
+<body class="container-x section-y">
+  <h1 class="display" style="font-size: var(--display-md); margin-bottom: 40px;">Colour tokens</h1>
+  <div class="grid">
+    <div class="swatch" style="background: var(--ink);"><div class="token-name swatch-dark">--ink</div><div class="token-value swatch-dark">#000000</div></div>
+    <div class="swatch" style="background: var(--ink-2);"><div class="token-name swatch-dark">--ink-2</div><div class="token-value swatch-dark">#525252</div></div>
+    <div class="swatch" style="background: var(--ink-3);"><div class="token-name swatch-dark">--ink-3</div><div class="token-value swatch-dark">#737373</div></div>
+    <div class="swatch" style="background: var(--surface);"><div class="token-name">--surface</div><div class="token-value">#ffffff</div></div>
+    <div class="swatch" style="background: var(--surface-alt);"><div class="token-name">--surface-alt</div><div class="token-value">#ededed</div></div>
+    <div class="swatch" style="background: var(--footer);"><div class="token-name swatch-dark">--footer</div><div class="token-value swatch-dark">#0a0a0a</div></div>
+    <div class="swatch" style="background: var(--cta-amber);"><div class="token-name">--cta-amber</div><div class="token-value">#d4a017</div></div>
+    <div class="swatch" style="background: var(--warning);"><div class="token-name swatch-dark">--warning</div><div class="token-value swatch-dark">#7a2e1c</div></div>
+  </div>
+</body>
+</html>

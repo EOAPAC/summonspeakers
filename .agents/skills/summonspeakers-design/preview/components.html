@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SummonSpeakers — Component Specimen</title>
+  <link rel="stylesheet" href="../colors_and_type.css">
+  <style>
+    .stack { display: flex; flex-direction: column; gap: 24px; align-items: flex-start; }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .card { width: 280px; }
+    .card img { width: 100%; height: 160px; object-fit: cover; display: block; }
+    .card-body { padding: 20px; }
+    .card-title { font-weight: 700; margin-bottom: 4px; }
+    .card-meta { font-size: 14px; color: var(--ink-2); margin-bottom: 12px; }
+    h2 { margin-top: 40px; margin-bottom: 16px; }
+  </style>
+</head>
+<body class="container-x section-y">
+  <h1 class="display" style="font-size: var(--display-md); margin-bottom: 40px;">Component specimen</h1>
+
+  <h2 class="label-mono">Buttons</h2>
+  <div class="stack">
+    <button class="btn-primary">Get matched</button>
+    <button class="btn-amber">Primary CTA</button>
+    <button class="btn-secondary">View all speakers</button>
+  </div>
+
+  <h2 class="label-mono">Tags</h2>
+  <div class="row">
+    <span class="fee-band">$15k – $20k</span>
+    <span class="fee-band"><span style="width:6px;height:6px;border-radius:50%;background:var(--cta-amber);display:inline-block;"></span> Available 2026</span>
+    <span class="pill">Leadership</span>
+    <span class="pill">Innovation</span>
+  </div>
+
+  <h2 class="label-mono">Speaker card</h2>
+  <div class="card">
+    <div class="media-well" style="border-radius:0;">
+      <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&auto=format&fit=crop&q=80" alt="Speaker portrait placeholder">
+    </div>
+    <div class="card-body">
+      <div class="card-title">Dr. Maya Ellison</div>
+      <div class="card-meta">Leadership, AI ethics</div>
+      <span class="fee-band">$15k – $20k</span>
+    </div>
+  </div>
+</body>
+</html>
