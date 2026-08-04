@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Page, FAQ, faqJsonLd, Eyebrow } from "@/components/Page";
 import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { ClosingCta } from "@/components/ClosingCta";
+import { feeTiers, feeColumns } from "@/data/fees";
 
 const faqs = [
   {
@@ -22,12 +23,9 @@ const faqs = [
   },
 ];
 
-const tiers = [
-  { tier: "Emerging", cells: ["$3k – $7k", "$4k – $8k", "$4k – $9k", "$5k – $10k"] },
-  { tier: "Established", cells: ["$9k – $18k", "$12k – $22k", "$10k – $20k", "$15k – $30k"] },
-  { tier: "Celebrity", cells: ["$35k – $75k", "$40k – $90k", "$35k – $80k", "$45k – $120k"] },
-];
-const cols = ["Motivational", "Leadership", "Business", "Futurist & AI"];
+const tiers = feeTiers;
+const cols = feeColumns;
+
 
 export const Route = createFileRoute("/speaker-fees")({
   head: () => ({
@@ -131,7 +129,7 @@ function SpeakerFees() {
         <FAQ items={faqs} />
       </section>
 
-      <ClosingCta />
+      <ClosingCta heading="Get the exact fee." />
     </Page>
   );
 }

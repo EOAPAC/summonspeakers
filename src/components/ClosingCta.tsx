@@ -1,8 +1,9 @@
 import { ButtonLink } from "./Button";
 
 export function ClosingCta({
-  heading = "Get matched",
-  sub = "Tell us about your event and we'll send a shortlist within one business day.",
+  heading = "Tell us about your event.",
+  sub = "We'll send a shortlist of matched speakers, with fees, within one business day.",
+
 }: {
   heading?: string;
   sub?: string;

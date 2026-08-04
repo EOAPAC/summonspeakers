@@ -77,8 +77,12 @@ function Home() {
     <Page>
       <section className="container-x pb-20 pt-16 md:pt-24">
         <h1 className="display max-w-[15ch] text-[length:var(--display-hero)]">
-          Book the keynote speaker your event deserves — with fees shown upfront.
+          Book the keynote speaker your event deserves
         </h1>
+        <p className="display mt-6 text-[length:var(--display-sm)] text-[var(--ink-2)]">
+          With fees shown upfront.
+        </p>
+
         <p className="mt-10 max-w-[48ch] text-lg text-[var(--ink-2)]">
           Browse, compare and book professional speakers directly. No bureau markup, no
           guessing what they cost.
@@ -92,6 +96,10 @@ function Home() {
             Browse speakers <span aria-hidden="true">→</span>
           </Link>
         </div>
+        <p className="label-mono mt-6 text-[var(--ink-3)]">
+          Free to enquire, no obligation
+        </p>
+
         <div className="hairline-top mt-20 pt-8">
           <Eyebrow>Trusted by event teams at</Eyebrow>
           <ul className="mt-6 flex flex-wrap gap-x-12 gap-y-4">
