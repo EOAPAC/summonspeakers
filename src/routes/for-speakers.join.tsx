@@ -9,7 +9,7 @@ import { submitListing } from "@/lib/listings.server";
 export const Route = createFileRoute("/for-speakers/join")({
   head: () => ({
     meta: [
-      { title: "Join SummonSpeakers — create your speaker listing" },
+      { title: "Join SummonSpeakers: create your speaker listing" },
       {
         name: "description",
         content:

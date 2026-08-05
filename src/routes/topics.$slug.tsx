@@ -123,8 +123,8 @@ export const Route = createFileRoute("/topics/$slug")({
       meta: [
         {
           title: pageTitle(
-            `${t.heading} — Fees Shown Upfront`,
-            `${t.heading} — Published Fees`,
+            `${t.heading}: Fees Shown Upfront`,
+            `${t.heading}: Published Fees`,
             t.heading,
           ),
         },

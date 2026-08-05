@@ -41,7 +41,7 @@ export const Route = createFileRoute("/")({
 const homeFaqs = [
   {
     q: "What is SummonSpeakers?",
-    a: "SummonSpeakers is a speaker booking marketplace that publishes every speaker's fee band upfront. Planners browse the roster, compare fees before making contact, and book directly with the speaker. The fee shown on a profile is the fee you pay — nothing is added afterward.",
+    a: "SummonSpeakers is a speaker booking marketplace that publishes every speaker's fee band upfront. Planners browse the roster, compare fees before making contact, and book directly with the speaker. The fee shown on a profile is the fee you pay. Nothing is added afterward.",
   },
   {
     q: "How much does a keynote speaker cost?",
@@ -49,15 +49,15 @@ const homeFaqs = [
   },
   {
     q: "Is SummonSpeakers free to use?",
-    a: "Yes. Enquiring is free, there is no account to create, and you are committed to nothing until you sign a booking. Whatever a profile shows is the number you'll pay — nothing is added later.",
+    a: "Yes. Enquiring is free, there is no account to create, and you are committed to nothing until you sign a booking. Whatever a profile shows is the number you'll pay. Nothing is added later.",
   },
   {
     q: "How is this different from a speaker bureau?",
-    a: "A traditional bureau adds 20 to 30 per cent to the speaker's fee and usually will not disclose the fee until you have had a sales call. SummonSpeakers publishes the band before you enquire, so the number you see is the number you budget — no sales call, no waiting to find out.",
+    a: "A traditional bureau adds 20 to 30 per cent to the speaker's fee and usually will not disclose the fee until you have had a sales call. SummonSpeakers publishes the band before you enquire, so the number you see is the number you budget. No sales call, no waiting to find out.",
   },
   {
     q: "Who uses SummonSpeakers?",
-    a: "Conference producers, event managers, HR and people teams, and association directors — anyone responsible for filling a stage on a fixed budget. Most briefs we receive name a theme rather than a speaker.",
+    a: "Conference producers, event managers, HR and people teams, and association directors: anyone responsible for filling a stage on a fixed budget. Most briefs we receive name a theme rather than a speaker.",
   },
   {
     q: "What happens if a speaker cancels?",
@@ -76,7 +76,7 @@ const benefits = [
   {
     n: "02",
     h: "Direct booking",
-    p: "Pay 50% once the speaker confirms your date. The relationship is yours from that moment — you deal with them directly.",
+    p: "Pay 50% once the speaker confirms your date. The relationship is yours from that moment, and you deal with them directly.",
   },
   {
     n: "03",

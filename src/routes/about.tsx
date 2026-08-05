@@ -44,7 +44,7 @@ const numbers = [
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About SummonSpeakers — why we publish every fee" },
+      { title: "About SummonSpeakers: why we publish every fee" },
       {
         name: "description",
         content:

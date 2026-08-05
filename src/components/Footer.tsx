@@ -43,7 +43,7 @@ export function Footer() {
           <div>
             <p className="label-mono">SUMMONSPEAKERS</p>
             <p className="mt-4 max-w-[24ch] text-sm text-white/60">
-              Book the keynote speaker your event deserves — with fees shown upfront.
+              Book the keynote speaker your event deserves, with fees shown upfront.
             </p>
           </div>
           {cols.map((col) => (

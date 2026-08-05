@@ -103,9 +103,7 @@ export const Route = createFileRoute("/speakers/")({
     // and its own title, rather than 35 pages all claiming to be page 1.
     const pageNo = s.page && s.page > 1 ? s.page : 0;
     const canonicalPath = faceted || !pageNo ? "/speakers" : `/speakers?page=${pageNo}`;
-    const titleLead = pageNo
-      ? `All Speakers — page ${pageNo}`
-      : "All Speakers — fees shown upfront";
+    const titleLead = pageNo ? `All Speakers, page ${pageNo}` : "All Speakers: fees shown upfront";
 
     const description = total
       ? `Search ${total.toLocaleString("en-AU")} speakers by category, location and gender. Every full profile publishes a fee band, so you can shortlist on budget.`

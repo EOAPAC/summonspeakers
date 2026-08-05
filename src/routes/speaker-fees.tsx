@@ -16,7 +16,7 @@ const faqs = [
   },
   {
     q: "How do your prices compare to a speaker bureau?",
-    a: "A traditional bureau adds 20 to 30 per cent on top of the speaker's fee, and usually will not tell you the fee until you have had a sales call. We charge the same kind of fee — 30 per cent, capped at $5,000 per booking — but it is already folded into the number on the profile. There is nothing to add, and no call required to find out.",
+    a: "A traditional bureau adds 20 to 30 per cent on top of the speaker's fee, and usually will not tell you the fee until you have had a sales call. We charge the same kind of fee, 30 per cent capped at $5,000 per booking, but it is already folded into the number on the profile. There is nothing to add, and no call required to find out.",
   },
   {
     q: "Do virtual sessions cost less?",

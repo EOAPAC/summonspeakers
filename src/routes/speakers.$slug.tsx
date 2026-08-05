@@ -49,13 +49,13 @@ export const Route = createFileRoute("/speakers/$slug")({
       meta: [
         {
           title: pageTitle(
-            `${s.name} — ${s.role} (${fee})`,
-            s.fee_on_application ? `${s.name} — Keynote Speaker` : `${s.name} — Fee ${fee}`,
+            `${s.name}: ${s.role} (${fee})`,
+            s.fee_on_application ? `${s.name}: Keynote Speaker` : `${s.name}: Fee ${fee}`,
             s.name,
           ),
         },
         { name: "description", content: description },
-        { property: "og:title", content: `${s.name} — ${s.role}` },
+        { property: "og:title", content: `${s.name}: ${s.role}` },
         { property: "og:description", content: description },
         { property: "og:type", content: "profile" },
         { property: "og:url", content: absoluteUrl(`/speakers/${params.slug}`) },

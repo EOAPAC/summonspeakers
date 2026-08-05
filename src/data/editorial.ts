@@ -123,7 +123,7 @@ export const posts: Post[] = [
           "Who is in it, and what they do all day.",
           "What they have already been told this year, so the speaker does not repeat it.",
           "What time of day the session runs, and what comes immediately before it.",
-          "Anything that would land badly — a restructure, a bad quarter, a departure.",
+          "Anything that would land badly: a restructure, a bad quarter, a departure.",
         ],
       },
       {
@@ -221,7 +221,7 @@ export const caseStudies: CaseStudy[] = [
     event: "1,200-delegate leadership summit",
     headline: "Meridian filled a closing keynote in 48 hours",
     summary:
-      "Two days out from their summit, Meridian lost their closing speaker. They needed someone who could hold a tired room at 4pm on day two, and who was genuinely free — not theoretically interested.",
+      "Two days out from their summit, Meridian lost their closing speaker. They needed someone who could hold a tired room at 4pm on day two, and who was genuinely free, not theoretically interested.",
     speaker_slug: "dr-maya-ellison",
     result: { value: "48 hrs", label: "brief to confirmed" },
     metrics: [
