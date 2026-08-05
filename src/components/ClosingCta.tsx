@@ -9,7 +9,7 @@ export function ClosingCta({
 }) {
   return (
     <section className="rule-open container-x section-y">
-      <h2 className="display text-[length:var(--display-cta)] leading-[var(--leading-cta)]">
+      <h2 className="display text-[length:var(--display-closing-cta)] leading-[var(--leading-cta)]">
         {heading}
       </h2>
       <div className="mt-10 flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">

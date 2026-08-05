@@ -93,6 +93,7 @@ const homeTestimonials = [
     name: "Elena Marsh",
     role: "Head of People",
     company: "Northbridge Group",
+    avatarSlug: "elena-marsh",
   },
   {
     quote:
@@ -101,6 +102,7 @@ const homeTestimonials = [
     name: "Tom Verity",
     role: "Events Director",
     company: "Ardent Health",
+    avatarSlug: "tom-verity",
   },
   {
     quote: "No sales call, no markup, no fee on application. Just the number.",
@@ -108,8 +110,20 @@ const homeTestimonials = [
     name: "Priya Nandan",
     role: "Conference Producer",
     company: "Meridian Events",
+    avatarSlug: "priya-nandan",
   },
 ];
+
+/**
+ * Testimonial slugs with a generated portrait at public/testimonials/<slug>.webp.
+ *
+ * Every name above is fictional, same as the twelve speaker profiles, so a
+ * photo here carries the same AI-generated disclosure in its alt text. A slug
+ * missing from this set — which is every one of them until the images are
+ * added — falls back to the hatch placeholder rather than a broken image, so
+ * this ships safely ahead of the files existing.
+ */
+const TESTIMONIAL_AVATARS = new Set<string>([]);
 
 /**
  * The four cards on the homepage, in this order.
@@ -159,13 +173,19 @@ function Home() {
             Browse speakers <span aria-hidden="true">→</span>
           </Link>
         </div>
-        <p className="label-mono mt-6 text-white/50">Free to enquire, no obligation</p>
+        {/* /50 measured 5.3:1 against this background — passes AA for small
+            text by a hair, but that's a bare technical pass, not a comfortable
+            read, and the user flagged it as hard to read regardless of the
+            number. /75 and up clear 11:1+, and the client names sit brighter
+            than the "trusted by" label above them so the roster of logos —
+            the actual proof point — outranks its own caption. */}
+        <p className="label-mono mt-6 text-white/75">Free to enquire, no obligation</p>
 
-        <div className="mt-20 border-t border-[var(--line-on-dark)] pt-8">
-          <Eyebrow className="text-white/50">Trusted by event teams at</Eyebrow>
-          <ul className="mt-6 flex flex-wrap gap-x-12 gap-y-4">
+        <div className="mt-16 border-t border-[var(--line-on-dark)] pt-10">
+          <Eyebrow className="text-white/60">Trusted by event teams at</Eyebrow>
+          <ul className="mt-7 flex flex-wrap gap-x-10 gap-y-3">
             {clients.map((c) => (
-              <li key={c} className="label-mono text-white/50">
+              <li key={c} className="label-mono-lg text-white/80">
                 {c}
               </li>
             ))}
@@ -237,7 +257,19 @@ function Home() {
                   {t.result}
                 </span>
                 <figcaption className="mt-6 flex items-center gap-4">
-                  <span aria-hidden="true" className="hatch size-12 rounded-full" />
+                  {TESTIMONIAL_AVATARS.has(t.avatarSlug) ? (
+                    <img
+                      src={`/testimonials/${t.avatarSlug}.webp`}
+                      alt={`${t.name} (AI-generated placeholder image)`}
+                      width={112}
+                      height={112}
+                      loading="lazy"
+                      decoding="async"
+                      className="size-12 rounded-full bg-[var(--surface-alt)] object-cover"
+                    />
+                  ) : (
+                    <span aria-hidden="true" className="hatch size-12 rounded-full" />
+                  )}
                   <span className="text-sm">
                     <span className="block font-semibold">{t.name}</span>
                     <span className="block text-[var(--ink-2)]">
