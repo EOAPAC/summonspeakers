@@ -384,7 +384,10 @@ Project settings that matter:
 | Setting         | Value                                                | Why                                                                                                                                                                                                                                                              |
 | --------------- | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `VITE_SITE_URL` | e.g. `https://summonspeakers.com`, no trailing slash | Every canonical, `og:url`, share card and the sitemap resolve against it. `VITE_*` vars are inlined at build time, so it must exist before the build runs — otherwise preview deployments advertise the production canonical. Set it for Production and Preview. |
+| `SUPABASE_URL` | e.g. `https://xxxx.supabase.co` | Server-side reads of the 12 full speaker profiles (`fetchSpeakers`). Unprefixed on purpose — see `supabase.server.ts`. Without it the homepage's featured speakers, the full-profile section on `/speakers`, and every `/speakers/$slug` page render nothing rather than 500, so the site still builds but looks broken. Set it for Production and Preview. |
+| `VITE_SUPABASE_ANON_KEY` | the project's anon/publishable key | Paired with `SUPABASE_URL` to read published speakers under RLS. Despite the `VITE_` prefix this is read server-side via `process.env`, not inlined into the client bundle. Set it for Production and Preview. |
 | Node version    | 22.x                                                 | Vite 8 needs 20.19+/22.12+. `engines` in `package.json` pins the floor.                                                                                                                                                                                          |
 
 `bun.lock` is committed, so Vercel installs with bun without further
-configuration. No secrets are required until the enquiry backend is wired up.
+configuration. `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `RESEND_FROM` and
+`ADMIN_EMAIL` are for the enquiry backend and stay optional until that ships.
