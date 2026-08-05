@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Button, ButtonLink } from "./Button";
-import { speakers, topics } from "@/data/speakers";
+import { topics, type Speaker } from "@/data/speakers";
 import { submitEnquiry } from "@/lib/enquiries.server";
 
 type Values = {
@@ -31,9 +31,6 @@ const budgets = ["Under $10k", "$10k – $20k", "$20k – $35k", "$35k+", "Not s
 
 const fieldBase =
   "min-h-[56px] w-full rounded-[var(--radius-sm)] border border-[var(--line-2)] bg-surface px-4 text-base";
-
-/** Names already offered by the topic and profile option groups. */
-const knownNames = new Set<string>([...topics.map((t) => t.name), ...speakers.map((s) => s.name)]);
 
 function Field({
   id,
@@ -70,9 +67,11 @@ function Field({
  * page still arrives here with their name filled in.
  */
 export function EnquiryFlow({
+  speakers,
   presetName = "",
   presetSlug = "",
 }: {
+  speakers: Speaker[];
   presetName?: string | undefined;
   presetSlug?: string | undefined;
 }) {
@@ -82,6 +81,12 @@ export function EnquiryFlow({
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // Names already offered by the topic and profile option groups.
+  const knownNames = new Set<string>([
+    ...topics.map((t) => t.name),
+    ...speakers.map((s) => s.name),
+  ]);
 
   const set =
     (k: keyof Values) =>

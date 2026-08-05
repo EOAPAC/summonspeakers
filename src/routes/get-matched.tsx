@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Page } from "@/components/Page";
 import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { EnquiryFlow } from "@/components/EnquiryFlow";
-import { getSpeaker } from "@/data/speakers";
+import { getSpeaker, type Speaker } from "@/data/speakers";
+import { fetchSpeakers } from "@/lib/speakers.server";
 import { fetchRosterSpeakerName } from "@/lib/roster.server";
 import { absoluteUrl, ogImageMeta } from "@/lib/site";
 
@@ -15,15 +16,17 @@ export const Route = createFileRoute("/get-matched")({
     return typeof speaker === "string" && speaker !== "" ? { speaker } : {};
   },
 
-  // Resolve the slug to a name here: full profiles are in the client bundle
-  // already, the wider roster needs a server hop.
+  // The full profiles come from Supabase now, so this always fetches them —
+  // the enquiry form's dropdown needs the full list regardless of whether a
+  // speaker was preset, not only when resolving a `?speaker=` slug.
   loaderDeps: ({ search }) => ({ speaker: search.speaker ?? "" }),
-  loader: async ({ deps }): Promise<{ presetName: string }> => {
-    if (!deps.speaker) return { presetName: "" };
-    const profile = getSpeaker(deps.speaker);
-    if (profile) return { presetName: profile.name };
+  loader: async ({ deps }): Promise<{ presetName: string; speakers: Speaker[] }> => {
+    const speakers = await fetchSpeakers();
+    if (!deps.speaker) return { presetName: "", speakers };
+    const profile = getSpeaker(deps.speaker, speakers);
+    if (profile) return { presetName: profile.name, speakers };
     const { name } = await fetchRosterSpeakerName({ data: deps.speaker });
-    return { presetName: name ?? "" };
+    return { presetName: name ?? "", speakers };
   },
 
   head: () => ({
@@ -60,12 +63,12 @@ export const Route = createFileRoute("/get-matched")({
 
 function GetMatched() {
   const { speaker } = Route.useSearch();
-  const { presetName } = Route.useLoaderData();
+  const { presetName, speakers } = Route.useLoaderData();
   return (
     <Page>
       <Breadcrumbs items={[{ label: "Home", to: "/" }, { label: "Get matched" }]} />
       <section className="container-x pb-24 pt-10">
-        <EnquiryFlow presetName={presetName} presetSlug={speaker ?? ""} />
+        <EnquiryFlow speakers={speakers} presetName={presetName} presetSlug={speaker ?? ""} />
       </section>
     </Page>
   );

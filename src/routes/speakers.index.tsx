@@ -8,6 +8,7 @@ import { ButtonLink } from "@/components/Button";
 import { getTopic, pinnedFirst } from "@/data/speakers";
 import type { RosterGender } from "@/data/roster";
 import { fetchRoster } from "@/lib/roster.server";
+import { fetchSpeakers } from "@/lib/speakers.server";
 import { absoluteUrl, ogImageMeta, pageTitle } from "@/lib/site";
 
 const faqs = [
@@ -36,12 +37,7 @@ function isNarrowed(s: RosterSearch): boolean {
 }
 
 /** Display order for the full-profile grid. The rest follow in their own order. */
-const fullProfileOrder = pinnedFirst([
-  "helena-brandt",
-  "robert-ainsley",
-  "andres-molina",
-  "omar-haddad",
-]);
+const FULL_PROFILE_ORDER = ["helena-brandt", "robert-ainsley", "andres-molina", "omar-haddad"];
 
 export const Route = createFileRoute("/speakers/")({
   // Defaults are omitted rather than defaulted, so /speakers never redirects to
@@ -74,6 +70,7 @@ export const Route = createFileRoute("/speakers/")({
     const topic = deps.topic ? getTopic(deps.topic) : undefined;
     const categories = topic?.roster?.categories ?? (deps.category ? [deps.category] : []);
     const gender = topic?.roster?.gender ?? deps.gender ?? "any";
+    const speakers = await fetchSpeakers();
     return {
       roster: await fetchRoster({
         data: {
@@ -85,6 +82,10 @@ export const Route = createFileRoute("/speakers/")({
         },
       }),
       topicLabel: topic?.name ?? null,
+      // An empty array means the backend was unreachable, not that a genuinely
+      // pinned slug is missing — pinnedFirst can't tell those apart, and a
+      // real outage should render the rest of the page rather than crash it.
+      fullProfileOrder: speakers.length > 0 ? pinnedFirst(FULL_PROFILE_ORDER, speakers) : [],
     };
   },
 
@@ -145,7 +146,7 @@ export const Route = createFileRoute("/speakers/")({
 });
 
 function SpeakersIndex() {
-  const { roster, topicLabel } = Route.useLoaderData();
+  const { roster, topicLabel, fullProfileOrder } = Route.useLoaderData();
   const search = Route.useSearch();
   // Named fields rather than Object.keys, which also counted tracking
   // parameters: arriving on /speakers?utm_source=… hid the featured cards for no
@@ -166,8 +167,10 @@ function SpeakersIndex() {
       </section>
 
       {/* Hidden once a filter is on: the featured cards are not filtered, so
-          leaving them above a filtered roster reads as a broken result set. */}
-      {unfiltered && (
+          leaving them above a filtered roster reads as a broken result set.
+          Also hidden, same reasoning as the homepage, if the backend that
+          serves them is unreachable rather than the roster genuinely empty. */}
+      {unfiltered && fullProfileOrder.length > 0 && (
         <section className="rule-open container-x section-y">
           <div className="flex items-end justify-between gap-6">
             <div>

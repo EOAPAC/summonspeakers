@@ -3,13 +3,15 @@ import { ButtonLink } from "@/components/Button";
 import { SpeakerCard } from "@/components/SpeakerCard";
 import { ClosingCta } from "@/components/ClosingCta";
 import { featuredTopics, pinnedFirst } from "@/data/speakers";
+import { fetchSpeakers } from "@/lib/speakers.server";
 import { absoluteUrl, ogImageMeta } from "@/lib/site";
 import { serviceJsonLd } from "@/lib/schema";
 import { Page, Eyebrow, FAQ, faqJsonLd } from "@/components/Page";
 import { HeroSentinel } from "@/components/Header";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
+  loader: async () => ({ speakers: await fetchSpeakers() }),
+  head: ({ loaderData }) => ({
     meta: [
       { title: "Keynote Speakers, Fees Shown Upfront | SummonSpeakers" },
       {
@@ -27,7 +29,10 @@ export const Route = createFileRoute("/")({
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/") }],
     scripts: [
-      { type: "application/ld+json", children: JSON.stringify(serviceJsonLd()) },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(serviceJsonLd(loaderData?.speakers.length ?? 0)),
+      },
       { type: "application/ld+json", children: JSON.stringify(faqJsonLd(homeFaqs)) },
     ],
   }),
@@ -132,8 +137,8 @@ const TESTIMONIAL_AVATARS = new Set<string>(["elena-marsh", "tom-verity", "priya
  * enquiry form's dropdown — reordering it to change the homepage would quietly
  * reorder all of those too.
  *
- * An unknown slug throws at module load rather than rendering three cards and
- * leaving nobody to notice the fourth went missing.
+ * An unknown slug throws at load rather than rendering three cards and leaving
+ * nobody to notice the fourth went missing.
  */
 const HOME_FEATURED = [
   "helena-brandt",
@@ -142,9 +147,13 @@ const HOME_FEATURED = [
   "michael-toure",
 ] as const;
 
-const homeFeatured = pinnedFirst(HOME_FEATURED).slice(0, 4);
-
 function Home() {
+  const { speakers } = Route.useLoaderData();
+  // An empty array means the backend was unreachable, not that a genuinely
+  // pinned slug is missing — pinnedFirst can't tell those apart, and a real
+  // outage should render the rest of the homepage rather than crash it.
+  const homeFeatured = speakers.length > 0 ? pinnedFirst(HOME_FEATURED, speakers).slice(0, 4) : [];
+
   return (
     <Page>
       {/* Dark hero. Greys are white-at-opacity rather than the light-mode ink
@@ -193,22 +202,26 @@ function Home() {
         <HeroSentinel />
       </section>
 
-      <section className="rule-open container-x section-y">
-        <div className="flex items-end justify-between gap-6">
-          <h2 className="display text-[length:var(--display-md)]">Featured speakers</h2>
-          <Link
-            to="/speakers"
-            className="hidden min-h-[44px] items-center gap-2 text-sm underline underline-offset-4 md:inline-flex"
-          >
-            All speakers <span aria-hidden="true">→</span>
-          </Link>
-        </div>
-        <div className="mt-12 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
-          {homeFeatured.map((s) => (
-            <SpeakerCard key={s.slug} speaker={s} />
-          ))}
-        </div>
-      </section>
+      {/* Hidden rather than shown empty: a heading with no cards under it, on
+          the rare occasion the backend is unreachable, reads as broken. */}
+      {homeFeatured.length > 0 && (
+        <section className="rule-open container-x section-y">
+          <div className="flex items-end justify-between gap-6">
+            <h2 className="display text-[length:var(--display-md)]">Featured speakers</h2>
+            <Link
+              to="/speakers"
+              className="hidden min-h-[44px] items-center gap-2 text-sm underline underline-offset-4 md:inline-flex"
+            >
+              All speakers <span aria-hidden="true">→</span>
+            </Link>
+          </div>
+          <div className="mt-12 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
+            {homeFeatured.map((s) => (
+              <SpeakerCard key={s.slug} speaker={s} />
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="rule-open container-x section-y">
         <Eyebrow>Browse by category</Eyebrow>

@@ -6,7 +6,8 @@ import { Pill } from "@/components/Pill";
 import { ButtonLink } from "@/components/Button";
 import { SpeakerCard } from "@/components/SpeakerCard";
 import { Portrait } from "@/components/Portrait";
-import { getSpeaker, speakers, type Speaker } from "@/data/speakers";
+import { getSpeaker, type Speaker } from "@/data/speakers";
+import { fetchSpeakers } from "@/lib/speakers.server";
 import { formatFee } from "@/lib/fee";
 import { absoluteUrl, pageTitle, ogImageMeta } from "@/lib/site";
 
@@ -24,10 +25,11 @@ function faqsFor(name: string, fee: string) {
 }
 
 export const Route = createFileRoute("/speakers/$slug")({
-  loader: ({ params }): { speaker: Speaker } => {
-    const speaker = getSpeaker(params.slug);
+  loader: async ({ params }): Promise<{ speaker: Speaker; speakers: Speaker[] }> => {
+    const speakers = await fetchSpeakers();
+    const speaker = getSpeaker(params.slug, speakers);
     if (!speaker) throw notFound();
-    return { speaker };
+    return { speaker, speakers };
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) {
@@ -113,7 +115,7 @@ export const Route = createFileRoute("/speakers/$slug")({
 });
 
 function SpeakerProfile() {
-  const { speaker: s } = Route.useLoaderData() as { speaker: Speaker };
+  const { speaker: s, speakers } = Route.useLoaderData();
   const fee = formatFee(s.fee_min, s.fee_max, s.fee_on_application);
   const similar = speakers
     .filter((o) => o.slug !== s.slug && o.topics.some((t) => s.topics.includes(t)))

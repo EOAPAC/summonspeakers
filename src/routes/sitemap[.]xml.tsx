@@ -1,16 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { caseStudies, posts } from "@/data/editorial";
-import { speakers, topics } from "@/data/speakers";
+import { topics } from "@/data/speakers";
+import { fetchSpeakers } from "@/lib/speakers.server";
 import { absoluteUrl } from "@/lib/site";
 
 type Entry = { path: string; priority: string; lastmod?: string };
 
 /**
- * Generated from the same data the pages render from, so a new speaker, topic
- * or post is in the sitemap the moment it exists. Nothing to keep in sync.
+ * Generated from the same data the pages render from, so a new topic or post
+ * is in the sitemap the moment it exists. The full-profile speakers come from
+ * Supabase, so this is now async — nothing else here needed to be.
  */
-function entries(): Entry[] {
+async function entries(): Promise<Entry[]> {
+  const speakers = await fetchSpeakers();
   return [
     { path: "/", priority: "1.0" },
     { path: "/speakers", priority: "0.9" },
@@ -29,8 +32,8 @@ function entries(): Entry[] {
   ];
 }
 
-function renderSitemap(): string {
-  const urls = entries()
+async function renderSitemap(): Promise<string> {
+  const urls = (await entries())
     .map(({ path, priority, lastmod }) =>
       [
         "  <url>",
@@ -52,8 +55,8 @@ ${urls}
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
-      GET: () =>
-        new Response(renderSitemap(), {
+      GET: async () =>
+        new Response(await renderSitemap(), {
           headers: {
             "content-type": "application/xml; charset=utf-8",
             "cache-control": "public, max-age=3600",
