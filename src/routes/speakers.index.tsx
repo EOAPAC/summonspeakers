@@ -22,14 +22,33 @@ const faqs = [
   },
   {
     q: "Why do some speakers not show a fee?",
-    a: "Speakers with a full profile publish a fee band. The wider roster is searchable by category, location and gender while we confirm each speaker's current rate, so send an enquiry and we come back with the exact figure within one business day.",
+    a: "Most speakers on the roster list a confirmed speaking fee, and speakers with a full profile publish a fee band. Where a rate is still being confirmed, send an enquiry and we come back with the exact figure within one business day.",
   },
 ];
 
 /** A facet is active — as distinct from any query parameter being present. */
 function isFaceted(s: RosterSearch): boolean {
-  return Boolean(s.topic || s.category || s.state || s.gender || s.q);
+  return Boolean(s.topic || s.category || s.place || s.gender || s.q);
 }
+
+/**
+ * The location filter used to be a flat AU state label in `?state=`. Old links
+ * and bookmarks still carry it, so it maps onto the equivalent node in the
+ * place tree rather than being dropped.
+ */
+const LEGACY_STATE_PLACE: Record<string, string> = {
+  ACT: "Oceania/Australia/ACT",
+  NSW: "Oceania/Australia/NSW",
+  NT: "Oceania/Australia/NT",
+  QLD: "Oceania/Australia/QLD",
+  SA: "Oceania/Australia/SA",
+  TAS: "Oceania/Australia/TAS",
+  VIC: "Oceania/Australia/VIC",
+  WA: "Oceania/Australia/WA",
+  "Australia (nationwide)": "Oceania/Australia",
+  "New Zealand": "Oceania/New Zealand",
+  International: "Global",
+};
 
 /** A facet is active, or we are past the first page. */
 function isNarrowed(s: RosterSearch): boolean {
@@ -49,8 +68,11 @@ export const Route = createFileRoute("/speakers/")({
     const out: RosterSearch = {};
     if (str("topic")) out.topic = str("topic");
     if (str("category")) out.category = str("category");
-    if (str("state")) out.state = str("state");
-    if (gender === "female" || gender === "male") out.gender = gender as RosterGender;
+    if (str("place")) out.place = str("place");
+    else if (str("state") && LEGACY_STATE_PLACE[str("state")])
+      out.place = LEGACY_STATE_PLACE[str("state")]!;
+    if (gender === "female" || gender === "male" || gender === "nonbinary")
+      out.gender = gender as RosterGender;
     if (str("q")) out.q = str("q");
     if (Number.isFinite(page) && page > 1) out.page = Math.floor(page);
     return out;
@@ -75,7 +97,7 @@ export const Route = createFileRoute("/speakers/")({
       roster: await fetchRoster({
         data: {
           categories,
-          state: deps.state ?? "",
+          place: deps.place ?? "",
           gender,
           q: deps.q ?? "",
           page: deps.page ?? 1,
@@ -160,9 +182,9 @@ function SpeakersIndex() {
       <section className="container-x pb-16 pt-10">
         <h1 className="display max-w-[16ch] text-[length:var(--display-lg)]">All speakers</h1>
         <p className="mt-8 max-w-[60ch] text-lg text-[var(--ink-2)]">
-          {roster.rosterCount.toLocaleString("en-AU")} speakers, searchable by category, location
-          and gender. Every full profile publishes a fee band, so you can shortlist inside your
-          budget before you contact anyone.
+          {roster.rosterCount.toLocaleString("en-AU")} speakers worldwide, searchable by category,
+          location and gender. Most list their speaking fee upfront, so you can shortlist inside
+          your budget before you contact anyone.
         </p>
       </section>
 

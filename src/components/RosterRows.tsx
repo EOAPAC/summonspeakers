@@ -25,13 +25,18 @@ export function RosterRows({ rows }: { rows: RosterRow[] }) {
             </p>
             {r.location && <p className="label-mono mt-2 text-[var(--ink-3)]">{r.location}</p>}
           </div>
-          <Link
-            to="/get-matched"
-            search={{ speaker: r.slug }}
-            className="label-mono inline-flex min-h-[44px] items-center gap-2 justify-self-start rounded-full border border-[var(--line-2)] px-4 transition-colors duration-500 [transition-timing-function:var(--ease)] hover:bg-ink hover:text-surface"
-          >
-            Enquire <span aria-hidden="true">→</span>
-          </Link>
+          <div className="flex items-baseline gap-5 md:flex-col md:items-end md:gap-3">
+            {r.fee !== null && (
+              <p className="label-mono whitespace-nowrap">${r.fee.toLocaleString("en-US")}</p>
+            )}
+            <Link
+              to="/get-matched"
+              search={{ speaker: r.slug }}
+              className="label-mono inline-flex min-h-[44px] items-center gap-2 rounded-full border border-[var(--line-2)] px-4 transition-colors duration-500 [transition-timing-function:var(--ease)] hover:bg-ink hover:text-surface"
+            >
+              Enquire <span aria-hidden="true">→</span>
+            </Link>
+          </div>
         </li>
       ))}
     </ul>

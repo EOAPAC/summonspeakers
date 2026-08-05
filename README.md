@@ -44,8 +44,8 @@ The category is dominated by bureaus that hide pricing behind "fee on applicatio
 
 **Built:** TanStack Start (SSR) with Nitro, on Vite 8 and bun. React 19,
 TypeScript, Tailwind v4. Hosted on Vercel. Speaker and editorial content is
-committed TypeScript under `src/data/`; the 2,131-speaker roster is imported
-from CSV by `bun run import:roster`.
+committed TypeScript under `src/data/`; the 6,221-speaker roster is imported
+from the CSVs in `data/roster-sources/` by `bun run import:roster`.
 
 **Not built yet.** Everything below is the intended backend. `src/lib/enquiries.ts`
 is currently a local stub that validates and discards, so no database, auth or
