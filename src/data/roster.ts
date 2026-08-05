@@ -201,6 +201,71 @@ export function rosterSpeakerName(slug: string): string | null {
   return roster.find((e) => e.slug === slug)?.name ?? null;
 }
 
+export type RosterStats = {
+  total: number;
+  /** Speakers per region, biggest first. */
+  regions: { name: string; count: number }[];
+  /** Top countries (depth-2 nodes), biggest first. */
+  countries: { name: string; count: number }[];
+  /** True number of countries and categories, before the lists are trimmed. */
+  countryCount: number;
+  categoryCount: number;
+  /** Speakers per category, biggest first. */
+  categories: { name: string; count: number }[];
+  gender: { female: number; male: number; nonbinary: number; unrecorded: number };
+  /** Share of speakers with a stated speaking fee. */
+  withFee: number;
+};
+
+/**
+ * Directory-wide statistics for /speaker-statistics. Computed from the live
+ * roster so every figure on that page stays true after the next import.
+ */
+export function rosterStats(): RosterStats {
+  const regionCounts = new Map<string, number>();
+  const countryCounts = new Map<string, number>();
+  const categoryCounts = new Map<string, number>();
+  const gender = { female: 0, male: 0, nonbinary: 0, unrecorded: 0 };
+  let withFee = 0;
+
+  for (const e of roster) {
+    const regions = new Set<string>();
+    const countries = new Set<string>();
+    for (const i of e.l) {
+      const segs = placePath[i]!.split("/");
+      regions.add(segs[0]!);
+      if (segs.length > 1) countries.add(segs[1]!);
+    }
+    for (const r of regions) regionCounts.set(r, (regionCounts.get(r) ?? 0) + 1);
+    for (const c of countries) countryCounts.set(c, (countryCounts.get(c) ?? 0) + 1);
+    for (const i of e.c) {
+      const name = rosterCategories[i];
+      if (name) categoryCounts.set(name, (categoryCounts.get(name) ?? 0) + 1);
+    }
+    if (e.g === 0) gender.unrecorded++;
+    if (e.g & 1) gender.female++;
+    if (e.g & 2) gender.male++;
+    if (e.g & 4) gender.nonbinary++;
+    if (e.f !== undefined) withFee++;
+  }
+
+  const sorted = (m: Map<string, number>) =>
+    [...m.entries()]
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+
+  return {
+    total: roster.length,
+    regions: sorted(regionCounts),
+    countries: sorted(countryCounts).slice(0, 15),
+    countryCount: countryCounts.size,
+    categoryCount: categoryCounts.size,
+    categories: sorted(categoryCounts).slice(0, 15),
+    gender,
+    withFee,
+  };
+}
+
 export type RosterProfile = {
   name: string;
   slug: string;

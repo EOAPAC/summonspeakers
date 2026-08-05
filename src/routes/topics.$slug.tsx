@@ -76,9 +76,11 @@ function faqsFor(name: string, roster: RosterPage | null) {
 function rosterSearchFor(topic: TopicDef): {
   category?: string;
   gender?: "female" | "male";
+  place?: string;
   topic?: string;
 } {
   if (topic.roster?.gender) return { gender: topic.roster.gender };
+  if (topic.roster?.place) return { place: topic.roster.place };
   const categories = topic.roster?.categories ?? [];
   if (categories.length === 1) return { category: categories[0]! };
   return categories.length > 1 ? { topic: topic.slug } : {};
@@ -95,7 +97,7 @@ export const Route = createFileRoute("/topics/$slug")({
           data: {
             categories: topic.roster.categories ?? [],
             gender: topic.roster.gender ?? "any",
-            place: "",
+            place: topic.roster.place ?? "",
             q: "",
             page: 1,
             pageSize: PREVIEW_SIZE,

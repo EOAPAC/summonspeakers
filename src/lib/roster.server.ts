@@ -6,10 +6,12 @@ import {
   rosterCount,
   rosterProfile,
   rosterSpeakerName,
+  rosterStats,
   type RosterFilters,
   type RosterGender,
   type RosterPage,
   type RosterProfile,
+  type RosterStats,
 } from "@/data/roster";
 
 /**
@@ -82,3 +84,8 @@ export const fetchRosterProfile = createServerFn({ method: "GET" })
   .handler(({ data }): { profile: RosterProfile | null } => ({
     profile: data ? rosterProfile(data) : null,
   }));
+
+/** Directory-wide statistics for /speaker-statistics. */
+export const fetchRosterStats = createServerFn({ method: "GET" }).handler((): RosterStats =>
+  rosterStats(),
+);

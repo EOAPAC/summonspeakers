@@ -31,6 +31,7 @@ const cols = [
       { to: "/about", label: "About" },
       { to: "/blog", label: "Journal" },
       { to: "/case-studies", label: "Case studies" },
+      { to: "/speaker-statistics", label: "Speaker statistics" },
     ],
   },
 ];
