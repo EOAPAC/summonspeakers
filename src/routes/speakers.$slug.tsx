@@ -1,4 +1,4 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute, notFound, Link } from "@tanstack/react-router";
 import { Page, FAQ, faqJsonLd } from "@/components/Page";
 import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { FeeBand } from "@/components/FeeBand";
@@ -7,6 +7,8 @@ import { ButtonLink } from "@/components/Button";
 import { SpeakerCard } from "@/components/SpeakerCard";
 import { Portrait } from "@/components/Portrait";
 import { getSpeaker, speakers, type Speaker } from "@/data/speakers";
+import type { RosterProfile, RosterProfileCard } from "@/data/roster-profiles";
+import { getRosterProfilePage } from "@/lib/roster-profiles.server";
 import { formatFee } from "@/lib/fee";
 import { absoluteUrl, pageTitle, ogImageMeta } from "@/lib/site";
 
@@ -23,11 +25,20 @@ function faqsFor(name: string, fee: string) {
   ];
 }
 
+type LoaderData = {
+  speaker: Speaker;
+  /** Present when the slug is an imported roster speaker, not a curated profile. */
+  roster?: RosterProfile;
+  rosterSimilar?: RosterProfileCard[];
+};
+
 export const Route = createFileRoute("/speakers/$slug")({
-  loader: ({ params }): { speaker: Speaker } => {
-    const speaker = getSpeaker(params.slug);
-    if (!speaker) throw notFound();
-    return { speaker };
+  loader: async ({ params }): Promise<LoaderData> => {
+    const curated = getSpeaker(params.slug);
+    if (curated) return { speaker: curated };
+    const page = await getRosterProfilePage({ data: params.slug });
+    if (!page) throw notFound();
+    return { speaker: page.profile, roster: page.profile, rosterSimilar: page.similar };
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) {
@@ -113,7 +124,7 @@ export const Route = createFileRoute("/speakers/$slug")({
 });
 
 function SpeakerProfile() {
-  const { speaker: s } = Route.useLoaderData() as { speaker: Speaker };
+  const { speaker: s, roster, rosterSimilar } = Route.useLoaderData() as LoaderData;
   const fee = formatFee(s.fee_min, s.fee_max, s.fee_on_application);
   const similar = speakers
     .filter((o) => o.slug !== s.slug && o.topics.some((t) => s.topics.includes(t)))
@@ -179,6 +190,25 @@ function SpeakerProfile() {
         </div>
       </section>
 
+      {roster && roster.talk_topics.length > 0 && (
+        <section className="container-x pb-24">
+          <h2 className="label-mono text-[var(--ink-3)]">Speaking topics</h2>
+          <div className="mt-10 grid gap-8 md:grid-cols-2">
+            {roster.talk_topics.map((t) => (
+              <div
+                key={t.name || t.description.slice(0, 40)}
+                className="rounded-[var(--radius-card)] border border-[var(--line)] p-8"
+              >
+                <h3 className="text-lg font-semibold tracking-[-0.02em]">
+                  {t.name || "Keynote session"}
+                </h3>
+                <p className="mt-3 text-[var(--ink-2)]">{t.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {s.showreel_url && (
         <section className="container-x pb-24">
           <h2 className="label-mono text-[var(--ink-3)]">Showreel</h2>
@@ -193,34 +223,38 @@ function SpeakerProfile() {
         </section>
       )}
 
-      <section className="rule-open container-x section-y">
-        <h2 className="label-mono text-[var(--ink-3)]">What organisers say</h2>
-        <div className="mt-10 grid gap-8 md:grid-cols-3">
-          {s.testimonials.map((t) => (
-            <figure
-              key={t.author_name}
-              className="rounded-[var(--radius-card)] border border-[var(--line)] p-8"
-            >
-              <blockquote className="text-lg tracking-[-0.02em]">“{t.quote}”</blockquote>
-              <figcaption className="mt-6 text-sm text-[var(--ink-2)]">
-                <span className="block font-semibold text-ink">{t.author_name}</span>
-                {t.author_role}, {t.company}
-              </figcaption>
-            </figure>
-          ))}
-        </div>
-      </section>
+      {s.testimonials.length > 0 && (
+        <section className="rule-open container-x section-y">
+          <h2 className="label-mono text-[var(--ink-3)]">What organisers say</h2>
+          <div className="mt-10 grid gap-8 md:grid-cols-3">
+            {s.testimonials.map((t) => (
+              <figure
+                key={t.author_name}
+                className="rounded-[var(--radius-card)] border border-[var(--line)] p-8"
+              >
+                <blockquote className="text-lg tracking-[-0.02em]">“{t.quote}”</blockquote>
+                <figcaption className="mt-6 text-sm text-[var(--ink-2)]">
+                  <span className="block font-semibold text-ink">{t.author_name}</span>
+                  {[t.author_role, t.company].filter(Boolean).join(", ")}
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </section>
+      )}
 
-      <section className="container-x pb-24">
-        <h2 className="label-mono text-[var(--ink-3)]">Past clients</h2>
-        <ul className="mt-6 flex flex-wrap gap-x-10 gap-y-4">
-          {s.past_clients.map((c) => (
-            <li key={c} className="label-mono text-[var(--ink-3)]">
-              {c}
-            </li>
-          ))}
-        </ul>
-      </section>
+      {s.past_clients.length > 0 && (
+        <section className="container-x pb-24">
+          <h2 className="label-mono text-[var(--ink-3)]">Past clients</h2>
+          <ul className="mt-6 flex flex-wrap gap-x-10 gap-y-4">
+            {s.past_clients.map((c) => (
+              <li key={c} className="label-mono text-[var(--ink-3)]">
+                {c}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section className="rule-open container-x section-y">
         <h2 className="display text-[length:var(--display-md)]">Fee and travel</h2>
@@ -250,11 +284,33 @@ function SpeakerProfile() {
 
       <section className="rule-open container-x section-y">
         <h2 className="display text-[length:var(--display-md)]">Similar speakers</h2>
-        <div className="mt-12 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
-          {similar.map((o) => (
-            <SpeakerCard key={o.slug} speaker={o} />
-          ))}
-        </div>
+        {rosterSimilar ? (
+          <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {rosterSimilar.map((o) => (
+              <Link
+                key={o.slug}
+                to="/speakers/$slug"
+                params={{ slug: o.slug }}
+                className="group rounded-[var(--radius-card)] border border-[var(--line)] p-8 transition-colors duration-500 [transition-timing-function:var(--ease)] hover:border-[var(--ink)]"
+              >
+                <p className="text-lg font-semibold tracking-[-0.02em]">{o.name}</p>
+                <p className="label-mono mt-3 text-[var(--ink-3)]">{o.role}</p>
+                <p className="mt-4 text-sm text-[var(--ink-2)]">
+                  {formatFee(o.fee_min, o.fee_max, false)} · {o.location.split(" · ")[0]}
+                </p>
+                <p className="label-mono mt-4 inline-flex items-center gap-2 group-hover:underline">
+                  View profile <span aria-hidden="true">→</span>
+                </p>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="mt-12 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
+            {similar.map((o) => (
+              <SpeakerCard key={o.slug} speaker={o} />
+            ))}
+          </div>
+        )}
       </section>
 
       <div className="sticky bottom-0 z-30 border-t border-[var(--line)] bg-surface p-4 shadow-[0_-8px_24px_rgba(0,0,0,0.06)] md:hidden">

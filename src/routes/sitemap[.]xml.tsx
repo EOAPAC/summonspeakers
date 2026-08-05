@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { caseStudies, posts } from "@/data/editorial";
 import { speakers, topics } from "@/data/speakers";
+import { rosterProfiles } from "@/data/roster-profiles.generated";
 import { absoluteUrl } from "@/lib/site";
 
 type Entry = { path: string; priority: string; lastmod?: string };
@@ -24,6 +25,10 @@ function entries(): Entry[] {
     { path: "/case-studies", priority: "0.6" },
     ...topics.map((t) => ({ path: `/topics/${t.slug}`, priority: "0.8" })),
     ...speakers.map((s) => ({ path: `/speakers/${s.slug}`, priority: "0.9" })),
+    ...Object.keys(rosterProfiles).map((slug) => ({
+      path: `/speakers/${slug}`,
+      priority: "0.7",
+    })),
     ...posts.map((p) => ({ path: `/blog/${p.slug}`, priority: "0.5", lastmod: p.iso })),
     ...caseStudies.map((c) => ({ path: `/case-studies/${c.slug}`, priority: "0.5" })),
   ];
