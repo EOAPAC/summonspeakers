@@ -224,7 +224,7 @@ function RosterSpeakerProfile({ profile: p }: { profile: RosterProfile }) {
       <section className="container-x grid gap-12 pb-16 pt-10 md:grid-cols-[1fr_1fr] md:items-start">
         <img
           src={`/speakers/roster/${p.slug}.webp`}
-          alt={`${p.name} portrait`}
+          alt={`AI-generated portrait of ${p.name}, keynote speaker`}
           className="aspect-[4/5] w-full rounded-[var(--radius-media)] bg-[var(--surface-alt)] object-cover"
         />
         <div>

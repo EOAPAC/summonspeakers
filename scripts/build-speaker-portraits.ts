@@ -33,7 +33,17 @@ import { mkdir, readdir, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 
-import { speakers } from "../src/data/speakers";
+import { roster } from "../src/data/roster.generated";
+
+// The full profiles moved from a static array to Supabase in the migration,
+// so the only slugs this script can know offline are the roster's and the
+// twelve curated profiles', which it lists by hand.
+const CURATED_SLUGS = [
+  "andres-molina", "daniel-hsu", "dr-maya-ellison", "grace-oyelaran",
+  "helena-brandt", "james-okoro", "michael-toure", "nina-castellan",
+  "omar-haddad", "priya-raman", "robert-ainsley", "sarah-lindqvist",
+];
+const KNOWN_SLUGS = new Set([...roster.map((s) => s.slug), ...CURATED_SLUGS]);
 
 const API = "https://api.runware.ai/v1";
 const MODEL = "runware:100@1";
@@ -217,9 +227,8 @@ async function writeManifest(): Promise<number> {
     else if (existing[1].kind === "plate" && parsed.kind === "photo") existing[1] = value;
   }
 
-  const known = new Set(speakers.map((s) => s.slug));
   for (const [slug] of entries) {
-    if (!known.has(slug))
+    if (!KNOWN_SLUGS.has(slug))
       console.warn(`warn   ${slug} is not a speaker slug — no profile will use it`);
   }
 
@@ -234,6 +243,13 @@ async function writeManifest(): Promise<number> {
 //
 // "plate" is a rendered monogram graphic from build-speaker-plates.ts. "photo"
 // is a portrait — generated or supplied. They get different alt text.
+//
+// Roster portraits (public/speakers/roster/<slug>.webp, scanned into
+// roster-images.generated.ts) resolve through the same functions as a
+// fallback, so the full-profile page, the index gate and the cards all agree
+// on what "has a portrait" means.
+
+import { rosterImageSlugs } from "./roster-images.generated";
 
 export type PortraitKind = "plate" | "photo";
 
@@ -241,13 +257,15 @@ const PORTRAITS: Readonly<Record<string, { src: string; kind: PortraitKind }>> =
 ${entries.map(([slug, v]) => `  "${slug}": { src: "${v.src}", kind: "${v.kind}" },`).join("\n")}
 };
 
+const ROSTER_PORTRAITS: ReadonlySet<string> = new Set(rosterImageSlugs);
+
 /** Public path to a speaker's image, or null when there is not one yet. */
 export function portraitFor(slug: string): string | null {
-  return PORTRAITS[slug]?.src ?? null;
+  return PORTRAITS[slug]?.src ?? (ROSTER_PORTRAITS.has(slug) ? \`/speakers/roster/\${slug}.webp\` : null);
 }
 
 export function portraitKind(slug: string): PortraitKind | null {
-  return PORTRAITS[slug]?.kind ?? null;
+  return PORTRAITS[slug]?.kind ?? (ROSTER_PORTRAITS.has(slug) ? "photo" : null);
 }
 
 /**
@@ -256,13 +274,16 @@ export function portraitKind(slug: string): PortraitKind | null {
  * A plate carries the name and role as artwork and always sits beside a heading
  * with the same name, so it is decorative and takes an empty alt rather than
  * making a screen reader announce the name twice. A photo is described, and says
- * it is generated, because these twelve profiles are placeholders and the face
- * belongs to nobody.
+ * it is generated: the curated profiles are placeholders whose faces belong to
+ * nobody, and roster portraits are AI-generated headshots published under the
+ * site's disclosure convention.
  */
 export function portraitAlt(slug: string, name: string): string {
-  return portraitKind(slug) === "plate"
-    ? ""
-    : \`Portrait of \${name}, keynote speaker (AI-generated placeholder image)\`;
+  const kind = portraitKind(slug);
+  if (kind === "plate") return "";
+  if (PORTRAITS[slug])
+    return \`Portrait of \${name}, keynote speaker (AI-generated placeholder image)\`;
+  return \`AI-generated portrait of \${name}, keynote speaker\`;
 }
 
 export const PORTRAIT_COUNT = ${entries.length};
