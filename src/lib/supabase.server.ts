@@ -43,3 +43,29 @@ export async function userFromToken(
   if (error || !data.user) return null;
   return { id: data.user.id, email: data.user.email ?? null };
 }
+
+/**
+ * Public (anon-key) Supabase client, for reading data RLS already allows
+ * anyone to see — e.g. published speaker profiles. SERVER ONLY by convention,
+ * not by necessity: this key is the same one shipped to the browser for
+ * sign-in (supabase-auth.ts), so nothing leaks by reading it here too. Kept
+ * separate from that browser client because this one has to work outside a
+ * browser, where there is no window and no localStorage to persist a session.
+ *
+ * VITE_SUPABASE_ANON_KEY is read via process.env rather than import.meta.env:
+ * the VITE_ prefix controls what Vite inlines into the client bundle, not
+ * what a Node/Nitro server process can read from its own environment, and
+ * this file never reaches the client bundle regardless.
+ */
+let publicCached: SupabaseClient | null | undefined;
+
+export function getPublicClient(): SupabaseClient | null {
+  if (publicCached !== undefined) return publicCached;
+  const url = process.env["SUPABASE_URL"];
+  const anonKey = process.env["VITE_SUPABASE_ANON_KEY"];
+  publicCached =
+    url && anonKey
+      ? createClient(url, anonKey, { auth: { autoRefreshToken: false, persistSession: false } })
+      : null;
+  return publicCached;
+}

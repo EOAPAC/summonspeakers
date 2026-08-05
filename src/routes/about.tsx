@@ -4,7 +4,7 @@ import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { ButtonLink } from "@/components/Button";
 import { ClosingCta } from "@/components/ClosingCta";
 import { ROSTER_COUNT } from "@/data/roster-facets";
-import { speakers } from "@/data/speakers";
+import { fetchSpeakers } from "@/lib/speakers.server";
 import { absoluteUrl, ogImageMeta } from "@/lib/site";
 
 const values = [
@@ -30,18 +30,8 @@ const values = [
   },
 ];
 
-// The speaker count is derived from the roster rather than typed in, so this
-// page cannot drift from what the directory actually holds.
-const speakerCount = ROSTER_COUNT + speakers.length;
-
-const numbers = [
-  { value: speakerCount.toLocaleString("en-AU"), label: "speakers listed" },
-  { value: "$0", label: "hidden in any fee" },
-  { value: "1 day", label: "median time to shortlist" },
-  { value: "4.9", label: "average event rating" },
-];
-
 export const Route = createFileRoute("/about")({
+  loader: async () => ({ speakers: await fetchSpeakers() }),
   head: () => ({
     meta: [
       { title: "About SummonSpeakers: why we publish every fee" },
@@ -75,6 +65,17 @@ export const Route = createFileRoute("/about")({
 });
 
 function About() {
+  const { speakers } = Route.useLoaderData();
+  // Derived from the roster plus the loader-fetched full profiles rather than
+  // typed in, so this page cannot drift from what the directory actually holds.
+  const speakerCount = ROSTER_COUNT + speakers.length;
+  const numbers = [
+    { value: speakerCount.toLocaleString("en-AU"), label: "speakers listed" },
+    { value: "$0", label: "hidden in any fee" },
+    { value: "1 day", label: "median time to shortlist" },
+    { value: "4.9", label: "average event rating" },
+  ];
+
   return (
     <Page>
       <Breadcrumbs items={[{ label: "Home", to: "/" }, { label: "About" }]} />

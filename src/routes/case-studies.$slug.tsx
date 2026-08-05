@@ -5,14 +5,16 @@ import { ButtonLink } from "@/components/Button";
 import { FeeBand } from "@/components/FeeBand";
 import { ClosingCta } from "@/components/ClosingCta";
 import { getCaseStudy, type CaseStudy } from "@/data/editorial";
-import { getSpeaker } from "@/data/speakers";
+import { getSpeaker, type Speaker } from "@/data/speakers";
+import { fetchSpeakers } from "@/lib/speakers.server";
 import { absoluteUrl, ogImageMeta, pageTitle } from "@/lib/site";
 
 export const Route = createFileRoute("/case-studies/$slug")({
-  loader: ({ params }): { study: CaseStudy } => {
+  loader: async ({ params }): Promise<{ study: CaseStudy; speaker: Speaker | undefined }> => {
     const study = getCaseStudy(params.slug);
     if (!study) throw notFound();
-    return { study };
+    const speakers = await fetchSpeakers();
+    return { study, speaker: getSpeaker(study.speaker_slug, speakers) };
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) {
@@ -53,8 +55,7 @@ export const Route = createFileRoute("/case-studies/$slug")({
 });
 
 function CaseStudyDetail() {
-  const { study } = Route.useLoaderData() as { study: CaseStudy };
-  const speaker = getSpeaker(study.speaker_slug);
+  const { study, speaker } = Route.useLoaderData() as { study: CaseStudy; speaker?: Speaker };
 
   return (
     <Page>

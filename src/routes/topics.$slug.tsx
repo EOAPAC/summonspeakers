@@ -15,6 +15,7 @@ import {
 import { feeAnswerForTopic } from "@/data/fees";
 import type { RosterPage } from "@/data/roster";
 import { fetchRoster } from "@/lib/roster.server";
+import { fetchSpeakers } from "@/lib/speakers.server";
 import { SITE_URL, absoluteUrl, ogImageMeta, pageTitle } from "@/lib/site";
 
 /** Roster speakers shown inline. The rest are one click away on /speakers. */
@@ -102,7 +103,8 @@ export const Route = createFileRoute("/topics/$slug")({
         })
       : null;
 
-    return { topic, speakers: speakersByTopic(topic.name), roster };
+    const allSpeakers = await fetchSpeakers();
+    return { topic, speakers: speakersByTopic(topic.name, allSpeakers), roster };
   },
 
   head: ({ loaderData, params }) => {

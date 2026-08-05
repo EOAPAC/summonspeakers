@@ -1,8 +1,5 @@
 import { ROSTER_COUNT } from "@/data/roster-facets";
-import { speakers } from "@/data/speakers";
 import { OG_IMAGE, SITE_URL, absoluteUrl } from "./site";
-
-const SPEAKER_COUNT = ROSTER_COUNT + speakers.length;
 
 /**
  * Sitewide entity. Attached to the root route so every page carries it — AI
@@ -56,15 +53,20 @@ export function webSiteJsonLd() {
  * The service itself, with the published fee range as a real PriceSpecification
  * rather than prose. This is the claim the whole site rests on, so it belongs in
  * structured data.
+ *
+ * `fullProfileCount` comes from the caller's loader rather than a module-level
+ * constant: the full profiles are fetched from Supabase now, so there is no
+ * static array left here to measure the length of.
  */
-export function serviceJsonLd() {
+export function serviceJsonLd(fullProfileCount: number) {
+  const speakerCount = ROSTER_COUNT + fullProfileCount;
   return {
     "@context": "https://schema.org",
     "@type": "Service",
     name: "Keynote speaker booking",
     provider: { "@id": `${SITE_URL}/#organization` },
     serviceType: "Speaker booking and event programming",
-    description: `Browse ${SPEAKER_COUNT.toLocaleString("en-AU")} speakers with published fee bands, receive a matched shortlist within one business day, and book directly with the fee shown upfront.`,
+    description: `Browse ${speakerCount.toLocaleString("en-AU")} speakers with published fee bands, receive a matched shortlist within one business day, and book directly with the fee shown upfront.`,
     areaServed: ["AU", "NZ", "Global"],
     audience: {
       "@type": "Audience",
