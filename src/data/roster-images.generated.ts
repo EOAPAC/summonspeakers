@@ -34,6 +34,7 @@ export const rosterImageSlugs: readonly string[] = [
   "alan-kohler",
   "alan-newey",
   "alan-oxley",
+  "alan-patching",
   "alan-tongue",
   "alastair-clarkson",
   "alastair-lynch",
@@ -298,6 +299,7 @@ export const rosterImageSlugs: readonly string[] = [
   "carren-smith",
   "casey-beros",
   "casey-burgess",
+  "casey-dellacqua",
   "casey-donovan",
   "cassie-kozyrkov",
   "cassie-silver",
@@ -346,6 +348,7 @@ export const rosterImageSlugs: readonly string[] = [
   "chris-ryan",
   "chris-smoje",
   "chris-taylor",
+  "christian-boo-boucousis-csp",
   "christian-chua",
   "christie-jenkins",
   "christina-morrissy",
@@ -387,5 +390,11 @@ export const rosterImageSlugs: readonly string[] = [
   "craig-bellamy",
   "craig-foster-am",
   "craig-hamilton",
-  "craig-harper"
+  "craig-harper",
+  "craig-hollywood",
+  "craig-lovett",
+  "craig-mcrae",
+  "craig-quartermaine",
+  "craig-reucassel",
+  "crescendo"
 ];
