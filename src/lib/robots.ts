@@ -7,7 +7,27 @@
 
 import { absoluteUrl, SITE_URL } from "./site";
 
-const AGENTS = ["Googlebot", "Bingbot", "Twitterbot", "facebookexternalhit", "*"];
+/**
+ * The AI search crawlers are named explicitly rather than left to ride the
+ * `*` rule: being citable in AI answers is a distribution channel for this
+ * site, and an explicit Allow survives any future tightening of the wildcard.
+ * GPTBot/ChatGPT-User are OpenAI, PerplexityBot is Perplexity, ClaudeBot and
+ * anthropic-ai are Anthropic, and Google-Extended gates Gemini and AI
+ * Overviews.
+ */
+const AGENTS = [
+  "Googlebot",
+  "Bingbot",
+  "Twitterbot",
+  "facebookexternalhit",
+  "GPTBot",
+  "ChatGPT-User",
+  "PerplexityBot",
+  "ClaudeBot",
+  "anthropic-ai",
+  "Google-Extended",
+  "*",
+];
 
 export function allowAllRobots(): string {
   return `${AGENTS.map((ua) => `User-agent: ${ua}\nAllow: /`).join("\n\n")}

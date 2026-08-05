@@ -18,6 +18,7 @@ async function entries(): Promise<Entry[]> {
     { path: "/", priority: "1.0" },
     { path: "/speakers", priority: "0.9" },
     { path: "/speaker-fees", priority: "0.9" },
+    { path: "/speaker-statistics", priority: "0.7" },
     { path: "/get-matched", priority: "0.8" },
     { path: "/how-it-works", priority: "0.7" },
     { path: "/for-speakers", priority: "0.7" },

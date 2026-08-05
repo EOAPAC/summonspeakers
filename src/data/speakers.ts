@@ -48,6 +48,11 @@ export type TopicDef = {
     categories?: string[];
     /** Locks the roster query to one gender, for /topics/female-speakers. */
     gender?: "female" | "male";
+    /**
+     * A path into the place tree ("Europe/UK/London"), for the location
+     * pages. Matches the node and everything beneath it.
+     */
+    place?: string;
   };
 };
 
@@ -376,6 +381,66 @@ export const topics: TopicDef[] = [
     kind: "topic",
     roster: { categories: ["Military"] },
   },
+
+  // ── Locations ──────────────────────────────────────────────────────────────
+  // One page per market with real inventory. The counts these pages quote come
+  // from the roster query at request time, so they stay honest as the roster
+  // changes. Places with a handful of speakers stay findable through the
+  // location filter instead of carrying a thin page.
+  {
+    slug: "uk-speakers",
+    name: "UK",
+    heading: "Keynote Speakers in the UK",
+    blurb:
+      "Keynote speakers based in the United Kingdom, from broadcast names to City economists. Booking locally keeps travel off the invoice, and most speakers here list their fee upfront.",
+    kind: "location",
+    roster: { place: "Europe/UK" },
+  },
+  {
+    slug: "london-speakers",
+    name: "London",
+    heading: "Keynote Speakers in London",
+    blurb:
+      "Speakers based in London, available for conferences, dinners and offsites across the city without travel costs. Most list a confirmed speaking fee, so you can shortlist on budget.",
+    kind: "location",
+    roster: { place: "Europe/UK/London" },
+  },
+  {
+    slug: "us-speakers",
+    name: "US",
+    heading: "Keynote Speakers in the US",
+    blurb:
+      "US-based keynote speakers across business, politics, science and sport. Fees are listed upfront on most profiles, so the shortlist fits the budget before anyone gets on a call.",
+    kind: "location",
+    roster: { place: "Americas/US" },
+  },
+  {
+    slug: "australia-speakers",
+    name: "Australia",
+    heading: "Keynote Speakers in Australia",
+    blurb:
+      "Australian keynote speakers, MCs and facilitators, filterable by state. A speaker in your city usually costs less than a bigger name flown in, which is easy to check when fees are published.",
+    kind: "location",
+    roster: { place: "Oceania/Australia" },
+  },
+  {
+    slug: "europe-speakers",
+    name: "Europe",
+    heading: "Keynote Speakers in Europe",
+    blurb:
+      "Keynote speakers across Europe, from London and Paris to Berlin and Stockholm. Filter by country to keep travel local, and compare listed fees before you enquire.",
+    kind: "location",
+    roster: { place: "Europe" },
+  },
+  {
+    slug: "asia-speakers",
+    name: "Asia",
+    heading: "Keynote Speakers in Asia",
+    blurb:
+      "Speakers based across Asia, with Singapore and Hong Kong the deepest markets. Regional expertise without long-haul travel, and listed fees on most profiles.",
+    kind: "location",
+    roster: { place: "Asia" },
+  },
 ];
 
 /**
@@ -405,7 +470,13 @@ const PHRASE_BASE: Record<string, string> = {
   Adventurers: "adventure",
   Generations: "intergenerational",
   "MCs & Hosts": "MC and event host",
+  Australia: "Australian",
+  Europe: "European",
+  Asia: "Asia-based",
 };
+
+/** Place names that must not be lowercased mid-sentence. */
+const PROPER_WORDS = new Set(["London", "Australian", "European", "Asia-based", "Singapore"]);
 
 /**
  * Lower-case a topic name for use mid-sentence, keeping acronyms intact so
@@ -415,7 +486,11 @@ function midSentence(rawName: string): string {
   const name = PHRASE_BASE[rawName] ?? rawName;
   return name
     .split(" ")
-    .map((word) => (/^[A-Z0-9&]+$/.test(word) && word.length <= 4 ? word : word.toLowerCase()))
+    .map((word) =>
+      (/^[A-Z0-9&]+$/.test(word) && word.length <= 4) || PROPER_WORDS.has(word)
+        ? word
+        : word.toLowerCase(),
+    )
     .join(" ");
 }
 

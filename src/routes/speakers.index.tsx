@@ -92,12 +92,13 @@ export const Route = createFileRoute("/speakers/")({
     const topic = deps.topic ? getTopic(deps.topic) : undefined;
     const categories = topic?.roster?.categories ?? (deps.category ? [deps.category] : []);
     const gender = topic?.roster?.gender ?? deps.gender ?? "any";
+    const place = topic?.roster?.place ?? deps.place ?? "";
     const speakers = await fetchSpeakers();
     return {
       roster: await fetchRoster({
         data: {
           categories,
-          place: deps.place ?? "",
+          place,
           gender,
           q: deps.q ?? "",
           page: deps.page ?? 1,
