@@ -820,3 +820,29 @@ export function topicSlugFor(topicName: string): string | null {
 export function speakersByTopic(topicName: string) {
   return speakers.filter((s) => s.topics.includes(topicName));
 }
+
+/**
+ * All full profiles, with the named slugs first in the order given and everyone
+ * else after, keeping their existing relative order.
+ *
+ * Display order is expressed at the call site rather than by reordering the
+ * `speakers` array, because that array also drives the sitemap, the enquiry
+ * form's dropdown, and the "similar speakers" rail — which is
+ * `speakers.filter(...).slice(0, 6)`, so reordering it would quietly change who
+ * shows as similar on every profile.
+ *
+ * Throws on an unknown or repeated slug: both would otherwise show up as a card
+ * silently missing or appearing twice, which nobody notices until a speaker asks
+ * why they are not on the page.
+ */
+export function pinnedFirst(slugs: readonly string[]): Speaker[] {
+  const seen = new Set<string>();
+  const pinned = slugs.map((slug) => {
+    if (seen.has(slug)) throw new Error(`pinnedFirst lists "${slug}" twice`);
+    seen.add(slug);
+    const speaker = getSpeaker(slug);
+    if (!speaker) throw new Error(`pinnedFirst names an unknown speaker slug: "${slug}"`);
+    return speaker;
+  });
+  return [...pinned, ...speakers.filter((s) => !seen.has(s.slug))];
+}

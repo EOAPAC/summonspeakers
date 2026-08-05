@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ButtonLink } from "@/components/Button";
 import { SpeakerCard } from "@/components/SpeakerCard";
 import { ClosingCta } from "@/components/ClosingCta";
-import { featuredTopics, getSpeaker } from "@/data/speakers";
+import { featuredTopics, pinnedFirst } from "@/data/speakers";
 import { absoluteUrl, ogImageMeta } from "@/lib/site";
 import { serviceJsonLd } from "@/lib/schema";
 import { Page, Eyebrow, FAQ, faqJsonLd } from "@/components/Page";
@@ -123,16 +123,12 @@ const homeTestimonials = [
  */
 const HOME_FEATURED = [
   "helena-brandt",
-  "nina-castellan",
   "robert-ainsley",
+  "nina-castellan",
   "michael-toure",
 ] as const;
 
-const homeFeatured = HOME_FEATURED.map((slug) => {
-  const speaker = getSpeaker(slug);
-  if (!speaker) throw new Error(`HOME_FEATURED names an unknown speaker slug: "${slug}"`);
-  return speaker;
-});
+const homeFeatured = pinnedFirst(HOME_FEATURED).slice(0, 4);
 
 function Home() {
   return (

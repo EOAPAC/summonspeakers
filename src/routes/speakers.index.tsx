@@ -5,7 +5,7 @@ import { SpeakerCard } from "@/components/SpeakerCard";
 import { RosterDirectory, type RosterSearch } from "@/components/RosterDirectory";
 import { ClosingCta } from "@/components/ClosingCta";
 import { ButtonLink } from "@/components/Button";
-import { getTopic, speakers } from "@/data/speakers";
+import { getTopic, pinnedFirst } from "@/data/speakers";
 import type { RosterGender } from "@/data/roster";
 import { fetchRoster } from "@/lib/roster.server";
 import { absoluteUrl, ogImageMeta, pageTitle } from "@/lib/site";
@@ -34,6 +34,14 @@ function isFaceted(s: RosterSearch): boolean {
 function isNarrowed(s: RosterSearch): boolean {
   return isFaceted(s) || (s.page !== undefined && s.page > 1);
 }
+
+/** Display order for the full-profile grid. The rest follow in their own order. */
+const fullProfileOrder = pinnedFirst([
+  "helena-brandt",
+  "robert-ainsley",
+  "andres-molina",
+  "omar-haddad",
+]);
 
 export const Route = createFileRoute("/speakers/")({
   // Defaults are omitted rather than defaulted, so /speakers never redirects to
@@ -174,7 +182,7 @@ function SpeakersIndex() {
             on the roster is available on enquiry.
           </p>
           <div className="mt-12 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
-            {speakers.map((s) => (
+            {fullProfileOrder.map((s) => (
               <SpeakerCard key={s.slug} speaker={s} />
             ))}
           </div>
