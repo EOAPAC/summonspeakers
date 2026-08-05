@@ -55,7 +55,7 @@ function coerceFilters(input: unknown): RosterFilters {
  * filter here keeps every byte of it out of the browser bundle.
  */
 export const fetchRoster = createServerFn({ method: "GET" })
-  .inputValidator(coerceFilters)
+  .validator(coerceFilters)
   .handler(({ data }): RosterPage & { rosterCount: number } => ({
     ...queryRoster(data),
     rosterCount,
@@ -63,7 +63,7 @@ export const fetchRoster = createServerFn({ method: "GET" })
 
 /** Resolves a roster slug to a display name for the enquiry form. */
 export const fetchRosterSpeakerName = createServerFn({ method: "GET" })
-  .inputValidator((input: unknown) => (typeof input === "string" ? input : ""))
+  .validator((input: unknown) => (typeof input === "string" ? input : ""))
   .handler(({ data }): { name: string | null } => ({
     name: data ? rosterSpeakerName(data) : null,
   }));
