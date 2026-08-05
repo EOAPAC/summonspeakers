@@ -123,8 +123,8 @@ const homeTestimonials = [
  */
 const HOME_FEATURED = [
   "helena-brandt",
-  "nina-castellan",
   "robert-ainsley",
+  "nina-castellan",
   "michael-toure",
 ] as const;
 
