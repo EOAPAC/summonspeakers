@@ -76,6 +76,18 @@
 
   --display-hero: clamp(44px, 8vw, 112px);
   --display-cta: clamp(48px, 11vw, 170px);
+  /* Same role as --display-cta, scaled to actually fit "Tell us about your
+     event." on one line at desktop widths — 11vw does not, it wraps onto two
+     lines everywhere from 1024px up to the ~2060px viewport where the vw
+     term overtakes the 170px cap. Measured against the rendered heading's
+     unwrapped width (a stable ~12.44x its font-size for this string): at the
+     6vw padding this section uses below 1600px, the available line width is
+     ~0.88x the viewport, so the font-size has to stay under ~7.08vw of it;
+     6.8vw keeps a margin. Past 1600px the section's padding caps at 96px and
+     the available width grows faster than 6.8vw does, so the margin only
+     widens; the 140px ceiling is chosen to stay under that margin at every
+     viewport width up to and beyond where the ceiling itself takes over. */
+  --display-closing-cta: clamp(48px, 6.8vw, 140px);
   --display-lg: clamp(32px, 5vw, 72px);
   --display-md: clamp(28px, 5vw, 60px);
   --display-sm: clamp(24px, 3vw, 34px);
