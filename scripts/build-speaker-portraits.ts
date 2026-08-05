@@ -266,6 +266,13 @@ export function portraitAlt(slug: string, name: string): string {
 }
 
 export const PORTRAIT_COUNT = ${entries.length};
+
+/**
+ * The slugs with a portrait, in one place: the portrait is the editorial
+ * quality bar — it decides which profiles are indexed, listed in the sitemap
+ * and offered in the enquiry dropdown.
+ */
+export const portraitSlugs: readonly string[] = ${JSON.stringify(entries.map((e) => e.slug))};
 `,
   );
   return entries.length;

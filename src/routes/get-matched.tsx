@@ -3,7 +3,8 @@ import { Page } from "@/components/Page";
 import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { EnquiryFlow } from "@/components/EnquiryFlow";
 import { getSpeaker, type Speaker } from "@/data/speakers";
-import { fetchSpeakers } from "@/lib/speakers.server";
+import { portraitSlugs } from "@/data/speaker-portraits";
+import { fetchSpeakerBySlug, fetchSpeakersBySlugs } from "@/lib/speakers.server";
 import { fetchRosterSpeakerName } from "@/lib/roster.server";
 import { absoluteUrl, ogImageMeta } from "@/lib/site";
 
@@ -21,10 +22,15 @@ export const Route = createFileRoute("/get-matched")({
   // speaker was preset, not only when resolving a `?speaker=` slug.
   loaderDeps: ({ search }) => ({ speaker: search.speaker ?? "" }),
   loader: async ({ deps }): Promise<{ presetName: string; speakers: Speaker[] }> => {
-    const speakers = await fetchSpeakers();
+    // Only the portrait-backed profiles populate the dropdown: the speakers
+    // table now holds thousands of rows, and a thousand-option select helps
+    // nobody. Everyone else arrives with their name prefilled via ?speaker=.
+    const speakers = await fetchSpeakersBySlugs({ data: [...portraitSlugs] });
     if (!deps.speaker) return { presetName: "", speakers };
     const profile = getSpeaker(deps.speaker, speakers);
     if (profile) return { presetName: profile.name, speakers };
+    const { speaker } = await fetchSpeakerBySlug({ data: deps.speaker });
+    if (speaker) return { presetName: speaker.name, speakers };
     const { name } = await fetchRosterSpeakerName({ data: deps.speaker });
     return { presetName: name ?? "", speakers };
   },

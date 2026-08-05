@@ -24,7 +24,7 @@ export function RosterRows({ rows }: { rows: RosterRow[] }) {
   return (
     <ul className="border-t border-[var(--ink)]">
       {rows.map((r) => {
-        const portrait = r.hasProfile ? (
+        const portrait = r.hasImage ? (
           <img
             src={`/speakers/roster/${r.slug}.webp`}
             alt=""

@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { caseStudies, posts } from "@/data/editorial";
+import { rosterImageSlugs } from "@/data/roster-images.generated";
+import { portraitSlugs } from "@/data/speaker-portraits";
 import { topics } from "@/data/speakers";
-import { fetchSpeakers } from "@/lib/speakers.server";
+import { fetchSpeakersBySlugs } from "@/lib/speakers.server";
 import { absoluteUrl } from "@/lib/site";
 
 type Entry = { path: string; priority: string; lastmod?: string };
@@ -13,7 +15,11 @@ type Entry = { path: string; priority: string; lastmod?: string };
  * Supabase, so this is now async — nothing else here needed to be.
  */
 async function entries(): Promise<Entry[]> {
-  const speakers = await fetchSpeakers();
+  // Only portrait-backed profiles are listed: the portrait is the editorial
+  // quality bar, and the bulk-inserted generated-bio profiles carry noindex
+  // until they earn one. Confirmed against Supabase so a renamed or
+  // unpublished speaker drops out of the sitemap with the page.
+  const speakers = await fetchSpeakersBySlugs({ data: [...portraitSlugs] });
   return [
     { path: "/", priority: "1.0" },
     { path: "/speakers", priority: "0.9" },
@@ -28,6 +34,7 @@ async function entries(): Promise<Entry[]> {
     { path: "/case-studies", priority: "0.6" },
     ...topics.map((t) => ({ path: `/topics/${t.slug}`, priority: "0.8" })),
     ...speakers.map((s) => ({ path: `/speakers/${s.slug}`, priority: "0.9" })),
+    ...rosterImageSlugs.map((slug) => ({ path: `/speakers/${slug}`, priority: "0.7" })),
     ...posts.map((p) => ({ path: `/blog/${p.slug}`, priority: "0.5", lastmod: p.iso })),
     ...caseStudies.map((c) => ({ path: `/case-studies/${c.slug}`, priority: "0.5" })),
   ];
