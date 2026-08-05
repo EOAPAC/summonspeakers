@@ -56,6 +56,27 @@ jobs:
           fi
           echo "Roster data absent from .vercel/output/static — ok"
 
+      # A component now imports enquiries.server.ts, and createServerFn is what
+      # keeps the handler body — and with it the service-role Supabase client and
+      # the Resend key — out of the browser. That split is a build-time
+      # transform, so a refactor could quietly break it and the build would still
+      # succeed. These names must never appear in the client bundle.
+      - name: Assert server-only code stays out of the client bundle
+        run: |
+          leaked=""
+          for needle in SUPABASE_SERVICE_ROLE_KEY getServiceClient RESEND_API_KEY userFromToken adminInbox; do
+            if grep -rlq "$needle" .vercel/output/static/; then
+              leaked="$leaked $needle"
+            fi
+          done
+          if [ -n "$leaked" ]; then
+            echo "::error::Server-only identifiers reached the client bundle:$leaked"
+            echo "createServerFn strips the handler body; something is importing these"
+            echo "outside a handler, or the split has broken."
+            exit 1
+          fi
+          echo "Server-only code absent from .vercel/output/static — ok"
+
       # A VITE_-prefixed variable is inlined into the client bundle, so reading
       # one is the same as publishing it. Checking the runner's environment would
       # be vacuous — it never holds the deployment's vars — so this checks what

@@ -85,7 +85,7 @@ export function validateListing(raw: unknown): ListingInput {
  * RLS policies make sure an owner cannot promote their own row.
  */
 export const submitListing = createServerFn({ method: "POST" })
-  .inputValidator(validateListing)
+  .validator(validateListing)
   .handler(async ({ data }) => {
     const supabase = getServiceClient();
     if (!supabase) {

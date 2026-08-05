@@ -69,7 +69,7 @@ export function validateEnquiry(raw: unknown): EnquiryInput {
  * shows its error state rather than a fake success.
  */
 export const submitEnquiry = createServerFn({ method: "POST" })
-  .inputValidator(validateEnquiry)
+  .validator(validateEnquiry)
   .handler(async ({ data }) => {
     const supabase = getServiceClient();
     if (!supabase) {

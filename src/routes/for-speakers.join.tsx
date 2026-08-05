@@ -4,6 +4,7 @@ import { Page } from "@/components/Page";
 import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { Button } from "@/components/Button";
 import { absoluteUrl, ogImageMeta } from "@/lib/site";
+import { submitListing } from "@/lib/listings.server";
 
 export const Route = createFileRoute("/for-speakers/join")({
   head: () => ({
@@ -45,6 +46,39 @@ const fieldBase =
 function Join() {
   const [submitted, setSubmitted] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const f = new FormData(form);
+    const str = (k: string) => String(f.get(k) ?? "");
+
+    setSubmitting(true);
+    setError(null);
+    try {
+      await submitListing({
+        data: {
+          // Single sign-on is not wired up, so every listing arrives
+          // unauthenticated. The server treats an empty token as anonymous and
+          // leaves owner_id null for an admin to claim later.
+          accessToken: "",
+          full_name: str("name"),
+          email: str("email"),
+          role: str("role"),
+          fee: str("fee"),
+          topics: str("topics"),
+        },
+      });
+      setSubmitted(true);
+      form.reset();
+    } catch {
+      setError("We couldn't submit that. Try again, or email hello@summonspeakers.com.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   return (
     <Page>
@@ -87,13 +121,7 @@ function Join() {
             )}
           </div>
 
-          <form
-            className="hairline-top mt-12 space-y-8 pt-12"
-            onSubmit={(e) => {
-              e.preventDefault();
-              setSubmitted(true);
-            }}
-          >
+          <form className="hairline-top mt-12 space-y-8 pt-12" onSubmit={handleSubmit}>
             <p className="label-mono text-[var(--ink-3)]">Or list with your email</p>
             {[
               { id: "name", label: "Full name", type: "text" },
@@ -114,13 +142,20 @@ function Join() {
               </label>
               <textarea id="topics" name="topics" rows={3} className={`${fieldBase} py-3`} />
             </div>
+            {error && (
+              <p role="alert" className="text-sm text-[var(--color-warning)]">
+                Error: {error}
+              </p>
+            )}
             {submitted ? (
               <p role="status" className="text-lg">
                 Thank you. Your listing is with our editor and we'll be in touch within two business
                 days.
               </p>
             ) : (
-              <Button type="submit">Submit for review</Button>
+              <Button type="submit" loading={submitting}>
+                Submit for review
+              </Button>
             )}
           </form>
         </div>
