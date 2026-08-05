@@ -4,7 +4,7 @@ import { ClosingCta } from "@/components/ClosingCta";
 import { PortalHero } from "@/components/PortalHero";
 import { featuredTopics, pinnedFirst } from "@/data/speakers";
 import { fetchSpeakersBySlugs } from "@/lib/speakers.server";
-import { absoluteUrl, ogImageMeta } from "@/lib/site";
+import { absoluteUrl, ogImageMeta, jsonLd } from "@/lib/site";
 import { serviceJsonLd } from "@/lib/schema";
 import { Page, Eyebrow, FAQ, faqJsonLd } from "@/components/Page";
 
@@ -41,9 +41,9 @@ export const Route = createFileRoute("/")({
       },
       {
         type: "application/ld+json",
-        children: JSON.stringify(serviceJsonLd(loaderData?.speakers.length ?? 0)),
+        children: jsonLd(serviceJsonLd(loaderData?.speakers.length ?? 0)),
       },
-      { type: "application/ld+json", children: JSON.stringify(faqJsonLd(homeFaqs)) },
+      { type: "application/ld+json", children: jsonLd(faqJsonLd(homeFaqs)) },
     ],
   }),
   component: Home,

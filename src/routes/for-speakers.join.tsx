@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Page } from "@/components/Page";
 import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { Button } from "@/components/Button";
-import { absoluteUrl, ogImageMeta } from "@/lib/site";
+import { absoluteUrl, ogImageMeta, jsonLd } from "@/lib/site";
 import { submitListing } from "@/lib/listings.server";
 
 export const Route = createFileRoute("/for-speakers/join")({
@@ -27,7 +27,7 @@ export const Route = createFileRoute("/for-speakers/join")({
     scripts: [
       {
         type: "application/ld+json",
-        children: JSON.stringify(
+        children: jsonLd(
           breadcrumbJsonLd([
             { name: "Home", item: "/" },
             { name: "For speakers", item: "/for-speakers" },

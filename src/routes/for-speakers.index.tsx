@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Page, Eyebrow } from "@/components/Page";
 import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { ButtonLink } from "@/components/Button";
-import { absoluteUrl, ogImageMeta } from "@/lib/site";
+import { absoluteUrl, ogImageMeta, jsonLd } from "@/lib/site";
 
 const benefits = [
   {
@@ -61,7 +61,7 @@ export const Route = createFileRoute("/for-speakers/")({
     scripts: [
       {
         type: "application/ld+json",
-        children: JSON.stringify(
+        children: jsonLd(
           breadcrumbJsonLd([
             { name: "Home", item: "/" },
             { name: "For speakers", item: "/for-speakers" },

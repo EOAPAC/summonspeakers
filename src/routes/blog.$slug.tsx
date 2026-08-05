@@ -4,7 +4,7 @@ import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { ButtonLink } from "@/components/Button";
 import { ClosingCta } from "@/components/ClosingCta";
 import { getPost, relatedPosts, type Post } from "@/data/editorial";
-import { absoluteUrl, ogImageMeta, pageTitle } from "@/lib/site";
+import { absoluteUrl, ogImageMeta, pageTitle, jsonLd } from "@/lib/site";
 
 /**
  * Several deks are short enough to be truncated-looking in a SERP. Pad only the
@@ -45,7 +45,7 @@ export const Route = createFileRoute("/blog/$slug")({
       scripts: [
         {
           type: "application/ld+json",
-          children: JSON.stringify(
+          children: jsonLd(
             breadcrumbJsonLd([
               { name: "Home", item: "/" },
               { name: "Journal", item: "/blog" },
@@ -55,7 +55,7 @@ export const Route = createFileRoute("/blog/$slug")({
         },
         {
           type: "application/ld+json",
-          children: JSON.stringify({
+          children: jsonLd({
             "@context": "https://schema.org",
             "@type": "Article",
             headline: p.title,
