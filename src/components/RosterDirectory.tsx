@@ -103,6 +103,10 @@ export function RosterDirectory({
   const navigate = useNavigate();
   const { rows, total, page, pageCount } = data;
   const [draftQuery, setDraftQuery] = useState(search.q ?? "");
+  // Collapsed on phones: four stacked controls pushed the first speaker a
+  // full screen down, and the results are what the page is for. Filters that
+  // are already in use keep the panel open so their controls stay reachable.
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   // Any filter change resets to page 1 — staying on page 9 of a result set that
   // now has two pages just shows an empty list. Picking a category also drops an
@@ -133,7 +137,23 @@ export function RosterDirectory({
 
   return (
     <div>
-      <div className="hairline-top grid gap-4 py-6 md:grid-cols-[1.2fr_1fr_1fr_1fr] md:items-end">
+      <button
+        type="button"
+        onClick={() => setFiltersOpen((v) => !v)}
+        aria-expanded={filtersOpen || active.length > 0}
+        aria-controls="roster-filters"
+        className="label-mono hairline-top mt-2 flex min-h-[52px] w-full items-center justify-between md:hidden"
+      >
+        <span>
+          Filters
+          {active.length > 0 && ` · ${active.length} active`}
+        </span>
+        <span aria-hidden="true">{filtersOpen || active.length > 0 ? "−" : "+"}</span>
+      </button>
+      <div
+        id="roster-filters"
+        className={`${filtersOpen || active.length > 0 ? "grid" : "hidden"} gap-4 py-2 md:hairline-top md:grid md:grid-cols-[1.2fr_1fr_1fr_1fr] md:items-end md:py-6`}
+      >
         <form
           onSubmit={(e) => {
             e.preventDefault();

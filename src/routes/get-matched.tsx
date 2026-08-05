@@ -74,7 +74,28 @@ function GetMatched() {
     <Page>
       <Breadcrumbs items={[{ label: "Home", to: "/" }, { label: "Get matched" }]} />
       <section className="container-x pb-24 pt-10">
-        <EnquiryFlow speakers={speakers} presetName={presetName} presetSlug={speaker ?? ""} />
+        <div className="grid gap-16 lg:grid-cols-[minmax(0,64ch)_280px] lg:gap-24">
+          <EnquiryFlow speakers={speakers} presetName={presetName} presetSlug={speaker ?? ""} />
+          {/* Reassurance while the form is open: what the enquiry actually
+              sets in motion, and what it does not commit anyone to. */}
+          <aside className="hidden h-fit lg:sticky lg:top-24 lg:block">
+            <p className="label-mono text-[var(--ink-3)]">What happens next</p>
+            <ol className="mt-6 space-y-6 border-t border-[var(--line)] pt-6">
+              {[
+                "We read your brief and shortlist speakers who fit the date, the room and the budget.",
+                "The shortlist lands in your inbox within one business day, fees included.",
+                "You pick who to talk to. No account, no commitment until you sign a booking.",
+              ].map((step, i) => (
+                <li key={step} className="flex gap-4 text-sm text-[var(--ink-2)]">
+                  <span className="label-mono text-[var(--ink-3)]">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span>{step}</span>
+                </li>
+              ))}
+            </ol>
+          </aside>
+        </div>
       </section>
     </Page>
   );
