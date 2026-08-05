@@ -3,11 +3,28 @@ import type { ReactNode } from "react";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 
-export function Page({ children }: { children: ReactNode }) {
+export function Page({
+  children,
+  headerRevealed = true,
+}: {
+  children: ReactNode;
+  /** False on the homepage only: the portal hero reveals the header on scroll. */
+  headerRevealed?: boolean;
+}) {
   return (
     <div className="flex min-h-dvh flex-col">
-      <Header />
-      <main className="flex-1">{children}</main>
+      {/* First focusable element on every page. The portal hero hides the
+          header at scroll 0, which makes this mandatory rather than nice. */}
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-ink focus:px-5 focus:py-3 focus:text-surface"
+      >
+        Skip to content
+      </a>
+      <Header revealed={headerRevealed} />
+      <main id="main" className="flex-1">
+        {children}
+      </main>
       <Footer />
     </div>
   );

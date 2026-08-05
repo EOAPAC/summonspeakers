@@ -242,6 +242,16 @@
   background-color: var(--surface-alt);
 }
 
+/* The portal hero hides the header until its reveal band. Keyboard focus must
+   always force it back: hiding the header hides the site's primary navigation,
+   and a focused element must never be invisible. Inline styles drive the hide,
+   so this needs !important to win. */
+.hdr-portal:focus-within {
+  opacity: 1 !important;
+  transform: none !important;
+  pointer-events: auto !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

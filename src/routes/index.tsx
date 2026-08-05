@@ -1,13 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ButtonLink } from "@/components/Button";
 import { SpeakerCard } from "@/components/SpeakerCard";
 import { ClosingCta } from "@/components/ClosingCta";
+import { PortalHero } from "@/components/PortalHero";
 import { featuredTopics, pinnedFirst } from "@/data/speakers";
 import { fetchSpeakers } from "@/lib/speakers.server";
 import { absoluteUrl, ogImageMeta } from "@/lib/site";
 import { serviceJsonLd } from "@/lib/schema";
 import { Page, Eyebrow, FAQ, faqJsonLd } from "@/components/Page";
-import { HeroSentinel } from "@/components/Header";
 
 export const Route = createFileRoute("/")({
   loader: async () => ({ speakers: await fetchSpeakers() }),
@@ -27,7 +26,11 @@ export const Route = createFileRoute("/")({
       { property: "og:url", content: absoluteUrl("/") },
       ...ogImageMeta("default"),
     ],
-    links: [{ rel: "canonical", href: absoluteUrl("/") }],
+    links: [
+      { rel: "canonical", href: absoluteUrl("/") },
+      // The portrait is the LCP element; without this it queues behind the CSS.
+      { rel: "preload", as: "image", href: "/hero-speaker.webp", fetchPriority: "high" },
+    ],
     scripts: [
       {
         type: "application/ld+json",
@@ -69,8 +72,6 @@ const homeFaqs = [
     a: "We find a replacement of the same calibre at the same fee, or you receive a full refund. If you need to cancel, that is free up to 14 days before your event.",
   },
 ];
-
-const clients = ["NORTHBRIDGE", "ARDENT HEALTH", "MERIDIAN", "HAVENLINE", "PALEWOOD"];
 
 const benefits = [
   {
@@ -155,52 +156,8 @@ function Home() {
   const homeFeatured = speakers.length > 0 ? pinnedFirst(HOME_FEATURED, speakers).slice(0, 4) : [];
 
   return (
-    <Page>
-      {/* Dark hero. Greys are white-at-opacity rather than the light-mode ink
-          tokens, which fail on this background: --ink-2 (#525252) measures
-          2.53:1 and --ink-3 (#737373) measures 4.18:1 against #0a0a0a. The
-          replacements below are 9.9:1 and 5.3:1. Same approach the footer
-          already uses, so there is one way of doing dark surfaces, not two.
-          `on-ink` switches the focus ring to white. */}
-      <section className="on-ink container-x relative bg-[var(--color-footer)] pb-20 pt-16 text-surface md:pt-24">
-        <h1 className="display text-[length:clamp(26px,3.6vw,76px)]">
-          Keynote Speakers Your Event Deserves
-        </h1>
-        <p className="mt-10 max-w-[48ch] text-lg text-white/70 md:max-w-none">
-          Browse, compare and book professional speakers with fees shown upfront. No hidden fees, no
-          guessing what they cost.
-        </p>
-        <div className="mt-10 flex flex-wrap items-center gap-8">
-          <ButtonLink to="/get-matched" variant="primaryInverse">
-            Get matched
-          </ButtonLink>
-          <Link
-            to="/speakers"
-            className="inline-flex min-h-[44px] items-center gap-2 text-base text-surface underline decoration-white/40 underline-offset-4 hover:decoration-white"
-          >
-            Browse speakers <span aria-hidden="true">→</span>
-          </Link>
-        </div>
-        {/* /50 measured 5.3:1 against this background — passes AA for small
-            text by a hair, but that's a bare technical pass, not a comfortable
-            read, and the user flagged it as hard to read regardless of the
-            number. /75 and up clear 11:1+, and the client names sit brighter
-            than the "trusted by" label above them so the roster of logos —
-            the actual proof point — outranks its own caption. */}
-        <p className="label-mono mt-6 text-white/75">Free to enquire, no obligation</p>
-
-        <div className="mt-16 border-t border-[var(--line-on-dark)] pt-10">
-          <Eyebrow className="text-white/60">Trusted by event teams at</Eyebrow>
-          <ul className="mt-7 flex flex-wrap gap-x-10 gap-y-3">
-            {clients.map((c) => (
-              <li key={c} className="label-mono-lg text-white/80">
-                {c}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <HeroSentinel />
-      </section>
+    <Page headerRevealed={false}>
+      <PortalHero />
 
       {/* Hidden rather than shown empty: a heading with no cards under it, on
           the rare occasion the backend is unreachable, reads as broken. */}

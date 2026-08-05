@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { ButtonLink } from "./Button";
 import { cn } from "@/lib/utils";
 
@@ -36,7 +36,17 @@ export function HeroSentinel() {
   return <span id={SENTINEL_ID} aria-hidden="true" className="absolute bottom-0 left-0 size-px" />;
 }
 
-export function Header() {
+/**
+ * `revealed` is the portal hero's reveal switch. Only the homepage passes
+ * false: the header then ships hidden and rides `--portal-hdr` /
+ * `--portal-hdr-pe`, two custom properties the hero's scroll loop writes each
+ * frame. Their defaults are the open state, so SSR, no-JS and reduced-motion
+ * renders all show a visible header. The `hdr-portal` class carries a
+ * focus-within override in styles.css — hiding the header hides the site's
+ * primary navigation, and a keyboard user tabbing in must always land on a
+ * visible one. It stays in the accessibility tree throughout.
+ */
+export function Header({ revealed = true }: { revealed?: boolean }) {
   const [open, setOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const hasDarkHero = DARK_HERO_ROUTES.has(pathname);
@@ -77,7 +87,17 @@ export function Header() {
             // otherwise let the H1 scroll through the nav on its way past.
             "on-ink border-transparent bg-[var(--color-footer)] text-surface"
           : "border-[var(--line)] bg-surface/95 backdrop-blur",
+        !revealed && "hdr-portal",
       )}
+      style={
+        revealed
+          ? undefined
+          : {
+              opacity: "var(--portal-hdr, 1)",
+              transform: "translateY(calc((1 - var(--portal-hdr, 1)) * -100%))",
+              pointerEvents: "var(--portal-hdr-pe, auto)" as CSSProperties["pointerEvents"],
+            }
+      }
     >
       <div className="container-x flex min-h-[72px] items-center justify-between gap-6">
         <Link
