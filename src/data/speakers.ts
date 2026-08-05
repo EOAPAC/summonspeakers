@@ -443,7 +443,7 @@ export const speakers: Speaker[] = [
     bio_short:
       "Two-time Olympic sprinter who now speaks about the unglamorous work behind visible performance.",
     bio_long: [
-      "James Okoro represented Great Britain over two Olympic cycles, finishing fourth in a final decided by four hundredths of a second. He talks about that race often, but never as a triumph — as evidence that preparation is the only part you control.",
+      "James Okoro represented Great Britain over two Olympic cycles, finishing fourth in a final decided by four hundredths of a second. He talks about that race often, but never as a triumph. He tells it as evidence that preparation is the only part you control.",
       "His keynote suits conference openings and sales kick-offs, where a room needs energy without slogans. He builds every talk around one decision the audience is facing that quarter.",
       "James lives in Melbourne and speaks across Australia and Asia-Pacific, with occasional dates in the UK.",
     ],

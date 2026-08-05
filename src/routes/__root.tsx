@@ -80,7 +80,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "SummonSpeakers — Book keynote speakers with fees shown upfront" },
+      { title: "SummonSpeakers: Book keynote speakers with fees shown upfront" },
       {
         name: "description",
         content:
@@ -95,7 +95,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:image:height", content: "630" },
       {
         property: "og:image:alt",
-        content: "SummonSpeakers — book keynote speakers with fees shown upfront",
+        content: "SummonSpeakers: book keynote speakers with fees shown upfront",
       },
       { property: "og:url", content: SITE_URL },
       { name: "twitter:card", content: "summary_large_image" },

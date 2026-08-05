@@ -19,7 +19,7 @@ export function organisationJsonLd() {
     logo: OG_IMAGE,
     description:
       "SummonSpeakers is a speaker booking marketplace that publishes every speaker's fee band upfront and books directly between planner and speaker.",
-    slogan: "Book the keynote speaker your event deserves — with fees shown upfront.",
+    slogan: "Book the keynote speaker your event deserves, with fees shown upfront.",
     email: "hello@summonspeakers.com",
     areaServed: ["AU", "NZ", "Global"],
     knowsAbout: [

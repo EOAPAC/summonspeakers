@@ -8,7 +8,7 @@ import { absoluteUrl, ogImageMeta } from "@/lib/site";
 export const Route = createFileRoute("/case-studies/")({
   head: () => ({
     meta: [
-      { title: "Case studies — real bookings, real fees | SummonSpeakers" },
+      { title: "Case studies: real bookings, real fees | SummonSpeakers" },
       {
         name: "description",
         content:
