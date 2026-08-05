@@ -15,7 +15,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Browse, compare and book professional speakers directly. No bureau markup, no guessing what they cost. Get a matched shortlist in one business day.",
+          "Browse, compare and book professional speakers directly. Fees shown upfront, no guessing what they cost. Get a matched shortlist in one business day.",
       },
       { property: "og:title", content: "Book the keynote speaker your event deserves" },
       {
@@ -41,7 +41,7 @@ export const Route = createFileRoute("/")({
 const homeFaqs = [
   {
     q: "What is SummonSpeakers?",
-    a: "SummonSpeakers is a speaker booking marketplace that publishes every speaker's fee band upfront. Planners browse the roster, compare fees before making contact, and book directly with the speaker. We add no markup to the fee you are quoted.",
+    a: "SummonSpeakers is a speaker booking marketplace that publishes every speaker's fee band upfront. Planners browse the roster, compare fees before making contact, and book directly with the speaker. The fee shown on a profile is the fee you pay — nothing is added afterward.",
   },
   {
     q: "How much does a keynote speaker cost?",
@@ -49,11 +49,11 @@ const homeFaqs = [
   },
   {
     q: "Is SummonSpeakers free to use?",
-    a: "Yes. Enquiring is free, there is no account to create, and you are committed to nothing until you sign a booking. Speakers pay a flat listing fee, so we earn nothing from your booking and nothing extra when a fee is higher.",
+    a: "Yes. Enquiring is free, there is no account to create, and you are committed to nothing until you sign a booking. Whatever a profile shows is the number you'll pay — nothing is added later.",
   },
   {
     q: "How is this different from a speaker bureau?",
-    a: "A traditional bureau adds 20 to 30 per cent to the speaker's fee and usually will not disclose the fee until you have had a sales call. SummonSpeakers publishes the band before you enquire and takes no percentage, so the number you see is the number you budget.",
+    a: "A traditional bureau adds 20 to 30 per cent to the speaker's fee and usually will not disclose the fee until you have had a sales call. SummonSpeakers publishes the band before you enquire, so the number you see is the number you budget — no sales call, no waiting to find out.",
   },
   {
     q: "Who uses SummonSpeakers?",
@@ -76,7 +76,7 @@ const benefits = [
   {
     n: "02",
     h: "Direct booking",
-    p: "You deal with the speaker, not a middleman adding twenty per cent. The relationship is yours from the first email.",
+    p: "Pay 50% once the speaker confirms your date. The relationship is yours from that moment — you deal with them directly.",
   },
   {
     n: "03",
@@ -105,7 +105,7 @@ const homeTestimonials = [
     avatarSlug: "tom-verity",
   },
   {
-    quote: "No sales call, no markup, no fee on application. Just the number.",
+    quote: "No sales call, no guessing, no fee on application. Just the number.",
     result: "Saved 22% on bureau quote",
     name: "Priya Nandan",
     role: "Conference Producer",
@@ -158,8 +158,8 @@ function Home() {
           Keynote Speakers Your Event Deserves
         </h1>
         <p className="mt-10 max-w-[48ch] text-lg text-white/70 md:max-w-none">
-          Browse, compare and book professional speakers with fees shown upfront. No bureau markup,
-          no guessing what they cost.
+          Browse, compare and book professional speakers with fees shown upfront. No hidden fees, no
+          guessing what they cost.
         </p>
         <div className="mt-10 flex flex-wrap items-center gap-8">
           <ButtonLink to="/get-matched" variant="primaryInverse">

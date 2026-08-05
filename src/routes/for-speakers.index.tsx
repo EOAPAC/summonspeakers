@@ -18,7 +18,7 @@ const benefits = [
   {
     n: "03",
     h: "Transparent fees that respect your value",
-    p: "We publish your band as you set it, and take no percentage of your fee. Planners arrive already comfortable with the number.",
+    p: "We publish your band as you set it. Planners arrive already comfortable with the number, so the first conversation is about the brief, not the price.",
   },
 ];
 
@@ -47,12 +47,12 @@ export const Route = createFileRoute("/for-speakers/")({
       {
         name: "description",
         content:
-          "List with SummonSpeakers: a profile built to rank in search, direct enquiries from event planners with the budget attached, and no commission on your fee.",
+          "List with SummonSpeakers: a profile built to rank in search, and direct enquiries from event planners with the budget already attached.",
       },
       { property: "og:title", content: "For speakers | SummonSpeakers" },
       {
         property: "og:description",
-        content: "Direct enquiries, published fees, no bureau taking a percentage.",
+        content: "Direct enquiries, published fees, no sales call before you know the number.",
       },
       { property: "og:url", content: absoluteUrl("/for-speakers") },
       ...ogImageMeta("for-speakers"),

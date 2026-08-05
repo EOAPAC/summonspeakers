@@ -18,7 +18,7 @@ const steps = [
   {
     n: "03",
     h: "Book directly through us",
-    p: "You contract with the speaker. We handle the paperwork and the logistics, and we add no markup to the fee you were quoted.",
+    p: "You contract with the speaker. We handle the paperwork and the logistics, and the fee you were quoted is the fee you pay.",
   },
   {
     n: "04",

@@ -21,7 +21,7 @@ const values = [
   {
     n: "03",
     h: "Earn from the booking, not the confusion",
-    p: "Speakers pay a flat listing fee. We do not make more money when you understand less, which is the only reason this model works.",
+    p: "We make money when a booking happens, not from you being confused about the price beforehand. That is why every band is published rather than quoted over the phone.",
   },
   {
     n: "04",
@@ -36,7 +36,7 @@ const speakerCount = ROSTER_COUNT + speakers.length;
 
 const numbers = [
   { value: speakerCount.toLocaleString("en-AU"), label: "speakers listed" },
-  { value: "$0", label: "added to any fee" },
+  { value: "$0", label: "hidden in any fee" },
   { value: "1 day", label: "median time to shortlist" },
   { value: "4.9", label: "average event rating" },
 ];
@@ -48,7 +48,7 @@ export const Route = createFileRoute("/about")({
       {
         name: "description",
         content:
-          "Booking a speaker means committing thousands to a stranger. We publish every fee upfront and take no cut of your booking. Here is why.",
+          "Booking a speaker means committing thousands to a stranger. We publish every fee upfront, so you never have to ask what it costs. Here is why.",
       },
       { property: "og:title", content: "About SummonSpeakers" },
       {

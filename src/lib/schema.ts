@@ -18,7 +18,7 @@ export function organisationJsonLd() {
     url: SITE_URL,
     logo: OG_IMAGE,
     description:
-      "SummonSpeakers is a speaker booking marketplace that publishes every speaker's fee band upfront and takes no commission on the booking.",
+      "SummonSpeakers is a speaker booking marketplace that publishes every speaker's fee band upfront and books directly between planner and speaker.",
     slogan: "Book the keynote speaker your event deserves — with fees shown upfront.",
     email: "hello@summonspeakers.com",
     areaServed: ["AU", "NZ", "Global"],
@@ -64,7 +64,7 @@ export function serviceJsonLd() {
     name: "Keynote speaker booking",
     provider: { "@id": `${SITE_URL}/#organization` },
     serviceType: "Speaker booking and event programming",
-    description: `Browse ${SPEAKER_COUNT.toLocaleString("en-AU")} speakers with published fee bands, receive a matched shortlist within one business day, and book directly with no bureau markup.`,
+    description: `Browse ${SPEAKER_COUNT.toLocaleString("en-AU")} speakers with published fee bands, receive a matched shortlist within one business day, and book directly with the fee shown upfront.`,
     areaServed: ["AU", "NZ", "Global"],
     audience: {
       "@type": "Audience",
