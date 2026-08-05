@@ -133,30 +133,38 @@ const homeFeatured = pinnedFirst(HOME_FEATURED).slice(0, 4);
 function Home() {
   return (
     <Page>
-      <section className="container-x pb-20 pt-16 md:pt-24">
+      {/* Dark hero. Greys are white-at-opacity rather than the light-mode ink
+          tokens, which fail on this background: --ink-2 (#525252) measures
+          2.53:1 and --ink-3 (#737373) measures 4.18:1 against #0a0a0a. The
+          replacements below are 9.9:1 and 5.3:1. Same approach the footer
+          already uses, so there is one way of doing dark surfaces, not two.
+          `on-ink` switches the focus ring to white. */}
+      <section className="on-ink container-x bg-[var(--color-footer)] pb-20 pt-16 text-surface md:pt-24">
         <h1 className="display text-[length:clamp(26px,3.6vw,76px)]">
           Keynote Speakers Your Event Deserves
         </h1>
-        <p className="mt-10 max-w-[48ch] text-lg text-[var(--ink-2)] md:max-w-none">
+        <p className="mt-10 max-w-[48ch] text-lg text-white/70 md:max-w-none">
           Browse, compare and book professional speakers with fees shown upfront. No bureau markup,
           no guessing what they cost.
         </p>
         <div className="mt-10 flex flex-wrap items-center gap-8">
-          <ButtonLink to="/get-matched">Get matched</ButtonLink>
+          <ButtonLink to="/get-matched" variant="primaryInverse">
+            Get matched
+          </ButtonLink>
           <Link
             to="/speakers"
-            className="inline-flex min-h-[44px] items-center gap-2 text-base underline decoration-[var(--line-2)] underline-offset-4 hover:decoration-ink"
+            className="inline-flex min-h-[44px] items-center gap-2 text-base text-surface underline decoration-white/40 underline-offset-4 hover:decoration-white"
           >
             Browse speakers <span aria-hidden="true">→</span>
           </Link>
         </div>
-        <p className="label-mono mt-6 text-[var(--ink-3)]">Free to enquire, no obligation</p>
+        <p className="label-mono mt-6 text-white/50">Free to enquire, no obligation</p>
 
-        <div className="hairline-top mt-20 pt-8">
-          <Eyebrow>Trusted by event teams at</Eyebrow>
+        <div className="mt-20 border-t border-[var(--line-on-dark)] pt-8">
+          <Eyebrow className="text-white/50">Trusted by event teams at</Eyebrow>
           <ul className="mt-6 flex flex-wrap gap-x-12 gap-y-4">
             {clients.map((c) => (
-              <li key={c} className="label-mono text-[var(--ink-3)]">
+              <li key={c} className="label-mono text-white/50">
                 {c}
               </li>
             ))}

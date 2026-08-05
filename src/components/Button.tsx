@@ -2,13 +2,13 @@ import { createLink, type LinkComponent } from "@tanstack/react-router";
 import type { ComponentProps, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-type Variant = "primary" | "secondary" | "ghost";
+type Variant = "primary" | "primaryInverse" | "secondary" | "ghost";
 
 const base =
   "group inline-flex items-center justify-center gap-3 font-semibold transition-all duration-500 [transition-timing-function:var(--ease)] disabled:opacity-40 disabled:pointer-events-none";
 
 const arrow = (variant: Variant) =>
-  variant === "primary" ? (
+  variant === "primary" || variant === "primaryInverse" ? (
     <span
       aria-hidden="true"
       className="transition-transform duration-500 [transition-timing-function:var(--ease)] group-hover:translate-x-1 group-hover:-translate-y-1"
@@ -22,6 +22,10 @@ const arrow = (variant: Variant) =>
 const variants: Record<Variant, string> = {
   primary:
     "rounded-full bg-ink text-surface min-h-[var(--hit-primary)] px-8 text-base tracking-[-0.02em] border border-ink hover:bg-surface hover:text-ink",
+  // The primary button on a dark section. Same shape and same hover inversion,
+  // colours swapped, because bg-ink on a near-black surface is invisible.
+  primaryInverse:
+    "rounded-full bg-surface text-ink min-h-[var(--hit-primary)] px-8 text-base tracking-[-0.02em] border border-surface hover:bg-transparent hover:text-surface",
   secondary:
     "min-h-[var(--hit-min)] text-base underline underline-offset-4 decoration-[var(--line-2)] hover:decoration-ink text-ink",
   ghost:

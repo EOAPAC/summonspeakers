@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
@@ -12,8 +13,10 @@ export function Page({ children }: { children: ReactNode }) {
   );
 }
 
-export function Eyebrow({ children }: { children: ReactNode }) {
-  return <p className="label-mono text-[var(--ink-3)]">{children}</p>;
+export function Eyebrow({ children, className }: { children: ReactNode; className?: string }) {
+  // className last so a dark section can override the muted ink colour, which
+  // is unreadable on a near-black background.
+  return <p className={cn("label-mono text-[var(--ink-3)]", className)}>{children}</p>;
 }
 
 export function FAQ({ items }: { items: { q: string; a: string }[] }) {
