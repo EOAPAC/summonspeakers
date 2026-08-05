@@ -293,7 +293,7 @@ export const PORTRAIT_COUNT = ${entries.length};
  * quality bar — it decides which profiles are indexed, listed in the sitemap
  * and offered in the enquiry dropdown.
  */
-export const portraitSlugs: readonly string[] = ${JSON.stringify(entries.map((e) => e.slug))};
+export const portraitSlugs: readonly string[] = ${JSON.stringify(entries.map(([slug]) => slug), null, 2)};
 `,
   );
   return entries.length;
