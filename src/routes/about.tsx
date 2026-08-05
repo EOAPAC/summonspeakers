@@ -115,7 +115,10 @@ function About() {
         </div>
       </section>
 
-      <section className="on-ink section-y">
+      {/* `on-ink` only recolours the focus ring — it carries no background, so
+          without this the white-at-55% labels below rendered white on white and
+          the heading and every stat caption were invisible. */}
+      <section className="on-ink section-y bg-[var(--color-footer)] text-surface">
         <div className="container-x">
           <p className="label-mono text-[rgba(255,255,255,0.55)]">Where we are so far</p>
           <dl className="mt-12 grid gap-10 border-t border-[var(--line-on-dark)] pt-12 sm:grid-cols-2 lg:grid-cols-4">
