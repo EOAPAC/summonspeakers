@@ -1,5 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 
+import { getPublicClient } from "./supabase.server";
+
 import {
   emptyFilters,
   queryRoster,
@@ -55,6 +57,32 @@ function coerceFilters(input: unknown): RosterFilters {
 }
 
 /**
+ * Marks rows whose slug has a published Supabase profile as routable, on top
+ * of the portrait-manifest profiles queryRoster already knows about. One
+ * IN-query per page of rows, against just the visible slugs — the speakers
+ * table is past PostgREST's 1,000-row response cap, so a "fetch all slugs"
+ * set would silently go stale at the letter M.
+ */
+async function markSupabaseProfiles(rows: RosterPage["rows"]): Promise<void> {
+  const missing = rows.filter((r) => !r.hasProfile).map((r) => r.slug);
+  const client = getPublicClient();
+  if (!client || missing.length === 0) return;
+  const { data, error } = await client
+    .from("speakers")
+    .select("slug")
+    .eq("status", "published")
+    .in("slug", missing);
+  if (error) {
+    // Rows render unlinked rather than the page failing: a backend hiccup
+    // should cost the links, not the directory.
+    console.error("markSupabaseProfiles: query failed", error);
+    return;
+  }
+  const published = new Set((data as { slug: string }[]).map((r) => r.slug));
+  for (const r of rows) if (published.has(r.slug)) r.hasProfile = true;
+}
+
+/**
  * Filters the imported roster on the server and returns one page.
  *
  * Deliberately a server function: the roster module is several hundred KB, and
@@ -62,10 +90,11 @@ function coerceFilters(input: unknown): RosterFilters {
  */
 export const fetchRoster = createServerFn({ method: "GET" })
   .validator(coerceFilters)
-  .handler(({ data }): RosterPage & { rosterCount: number } => ({
-    ...queryRoster(data),
-    rosterCount,
-  }));
+  .handler(async ({ data }): Promise<RosterPage & { rosterCount: number }> => {
+    const page = queryRoster(data);
+    await markSupabaseProfiles(page.rows);
+    return { ...page, rosterCount };
+  });
 
 /** Resolves a roster slug to a display name for the enquiry form. */
 export const fetchRosterSpeakerName = createServerFn({ method: "GET" })
@@ -81,9 +110,11 @@ export const fetchRosterSpeakerName = createServerFn({ method: "GET" })
  */
 export const fetchRosterProfile = createServerFn({ method: "GET" })
   .validator((input: unknown) => (typeof input === "string" ? input.slice(0, 100) : ""))
-  .handler(({ data }): { profile: RosterProfile | null } => ({
-    profile: data ? rosterProfile(data) : null,
-  }));
+  .handler(async ({ data }): Promise<{ profile: RosterProfile | null }> => {
+    const profile = data ? rosterProfile(data) : null;
+    if (profile) await markSupabaseProfiles(profile.similar);
+    return { profile };
+  });
 
 /** Directory-wide statistics for /speaker-statistics. */
 export const fetchRosterStats = createServerFn({ method: "GET" }).handler((): RosterStats =>

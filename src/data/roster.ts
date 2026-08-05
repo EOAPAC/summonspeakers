@@ -48,10 +48,14 @@ export type RosterRow = {
   /** Speaking fee in USD, or null when the source does not state one. */
   fee: number | null;
   /**
-   * True when a portrait exists at public/speakers/roster/<slug>.webp, which
-   * is also what gives the speaker a profile page at /speakers/<slug>.
+   * True when /speakers/<slug> serves a page for this speaker, so the row's
+   * name can link to it. Seeded here from the portrait manifest (roster-tier
+   * profiles); fetchRoster then augments it against the Supabase speakers
+   * table, which serves the other tier of profile.
    */
   hasProfile: boolean;
+  /** True when a portrait exists at public/speakers/roster/<slug>.webp. */
+  hasImage: boolean;
 };
 
 export type RosterPage = {
@@ -189,6 +193,7 @@ export function queryRoster(filters: RosterFilters): RosterPage {
       gender: e.g,
       fee: e.f ?? null,
       hasProfile: profileSlugs.has(e.slug),
+      hasImage: profileSlugs.has(e.slug),
     })),
   };
 }

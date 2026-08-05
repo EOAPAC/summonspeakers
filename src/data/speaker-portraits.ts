@@ -50,3 +50,23 @@ export function portraitAlt(slug: string, name: string): string {
 }
 
 export const PORTRAIT_COUNT = 12;
+
+/**
+ * The slugs with a portrait, in one place: the portrait is the editorial
+ * quality bar — it decides which profiles are indexed, listed in the sitemap
+ * and offered in the enquiry dropdown.
+ */
+export const portraitSlugs: readonly string[] = [
+  "andres-molina",
+  "daniel-hsu",
+  "dr-maya-ellison",
+  "grace-oyelaran",
+  "helena-brandt",
+  "james-okoro",
+  "michael-toure",
+  "nina-castellan",
+  "omar-haddad",
+  "priya-raman",
+  "robert-ainsley",
+  "sarah-lindqvist",
+];

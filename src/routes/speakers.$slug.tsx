@@ -11,6 +11,7 @@ import type { Speaker } from "@/data/speakers";
 import type { RosterProfile } from "@/data/roster";
 import { fetchRosterProfile } from "@/lib/roster.server";
 import { fetchSpeakerBySlug } from "@/lib/speakers.server";
+import { portraitFor } from "@/data/speaker-portraits";
 import { formatFee } from "@/lib/fee";
 import { absoluteUrl, pageTitle, ogImageMeta } from "@/lib/site";
 
@@ -134,6 +135,11 @@ export const Route = createFileRoute("/speakers/$slug")({
           ),
         },
         { name: "description", content: description },
+        // The portrait is the editorial quality bar. Thousands of profiles
+        // were bulk-inserted with generated bios; they stay reachable for
+        // planners but out of the index until someone deliberately gives
+        // them a portrait, which is also what puts them in the sitemap.
+        ...(portraitFor(s.slug) ? [] : [{ name: "robots", content: "noindex,follow" }]),
         { property: "og:title", content: `${s.name}: ${s.role}` },
         { property: "og:description", content: description },
         { property: "og:type", content: "profile" },
