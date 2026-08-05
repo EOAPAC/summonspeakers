@@ -7,6 +7,7 @@
  */
 
 import { rosterCategories, rosterPlaces } from "./roster-facets";
+import { rosterImageSlugs } from "./roster-images.generated";
 import { roster } from "./roster.generated";
 
 export const ROSTER_PAGE_SIZE = 60;
@@ -46,6 +47,11 @@ export type RosterRow = {
   gender: number;
   /** Speaking fee in USD, or null when the source does not state one. */
   fee: number | null;
+  /**
+   * True when a portrait exists at public/speakers/roster/<slug>.webp, which
+   * is also what gives the speaker a profile page at /speakers/<slug>.
+   */
+  hasProfile: boolean;
 };
 
 export type RosterPage = {
@@ -117,6 +123,8 @@ function locationLabel(placeIdx: number[], city: string | undefined): string {
 
 const genderBit = { female: 1, male: 2, nonbinary: 4 } as const;
 
+const profileSlugs = new Set(rosterImageSlugs);
+
 export function queryRoster(filters: RosterFilters): RosterPage {
   const wantCategories = filters.categories
     .map((c) => categoryId.get(c))
@@ -180,6 +188,7 @@ export function queryRoster(filters: RosterFilters): RosterPage {
       location: locationLabel(e.l, e.city),
       gender: e.g,
       fee: e.f ?? null,
+      hasProfile: profileSlugs.has(e.slug),
     })),
   };
 }
@@ -190,4 +199,40 @@ export const rosterCount = roster.length;
 /** Look a roster speaker up by slug, for prefilling an enquiry. */
 export function rosterSpeakerName(slug: string): string | null {
   return roster.find((e) => e.slug === slug)?.name ?? null;
+}
+
+export type RosterProfile = {
+  name: string;
+  slug: string;
+  categories: string[];
+  location: string;
+  fee: number | null;
+  /** Roster speakers who share this speaker's first category, for the rail. */
+  similar: RosterRow[];
+};
+
+/**
+ * A roster speaker's profile, or null when they have no uploaded portrait —
+ * the portrait is what turns a roster row into a page worth publishing.
+ */
+export function rosterProfile(slug: string): RosterProfile | null {
+  if (!profileSlugs.has(slug)) return null;
+  const e = roster.find((r) => r.slug === slug);
+  if (!e) return null;
+  const categories = e.c.map((i) => rosterCategories[i]).filter((c): c is string => Boolean(c));
+  const similar = categories.length
+    ? queryRoster({
+        ...emptyFilters,
+        categories: [categories[0]!],
+        pageSize: 7,
+      }).rows.filter((r) => r.slug !== slug)
+    : [];
+  return {
+    name: e.name,
+    slug: e.slug,
+    categories,
+    location: locationLabel(e.l, e.city),
+    fee: e.f ?? null,
+    similar: similar.slice(0, 6),
+  };
 }

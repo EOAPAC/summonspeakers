@@ -1,12 +1,15 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Page, FAQ, faqJsonLd } from "@/components/Page";
 import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { FeeBand } from "@/components/FeeBand";
 import { Pill } from "@/components/Pill";
 import { ButtonLink } from "@/components/Button";
 import { SpeakerCard } from "@/components/SpeakerCard";
+import { RosterRows } from "@/components/RosterRows";
 import { Portrait } from "@/components/Portrait";
 import { getSpeaker, type Speaker } from "@/data/speakers";
+import type { RosterProfile } from "@/data/roster";
+import { fetchRosterProfile } from "@/lib/roster.server";
 import { fetchSpeakers } from "@/lib/speakers.server";
 import { formatFee } from "@/lib/fee";
 import { absoluteUrl, pageTitle, ogImageMeta } from "@/lib/site";
@@ -24,12 +27,24 @@ function faqsFor(name: string, fee: string) {
   ];
 }
 
+/**
+ * Two tiers share this route. A hand-written full profile (Supabase) renders
+ * the complete page; a roster speaker with an uploaded portrait renders the
+ * lighter directory profile. A roster speaker without a portrait 404s — the
+ * portrait is what makes the page worth publishing.
+ */
+type ProfileData =
+  | { kind: "full"; speaker: Speaker; speakers: Speaker[] }
+  | { kind: "roster"; profile: RosterProfile };
+
 export const Route = createFileRoute("/speakers/$slug")({
-  loader: async ({ params }): Promise<{ speaker: Speaker; speakers: Speaker[] }> => {
+  loader: async ({ params }): Promise<ProfileData> => {
     const speakers = await fetchSpeakers();
     const speaker = getSpeaker(params.slug, speakers);
-    if (!speaker) throw notFound();
-    return { speaker, speakers };
+    if (speaker) return { kind: "full", speaker, speakers };
+    const { profile } = await fetchRosterProfile({ data: params.slug });
+    if (profile) return { kind: "roster", profile };
+    throw notFound();
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) {
@@ -37,6 +52,69 @@ export const Route = createFileRoute("/speakers/$slug")({
         meta: [
           { title: "Speaker unavailable | SummonSpeakers" },
           { name: "robots", content: "noindex" },
+        ],
+      };
+    }
+    if (loaderData.kind === "roster") {
+      const p = loaderData.profile;
+      const fee = p.fee ? `$${p.fee.toLocaleString("en-US")}` : "on enquiry";
+      const description =
+        `${p.name}, keynote speaker${p.categories[0] ? ` on ${p.categories.slice(0, 2).join(" and ").toLowerCase()}` : ""}. Speaking fee ${fee}.${p.location ? ` Based in ${p.location}.` : ""}`.slice(
+          0,
+          158,
+        );
+      return {
+        meta: [
+          {
+            title: pageTitle(
+              `${p.name}: Keynote Speaker${p.fee ? ` (${fee})` : ""}`,
+              `${p.name}: Keynote Speaker`,
+              p.name,
+            ),
+          },
+          { name: "description", content: description },
+          { property: "og:title", content: `${p.name}: Keynote Speaker` },
+          { property: "og:description", content: description },
+          { property: "og:type", content: "profile" },
+          { property: "og:url", content: absoluteUrl(`/speakers/${params.slug}`) },
+          ...ogImageMeta("speakers"),
+        ],
+        links: [{ rel: "canonical", href: absoluteUrl(`/speakers/${params.slug}`) }],
+        scripts: [
+          {
+            type: "application/ld+json",
+            children: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Person",
+              name: p.name,
+              jobTitle: "Keynote speaker",
+              knowsAbout: p.categories,
+              url: absoluteUrl(`/speakers/${p.slug}`),
+              ...(p.fee
+                ? {
+                    makesOffer: {
+                      "@type": "Offer",
+                      name: `Keynote speaking engagement with ${p.name}`,
+                      priceSpecification: {
+                        "@type": "PriceSpecification",
+                        price: p.fee,
+                        priceCurrency: "USD",
+                      },
+                    },
+                  }
+                : {}),
+            }),
+          },
+          {
+            type: "application/ld+json",
+            children: JSON.stringify(
+              breadcrumbJsonLd([
+                { name: "Home", item: "/" },
+                { name: "Speakers", item: "/speakers" },
+                { name: p.name, item: `/speakers/${p.slug}` },
+              ]),
+            ),
+          },
         ],
       };
     }
@@ -115,7 +193,104 @@ export const Route = createFileRoute("/speakers/$slug")({
 });
 
 function SpeakerProfile() {
-  const { speaker: s, speakers } = Route.useLoaderData();
+  const data = Route.useLoaderData();
+  if (data.kind === "roster") return <RosterSpeakerProfile profile={data.profile} />;
+  return <FullSpeakerProfile speaker={data.speaker} speakers={data.speakers} />;
+}
+
+/**
+ * The directory-tier profile: portrait, categories, location and the fee.
+ * Deliberately lighter than the full profile — there is no hand-written bio
+ * or testimonial set for these speakers, and padding the page out with
+ * boilerplate would read as exactly that.
+ */
+function RosterSpeakerProfile({ profile: p }: { profile: RosterProfile }) {
+  const fee = p.fee ? `$${p.fee.toLocaleString("en-US")}` : "Fee on enquiry";
+  return (
+    <Page>
+      <Breadcrumbs
+        items={[
+          { label: "Home", to: "/" },
+          { label: "Speakers", to: "/speakers" },
+          { label: p.name },
+        ]}
+      />
+
+      <section className="container-x grid gap-12 pb-16 pt-10 md:grid-cols-[1fr_1fr] md:items-start">
+        <img
+          src={`/speakers/roster/${p.slug}.webp`}
+          alt={`${p.name} portrait`}
+          className="aspect-[4/5] w-full rounded-[var(--radius-media)] bg-[var(--surface-alt)] object-cover"
+        />
+        <div>
+          <h1 className="display text-[length:var(--display-md)]">{p.name}</h1>
+          <p className="label-mono mt-6 text-[var(--ink-3)]">Keynote speaker</p>
+          <div className="mt-8">
+            <p className="label-mono mb-3 text-[var(--ink-3)]">Speaking fee</p>
+            <p className="text-[length:var(--display-sm)] font-semibold tracking-[-0.03em]">
+              {fee}
+            </p>
+            {p.location && <p className="mt-3 text-sm text-[var(--ink-2)]">{p.location}</p>}
+          </div>
+          <div className="mt-10 hidden md:block">
+            <ButtonLink to="/get-matched" search={{ speaker: p.slug }}>
+              Check availability
+            </ButtonLink>
+          </div>
+          {p.categories.length > 0 && (
+            <ul className="mt-10 flex flex-wrap gap-3">
+              {p.categories.map((c) => (
+                <li key={c}>
+                  <Pill topic={c} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </section>
+
+      <section className="rule-open container-x section-y">
+        <h2 className="label-mono text-[var(--ink-3)]">Booking {p.name}</h2>
+        <p className="mt-8 max-w-[68ch] text-lg text-[var(--ink-2)]">
+          Send an enquiry with your date, audience size and theme. We confirm {p.name}&rsquo;s
+          availability and the exact fee within one business day, then you book directly. The fee
+          shown is the fee you pay; travel and accommodation are quoted separately at cost.
+          Cancellation is free up to 14 days before your event.
+        </p>
+        <div className="mt-8">
+          <ButtonLink to="/get-matched" search={{ speaker: p.slug }}>
+            Check availability
+          </ButtonLink>
+        </div>
+      </section>
+
+      {p.similar.length > 0 && (
+        <section className="container-x pb-24">
+          <h2 className="label-mono text-[var(--ink-3)]">More {p.categories[0] ?? ""} speakers</h2>
+          <div className="mt-8">
+            <RosterRows rows={p.similar} />
+          </div>
+          <p className="mt-8">
+            <Link to="/speakers" className="underline underline-offset-4">
+              Browse all speakers
+            </Link>
+          </p>
+        </section>
+      )}
+
+      <div className="sticky bottom-0 z-30 border-t border-[var(--line)] bg-surface p-4 shadow-[0_-8px_24px_rgba(0,0,0,0.06)] md:hidden">
+        <div className="flex items-center justify-between gap-4">
+          <span className="label-mono">{fee}</span>
+          <ButtonLink to="/get-matched" search={{ speaker: p.slug }} className="px-6">
+            Check availability
+          </ButtonLink>
+        </div>
+      </div>
+    </Page>
+  );
+}
+
+function FullSpeakerProfile({ speaker: s, speakers }: { speaker: Speaker; speakers: Speaker[] }) {
   const fee = formatFee(s.fee_min, s.fee_max, s.fee_on_application);
   const similar = speakers
     .filter((o) => o.slug !== s.slug && o.topics.some((t) => s.topics.includes(t)))

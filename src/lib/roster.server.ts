@@ -4,10 +4,12 @@ import {
   emptyFilters,
   queryRoster,
   rosterCount,
+  rosterProfile,
   rosterSpeakerName,
   type RosterFilters,
   type RosterGender,
   type RosterPage,
+  type RosterProfile,
 } from "@/data/roster";
 
 /**
@@ -68,4 +70,15 @@ export const fetchRosterSpeakerName = createServerFn({ method: "GET" })
   .validator((input: unknown) => (typeof input === "string" ? input : ""))
   .handler(({ data }): { name: string | null } => ({
     name: data ? rosterSpeakerName(data) : null,
+  }));
+
+/**
+ * A roster speaker's profile page data, or null when they have no uploaded
+ * portrait. Serves /speakers/$slug for the roster tier the same way
+ * fetchSpeakers serves the hand-written full profiles.
+ */
+export const fetchRosterProfile = createServerFn({ method: "GET" })
+  .validator((input: unknown) => (typeof input === "string" ? input.slice(0, 100) : ""))
+  .handler(({ data }): { profile: RosterProfile | null } => ({
+    profile: data ? rosterProfile(data) : null,
   }));
