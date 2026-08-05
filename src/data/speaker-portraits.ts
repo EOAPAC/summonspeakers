@@ -11,18 +11,18 @@
 export type PortraitKind = "plate" | "photo";
 
 const PORTRAITS: Readonly<Record<string, { src: string; kind: PortraitKind }>> = {
-  "andres-molina": { src: "/speakers/andres-molina.plate.png", kind: "plate" },
-  "daniel-hsu": { src: "/speakers/daniel-hsu.plate.png", kind: "plate" },
-  "dr-maya-ellison": { src: "/speakers/dr-maya-ellison.plate.png", kind: "plate" },
-  "grace-oyelaran": { src: "/speakers/grace-oyelaran.plate.png", kind: "plate" },
-  "helena-brandt": { src: "/speakers/helena-brandt.plate.png", kind: "plate" },
-  "james-okoro": { src: "/speakers/james-okoro.plate.png", kind: "plate" },
-  "michael-toure": { src: "/speakers/michael-toure.plate.png", kind: "plate" },
-  "nina-castellan": { src: "/speakers/nina-castellan.plate.png", kind: "plate" },
-  "omar-haddad": { src: "/speakers/omar-haddad.plate.png", kind: "plate" },
-  "priya-raman": { src: "/speakers/priya-raman.plate.png", kind: "plate" },
-  "robert-ainsley": { src: "/speakers/robert-ainsley.plate.png", kind: "plate" },
-  "sarah-lindqvist": { src: "/speakers/sarah-lindqvist.plate.png", kind: "plate" },
+  "andres-molina": { src: "/speakers/andres-molina.webp", kind: "photo" },
+  "daniel-hsu": { src: "/speakers/daniel-hsu.webp", kind: "photo" },
+  "dr-maya-ellison": { src: "/speakers/dr-maya-ellison.webp", kind: "photo" },
+  "grace-oyelaran": { src: "/speakers/grace-oyelaran.webp", kind: "photo" },
+  "helena-brandt": { src: "/speakers/helena-brandt.webp", kind: "photo" },
+  "james-okoro": { src: "/speakers/james-okoro.webp", kind: "photo" },
+  "michael-toure": { src: "/speakers/michael-toure.webp", kind: "photo" },
+  "nina-castellan": { src: "/speakers/nina-castellan.webp", kind: "photo" },
+  "omar-haddad": { src: "/speakers/omar-haddad.webp", kind: "photo" },
+  "priya-raman": { src: "/speakers/priya-raman.webp", kind: "photo" },
+  "robert-ainsley": { src: "/speakers/robert-ainsley.webp", kind: "photo" },
+  "sarah-lindqvist": { src: "/speakers/sarah-lindqvist.webp", kind: "photo" },
 };
 
 /** Public path to a speaker's image, or null when there is not one yet. */
