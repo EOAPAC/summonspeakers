@@ -30,7 +30,7 @@ function faqsFor(name: string, roster: RosterPage | null) {
   const feeAnswer = feeAnswerForTopic(name);
   const phrase = topicPhrase(name);
   const singular = topicPhraseSingular(name);
-  const top = roster?.states.slice(0, 3) ?? [];
+  const top = roster?.places.slice(0, 3) ?? [];
 
   return [
     ...(feeAnswer ? [{ q: `How much do ${phrase} cost?`, a: feeAnswer }] : []),
@@ -50,7 +50,7 @@ function faqsFor(name: string, roster: RosterPage | null) {
       ? [
           {
             q: `Where are your ${phrase} based?`,
-            a: `Most are in ${top.map((t) => `${t.name} (${t.count})`).join(", ")}. Travel and accommodation outside a speaker's home state are quoted separately at cost, so booking locally is usually the cheaper option.`,
+            a: `Most are in ${top.map((t) => `${t.name} (${t.count})`).join(", ")}. Travel and accommodation outside a speaker's home city are quoted separately at cost, so booking locally is usually the cheaper option.`,
           },
         ]
       : []),
@@ -95,7 +95,7 @@ export const Route = createFileRoute("/topics/$slug")({
           data: {
             categories: topic.roster.categories ?? [],
             gender: topic.roster.gender ?? "any",
-            state: "",
+            place: "",
             q: "",
             page: 1,
             pageSize: PREVIEW_SIZE,
@@ -219,11 +219,11 @@ function TopicPage() {
                 </dd>
               </div>
             )}
-            {roster.states[0] && (
+            {roster.places[0] && (
               <div>
                 <dt className="label-mono text-[var(--ink-3)]">Most based in</dt>
                 <dd className="mt-3 text-2xl font-semibold tracking-[-0.03em]">
-                  {roster.states[0].name} ({roster.states[0].count})
+                  {roster.places[0].name} ({roster.places[0].count})
                 </dd>
               </div>
             )}

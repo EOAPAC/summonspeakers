@@ -19,7 +19,7 @@ which export a JSON-LD helper alongside their components by design.
 
 | File                                                        | Regenerate with                                            |
 | ----------------------------------------------------------- | ---------------------------------------------------------- |
-| `src/data/roster.generated.ts`, `src/data/roster-facets.ts` | `bun run import:roster <csv>`                              |
+| `src/data/roster.generated.ts`, `src/data/roster-facets.ts` | `bun run import:roster data/roster-sources/*.csv`                              |
 | `public/og/*.png`                                           | `bun run build:og`                                         |
 | `public/speakers/*.plate.png`                               | `bun run build:plates`                                     |
 | `src/data/speaker-portraits.ts`                             | `bun run build:portraits --manifest-only`                  |

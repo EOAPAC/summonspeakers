@@ -1,17 +1,17 @@
 /**
  * Roster query layer.
  *
- * SERVER ONLY — this module pulls in roster.generated.ts (~180KB). Reach it
+ * SERVER ONLY — this module pulls in roster.generated.ts (large). Reach it
  * from a server function, never from a component. Client code that needs the
  * filter labels imports ./roster-facets, which is a few hundred bytes.
  */
 
-import { rosterCategories, rosterStates } from "./roster-facets";
+import { rosterCategories, rosterPlaces } from "./roster-facets";
 import { roster } from "./roster.generated";
 
 export const ROSTER_PAGE_SIZE = 60;
 
-export type RosterGender = "any" | "female" | "male";
+export type RosterGender = "any" | "female" | "male" | "nonbinary";
 
 export type RosterFilters = {
   /**
@@ -22,8 +22,11 @@ export type RosterFilters = {
    * Innovation" and "AI".
    */
   categories: string[];
-  /** State label, or "" for anywhere. */
-  state: string;
+  /**
+   * A path into the place tree, segments joined with "/", or "" for anywhere.
+   * "Europe" matches every European speaker; "Europe/UK/London" just London.
+   */
+  place: string;
   gender: RosterGender;
   /** Free-text match on the speaker's name. */
   q: string;
@@ -37,9 +40,12 @@ export type RosterRow = {
   name: string;
   slug: string;
   categories: string[];
-  /** Pre-joined for display, e.g. "NSW · Sydney". Empty when not stated. */
+  /** Pre-joined for display, e.g. "Australia · NSW · Sydney". Empty when not stated. */
   location: string;
-  gender: "female" | "male" | null;
+  /** Bitmask: 1 female, 2 male, 4 non-binary. 0 = not recorded. */
+  gender: number;
+  /** Speaking fee in USD, or null when the source does not state one. */
+  fee: number | null;
 };
 
 export type RosterPage = {
@@ -48,45 +54,75 @@ export type RosterPage = {
   total: number;
   /**
    * Speakers that match every other filter but have no gender recorded, so a
-   * gender filter excludes them. Surfaced rather than swallowed: 16 of the
-   * 2,131 imported rows have no gender in the source, and silently dropping
-   * people from a result set is how a directory quietly loses them.
+   * gender filter excludes them. Surfaced rather than swallowed: silently
+   * dropping people from a result set is how a directory quietly loses them.
    */
   unrecordedGender: number;
   page: number;
   pageCount: number;
   /**
-   * Where the matching speakers are, biggest first. Real figures for the topic
-   * pages to quote — concrete numbers are what makes a category page worth
-   * citing rather than a list of names.
+   * Where the matching speakers are, biggest first, counted at country level.
+   * Real figures for the topic pages to quote — concrete numbers are what
+   * makes a category page worth citing rather than a list of names.
    */
-  states: { name: string; count: number }[];
+  places: { name: string; count: number }[];
 };
 
 export const emptyFilters: RosterFilters = {
   categories: [],
-  state: "",
+  place: "",
   gender: "any",
   q: "",
   page: 1,
 };
 
 const categoryId = new Map(rosterCategories.map((c, i) => [c, i]));
-const stateId = new Map(rosterStates.map((s, i) => [s, i]));
 
-function locationLabel(stateIdx: number[], city: string | undefined): string {
-  const names = stateIdx.map((i) => rosterStates[i]).filter((s): s is string => Boolean(s));
+/**
+ * Full path key ("Europe/UK/London") for each place node, built once. Parents
+ * precede children in the generated list, so each path extends an earlier one.
+ */
+const placePath: string[] = [];
+for (let i = 0; i < rosterPlaces.length; i++) {
+  const node = rosterPlaces[i]!;
+  placePath.push(node.p === -1 ? node.n : `${placePath[node.p]}/${node.n}`);
+}
+const placeIdByPath = new Map(placePath.map((p, i) => [p, i]));
+
+/** Walks a node's parent chain; true when `ancestor` is the node or above it. */
+function underPlace(node: number, ancestor: number): boolean {
+  for (let cur = node; cur !== -1; cur = rosterPlaces[cur]!.p) {
+    if (cur === ancestor) return true;
+  }
+  return false;
+}
+
+/** The country-level label a leaf rolls up to, or the region for root-only rows. */
+function countryLabelFor(node: number): string {
+  const segs = placePath[node]!.split("/");
+  return segs.length === 1 ? segs[0]! : segs[1]!;
+}
+
+function locationLabel(placeIdx: number[], city: string | undefined): string {
+  const names = placeIdx.map((i) => {
+    const path = placePath[i]!.split("/");
+    // The region alone for root-level rows ("Global"); otherwise the path
+    // below the region, which is what a planner would say out loud.
+    return path.length === 1 ? path[0]! : path.slice(1).join(" · ");
+  });
   if (!names.length) return city ?? "";
   const head = names.join(" / ");
   return city ? `${head} · ${city}` : head;
 }
 
+const genderBit = { female: 1, male: 2, nonbinary: 4 } as const;
+
 export function queryRoster(filters: RosterFilters): RosterPage {
   const wantCategories = filters.categories
     .map((c) => categoryId.get(c))
     .filter((id): id is number => id !== undefined);
-  const wantState = filters.state ? stateId.get(filters.state) : undefined;
-  const wantGender = filters.gender === "female" ? 1 : filters.gender === "male" ? 2 : 0;
+  const wantPlace = filters.place ? placeIdByPath.get(filters.place) : undefined;
+  const wantGender = filters.gender === "any" ? 0 : genderBit[filters.gender];
   const needle = filters.q.trim().toLowerCase();
 
   // A filter naming something absent from the facet lists matches nothing,
@@ -94,7 +130,7 @@ export function queryRoster(filters: RosterFilters): RosterPage {
   // like an unfiltered result set.
   const impossible =
     (filters.categories.length > 0 && wantCategories.length === 0) ||
-    (filters.state !== "" && wantState === undefined);
+    (filters.place !== "" && wantPlace === undefined);
 
   // Everything except gender, so the gender filter's exclusions can be counted
   // rather than disappearing.
@@ -102,12 +138,13 @@ export function queryRoster(filters: RosterFilters): RosterPage {
     ? []
     : roster.filter((e) => {
         if (wantCategories.length && !wantCategories.some((id) => e.c.includes(id))) return false;
-        if (wantState !== undefined && !e.s.includes(wantState)) return false;
+        if (wantPlace !== undefined && !e.l.some((id) => underPlace(id, wantPlace))) return false;
         if (needle && !e.name.toLowerCase().includes(needle)) return false;
         return true;
       });
 
-  const matches = wantGender === 0 ? beforeGender : beforeGender.filter((e) => e.g === wantGender);
+  const matches =
+    wantGender === 0 ? beforeGender : beforeGender.filter((e) => (e.g & wantGender) !== 0);
   const unrecordedGender =
     wantGender === 0 ? 0 : beforeGender.reduce((n, e) => n + (e.g === 0 ? 1 : 0), 0);
 
@@ -116,11 +153,15 @@ export function queryRoster(filters: RosterFilters): RosterPage {
   const page = Math.min(Math.max(1, filters.page), pageCount);
   const start = (page - 1) * size;
 
-  const stateCounts = new Map<string, number>();
+  const placeCounts = new Map<string, number>();
   for (const e of matches) {
-    for (const i of e.s) {
-      const name = rosterStates[i];
-      if (name) stateCounts.set(name, (stateCounts.get(name) ?? 0) + 1);
+    const seen = new Set<string>();
+    for (const i of e.l) {
+      const name = countryLabelFor(i);
+      if (!seen.has(name)) {
+        seen.add(name);
+        placeCounts.set(name, (placeCounts.get(name) ?? 0) + 1);
+      }
     }
   }
 
@@ -129,15 +170,16 @@ export function queryRoster(filters: RosterFilters): RosterPage {
     unrecordedGender,
     page,
     pageCount,
-    states: [...stateCounts.entries()]
+    places: [...placeCounts.entries()]
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name)),
     rows: matches.slice(start, start + size).map((e) => ({
       name: e.name,
       slug: e.slug,
       categories: e.c.map((i) => rosterCategories[i]).filter((c): c is string => Boolean(c)),
-      location: locationLabel(e.s, e.city),
-      gender: e.g === 1 ? "female" : e.g === 2 ? "male" : null,
+      location: locationLabel(e.l, e.city),
+      gender: e.g,
+      fee: e.f ?? null,
     })),
   };
 }

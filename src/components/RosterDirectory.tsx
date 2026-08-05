@@ -2,12 +2,13 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 
 import { RosterRows } from "./RosterRows";
-import { rosterCategories, rosterStates } from "@/data/roster-facets";
+import { rosterCategories, rosterPlaces } from "@/data/roster-facets";
 import type { RosterGender, RosterPage } from "@/data/roster";
 
 export type RosterSearch = {
   category?: string;
-  state?: string;
+  /** A path into the place tree, segments joined with "/", e.g. "Europe/UK". */
+  place?: string;
   gender?: RosterGender;
   q?: string;
   page?: number;
@@ -28,7 +29,52 @@ const genders: { value: RosterGender; label: string }[] = [
   { value: "any", label: "Any gender" },
   { value: "female", label: "Female" },
   { value: "male", label: "Male" },
+  { value: "nonbinary", label: "Non-binary" },
 ];
+
+/**
+ * The location dropdown, built from the place tree: each region is an
+ * optgroup, its countries are options, and areas (US states, AU states,
+ * London) indent under their country. One nested control rather than three
+ * cascading ones — nothing moves around the page when a region is picked.
+ */
+type PlaceOption = { value: string; label: string; depth: number };
+type PlaceGroup = { label: string; options: PlaceOption[] };
+
+const placeGroups: PlaceGroup[] = (() => {
+  const path: string[] = [];
+  for (const node of rosterPlaces) {
+    path.push(node.p === -1 ? node.n : `${path[node.p]}/${node.n}`);
+  }
+  // Depth-first, so each country's areas sit directly under it.
+  function optionsUnder(parent: number, depth: number): PlaceOption[] {
+    const out: PlaceOption[] = [];
+    rosterPlaces.forEach((node, i) => {
+      if (node.p !== parent) return;
+      out.push({ value: path[i]!, label: node.n, depth });
+      out.push(...optionsUnder(i, depth + 1));
+    });
+    return out;
+  }
+  const groups: PlaceGroup[] = [];
+  rosterPlaces.forEach((node, i) => {
+    if (node.p !== -1) return;
+    groups.push({
+      label: node.n,
+      options: [
+        { value: path[i]!, label: node.n === "Global" ? "Global" : `All ${node.n}`, depth: 0 },
+        ...optionsUnder(i, 1),
+      ],
+    });
+  });
+  return groups;
+})();
+
+/** Last path segment, for the removable filter chip. */
+function placeLabel(place: string): string {
+  const segs = place.split("/");
+  return segs[segs.length - 1] ?? place;
+}
 
 /** Drop defaults so a URL only ever carries the filters actually in use. */
 function tidy(search: RosterSearch): RosterSearch {
@@ -42,7 +88,7 @@ function tidy(search: RosterSearch): RosterSearch {
 /**
  * Filters live in the URL rather than component state, so a filtered view is
  * shareable and server-rendered. Each change navigates; the loader re-queries on
- * the server, which is how the 2,131-row dataset stays out of the browser.
+ * the server, which is how the multi-thousand-row dataset stays out of the browser.
  */
 export function RosterDirectory({
   data,
@@ -75,10 +121,10 @@ export function RosterDirectory({
   const active = [
     topicLabel ? { label: topicLabel, clear: withFilters({ topic: "" }) } : null,
     search.category ? { label: search.category, clear: withFilters({ category: "" }) } : null,
-    search.state ? { label: search.state, clear: withFilters({ state: "" }) } : null,
+    search.place ? { label: placeLabel(search.place), clear: withFilters({ place: "" }) } : null,
     search.gender && search.gender !== "any"
       ? {
-          label: search.gender === "female" ? "Female" : "Male",
+          label: genders.find((g) => g.value === search.gender)?.label ?? search.gender,
           clear: withFilters({ gender: "any" }),
         }
       : null,
@@ -130,20 +176,24 @@ export function RosterDirectory({
         </div>
 
         <div>
-          <label htmlFor="r-state" className="label-mono mb-2 block text-[var(--ink-3)]">
+          <label htmlFor="r-place" className="label-mono mb-2 block text-[var(--ink-3)]">
             Location
           </label>
           <select
-            id="r-state"
+            id="r-place"
             className={controlClass}
-            value={search.state ?? ""}
-            onChange={(e) => apply({ state: e.target.value })}
+            value={search.place ?? ""}
+            onChange={(e) => apply({ place: e.target.value })}
           >
             <option value="">Anywhere</option>
-            {rosterStates.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
+            {placeGroups.map((g) => (
+              <optgroup key={g.label} label={g.label}>
+                {g.options.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {"  ".repeat(o.depth) + o.label}
+                  </option>
+                ))}
+              </optgroup>
             ))}
           </select>
         </div>

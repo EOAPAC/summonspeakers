@@ -37,9 +37,11 @@ function coerceFilters(input: unknown): RosterFilters {
     categories: Array.isArray(raw.categories)
       ? raw.categories.filter((c): c is string => typeof c === "string").slice(0, MAX_CATEGORIES)
       : emptyFilters.categories,
-    state: typeof raw.state === "string" ? raw.state : emptyFilters.state,
+    place: typeof raw.place === "string" ? raw.place : emptyFilters.place,
     gender:
-      gender === "female" || gender === "male" ? (gender as RosterGender) : emptyFilters.gender,
+      gender === "female" || gender === "male" || gender === "nonbinary"
+        ? (gender as RosterGender)
+        : emptyFilters.gender,
     q: typeof raw.q === "string" ? raw.q.slice(0, MAX_QUERY_LENGTH) : emptyFilters.q,
     page: Number.isFinite(page) && page >= 1 ? clamp(page, 1, Number.MAX_SAFE_INTEGER) : 1,
     ...(Number.isFinite(pageSize) && pageSize >= 1
@@ -49,10 +51,10 @@ function coerceFilters(input: unknown): RosterFilters {
 }
 
 /**
- * Filters the 2,131-speaker roster on the server and returns one page.
+ * Filters the imported roster on the server and returns one page.
  *
- * Deliberately a server function: the roster module is ~180KB, and running the
- * filter here keeps every byte of it out of the browser bundle.
+ * Deliberately a server function: the roster module is several hundred KB, and
+ * running the filter here keeps every byte of it out of the browser bundle.
  */
 export const fetchRoster = createServerFn({ method: "GET" })
   .validator(coerceFilters)

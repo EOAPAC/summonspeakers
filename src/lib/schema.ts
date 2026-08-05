@@ -18,7 +18,7 @@ export function organisationJsonLd() {
       "SummonSpeakers is a speaker booking marketplace that publishes every speaker's fee band upfront and books directly between planner and speaker.",
     slogan: "Book the keynote speaker your event deserves, with fees shown upfront.",
     email: "hello@summonspeakers.com",
-    areaServed: ["AU", "NZ", "Global"],
+    areaServed: ["US", "GB", "AU", "NZ", "Global"],
     knowsAbout: [
       "keynote speakers",
       "speaker fees",
@@ -67,7 +67,7 @@ export function serviceJsonLd(fullProfileCount: number) {
     provider: { "@id": `${SITE_URL}/#organization` },
     serviceType: "Speaker booking and event programming",
     description: `Browse ${speakerCount.toLocaleString("en-AU")} speakers with published fee bands, receive a matched shortlist within one business day, and book directly with the fee shown upfront.`,
-    areaServed: ["AU", "NZ", "Global"],
+    areaServed: ["US", "GB", "AU", "NZ", "Global"],
     audience: {
       "@type": "Audience",
       audienceType:
