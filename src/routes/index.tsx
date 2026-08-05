@@ -194,6 +194,23 @@ function Home() {
       </section>
 
       <section className="rule-open container-x section-y">
+        <div className="flex items-end justify-between gap-6">
+          <h2 className="display text-[length:var(--display-md)]">Featured speakers</h2>
+          <Link
+            to="/speakers"
+            className="hidden min-h-[44px] items-center gap-2 text-sm underline underline-offset-4 md:inline-flex"
+          >
+            All speakers <span aria-hidden="true">→</span>
+          </Link>
+        </div>
+        <div className="mt-12 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
+          {homeFeatured.map((s) => (
+            <SpeakerCard key={s.slug} speaker={s} />
+          ))}
+        </div>
+      </section>
+
+      <section className="rule-open container-x section-y">
         <Eyebrow>Browse by category</Eyebrow>
         <ul className="mt-10 border-t border-[var(--line)]">
           {featuredTopics.map((t, i) => (
@@ -278,23 +295,6 @@ function Home() {
                 </figcaption>
               </div>
             </figure>
-          ))}
-        </div>
-      </section>
-
-      <section className="rule-open container-x section-y">
-        <div className="flex items-end justify-between gap-6">
-          <h2 className="display text-[length:var(--display-md)]">Featured speakers</h2>
-          <Link
-            to="/speakers"
-            className="hidden min-h-[44px] items-center gap-2 text-sm underline underline-offset-4 md:inline-flex"
-          >
-            All speakers <span aria-hidden="true">→</span>
-          </Link>
-        </div>
-        <div className="mt-12 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
-          {homeFeatured.map((s) => (
-            <SpeakerCard key={s.slug} speaker={s} />
           ))}
         </div>
       </section>
