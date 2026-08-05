@@ -59,3 +59,15 @@ export function pageTitle(...leads: string[]): string {
   const last = leads[leads.length - 1] ?? BRAND;
   return last.slice(0, TITLE_LIMIT - suffix.length - 1).trimEnd() + "…" + suffix;
 }
+
+/**
+ * JSON for an inline <script> body. JSON.stringify alone is not safe there:
+ * the framework injects script children without HTML-escaping (escaping would
+ * corrupt the JSON), so a "</script>" inside any string — speaker bios come
+ * from a database that other tools write to — would close the tag and turn
+ * the rest of the value into markup. Escaping "<" keeps the JSON identical
+ * to a parser and inert to the HTML tokenizer.
+ */
+export function jsonLd(value: unknown): string {
+  return JSON.stringify(value).replace(/</g, "\\u003c");
+}

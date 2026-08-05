@@ -3,7 +3,7 @@ import { Page, Eyebrow } from "@/components/Page";
 import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { ClosingCta } from "@/components/ClosingCta";
 import { posts } from "@/data/editorial";
-import { absoluteUrl, ogImageMeta } from "@/lib/site";
+import { absoluteUrl, ogImageMeta, jsonLd } from "@/lib/site";
 
 export const Route = createFileRoute("/blog/")({
   head: () => ({
@@ -26,7 +26,7 @@ export const Route = createFileRoute("/blog/")({
     scripts: [
       {
         type: "application/ld+json",
-        children: JSON.stringify(
+        children: jsonLd(
           breadcrumbJsonLd([
             { name: "Home", item: "/" },
             { name: "Journal", item: "/blog" },

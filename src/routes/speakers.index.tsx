@@ -9,7 +9,7 @@ import { getTopic, pinnedFirst } from "@/data/speakers";
 import type { RosterGender } from "@/data/roster";
 import { fetchRoster } from "@/lib/roster.server";
 import { fetchSpeakersBySlugs } from "@/lib/speakers.server";
-import { absoluteUrl, ogImageMeta, pageTitle } from "@/lib/site";
+import { absoluteUrl, ogImageMeta, pageTitle, jsonLd } from "@/lib/site";
 
 const faqs = [
   {
@@ -154,14 +154,14 @@ export const Route = createFileRoute("/speakers/")({
       scripts: [
         {
           type: "application/ld+json",
-          children: JSON.stringify(
+          children: jsonLd(
             breadcrumbJsonLd([
               { name: "Home", item: "/" },
               { name: "Speakers", item: "/speakers" },
             ]),
           ),
         },
-        { type: "application/ld+json", children: JSON.stringify(faqJsonLd(faqs)) },
+        { type: "application/ld+json", children: jsonLd(faqJsonLd(faqs)) },
       ],
     };
   },

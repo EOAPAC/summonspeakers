@@ -16,7 +16,7 @@ import { feeAnswerForTopic } from "@/data/fees";
 import type { RosterPage } from "@/data/roster";
 import { fetchRoster } from "@/lib/roster.server";
 import { fetchSpeakers } from "@/lib/speakers.server";
-import { SITE_URL, absoluteUrl, ogImageMeta, pageTitle } from "@/lib/site";
+import { SITE_URL, absoluteUrl, ogImageMeta, pageTitle, jsonLd } from "@/lib/site";
 
 /** Roster speakers shown inline. The rest are one click away on /speakers. */
 const PREVIEW_SIZE = 24;
@@ -143,7 +143,7 @@ export const Route = createFileRoute("/topics/$slug")({
       scripts: [
         {
           type: "application/ld+json",
-          children: JSON.stringify(
+          children: jsonLd(
             breadcrumbJsonLd([
               { name: "Home", item: "/" },
               { name: "Topics", item: "/speakers" },
@@ -153,11 +153,11 @@ export const Route = createFileRoute("/topics/$slug")({
         },
         {
           type: "application/ld+json",
-          children: JSON.stringify(faqJsonLd(faqsFor(t.name, loaderData.roster))),
+          children: jsonLd(faqJsonLd(faqsFor(t.name, loaderData.roster))),
         },
         {
           type: "application/ld+json",
-          children: JSON.stringify({
+          children: jsonLd({
             "@context": "https://schema.org",
             "@type": "CollectionPage",
             name: t.heading,

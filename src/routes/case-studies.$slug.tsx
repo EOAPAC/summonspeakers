@@ -7,7 +7,7 @@ import { ClosingCta } from "@/components/ClosingCta";
 import { getCaseStudy, type CaseStudy } from "@/data/editorial";
 import { getSpeaker, type Speaker } from "@/data/speakers";
 import { fetchSpeakersBySlugs } from "@/lib/speakers.server";
-import { absoluteUrl, ogImageMeta, pageTitle } from "@/lib/site";
+import { absoluteUrl, ogImageMeta, pageTitle, jsonLd } from "@/lib/site";
 
 export const Route = createFileRoute("/case-studies/$slug")({
   loader: async ({ params }): Promise<{ study: CaseStudy; speaker: Speaker | undefined }> => {
@@ -40,7 +40,7 @@ export const Route = createFileRoute("/case-studies/$slug")({
       scripts: [
         {
           type: "application/ld+json",
-          children: JSON.stringify(
+          children: jsonLd(
             breadcrumbJsonLd([
               { name: "Home", item: "/" },
               { name: "Case studies", item: "/case-studies" },

@@ -13,7 +13,7 @@ import { fetchRosterProfile } from "@/lib/roster.server";
 import { fetchSpeakerBySlug } from "@/lib/speakers.server";
 import { portraitFor } from "@/data/speaker-portraits";
 import { formatFee } from "@/lib/fee";
-import { absoluteUrl, pageTitle, ogImageMeta } from "@/lib/site";
+import { absoluteUrl, pageTitle, ogImageMeta, jsonLd } from "@/lib/site";
 
 function faqsFor(name: string, fee: string) {
   return [
@@ -83,7 +83,7 @@ export const Route = createFileRoute("/speakers/$slug")({
         scripts: [
           {
             type: "application/ld+json",
-            children: JSON.stringify({
+            children: jsonLd({
               "@context": "https://schema.org",
               "@type": "Person",
               name: p.name,
@@ -107,7 +107,7 @@ export const Route = createFileRoute("/speakers/$slug")({
           },
           {
             type: "application/ld+json",
-            children: JSON.stringify(
+            children: jsonLd(
               breadcrumbJsonLd([
                 { name: "Home", item: "/" },
                 { name: "Speakers", item: "/speakers" },
@@ -150,7 +150,7 @@ export const Route = createFileRoute("/speakers/$slug")({
       scripts: [
         {
           type: "application/ld+json",
-          children: JSON.stringify({
+          children: jsonLd({
             "@context": "https://schema.org",
             "@type": "Person",
             name: s.name,
@@ -179,7 +179,7 @@ export const Route = createFileRoute("/speakers/$slug")({
         },
         {
           type: "application/ld+json",
-          children: JSON.stringify(
+          children: jsonLd(
             breadcrumbJsonLd([
               { name: "Home", item: "/" },
               { name: "Speakers", item: "/speakers" },
@@ -189,7 +189,7 @@ export const Route = createFileRoute("/speakers/$slug")({
         },
         {
           type: "application/ld+json",
-          children: JSON.stringify(faqJsonLd(faqsFor(s.name, fee))),
+          children: jsonLd(faqJsonLd(faqsFor(s.name, fee))),
         },
       ],
     };

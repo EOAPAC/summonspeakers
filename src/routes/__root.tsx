@@ -10,7 +10,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { OG_IMAGE, SITE_URL } from "../lib/site";
+import { OG_IMAGE, SITE_URL, jsonLd } from "../lib/site";
 import { organisationJsonLd, webSiteJsonLd } from "../lib/schema";
 
 function NotFoundComponent() {
@@ -113,8 +113,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     // Sitewide entity data. Every page inherits it, which is what lets AI
     // systems tie the individual pages back to one verifiable organisation.
     scripts: [
-      { type: "application/ld+json", children: JSON.stringify(organisationJsonLd()) },
-      { type: "application/ld+json", children: JSON.stringify(webSiteJsonLd()) },
+      { type: "application/ld+json", children: jsonLd(organisationJsonLd()) },
+      { type: "application/ld+json", children: jsonLd(webSiteJsonLd()) },
     ],
   }),
 

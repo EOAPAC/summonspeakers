@@ -6,7 +6,7 @@ import { getSpeaker, type Speaker } from "@/data/speakers";
 import { portraitSlugs } from "@/data/speaker-portraits";
 import { fetchSpeakerBySlug, fetchSpeakersBySlugs } from "@/lib/speakers.server";
 import { fetchRosterSpeakerName } from "@/lib/roster.server";
-import { absoluteUrl, ogImageMeta } from "@/lib/site";
+import { absoluteUrl, ogImageMeta, jsonLd } from "@/lib/site";
 
 export const Route = createFileRoute("/get-matched")({
   // Omit the key when there is no speaker rather than defaulting to "" —
@@ -55,7 +55,7 @@ export const Route = createFileRoute("/get-matched")({
     scripts: [
       {
         type: "application/ld+json",
-        children: JSON.stringify(
+        children: jsonLd(
           breadcrumbJsonLd([
             { name: "Home", item: "/" },
             { name: "Get matched", item: "/get-matched" },

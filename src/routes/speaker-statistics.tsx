@@ -5,7 +5,7 @@ import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { ClosingCta } from "@/components/ClosingCta";
 import type { RosterStats } from "@/data/roster";
 import { fetchRosterStats } from "@/lib/roster.server";
-import { absoluteUrl, ogImageMeta, pageTitle } from "@/lib/site";
+import { absoluteUrl, ogImageMeta, pageTitle, jsonLd } from "@/lib/site";
 
 /**
  * Original data about the directory itself: how many speakers, where they
@@ -56,7 +56,7 @@ export const Route = createFileRoute("/speaker-statistics")({
       scripts: [
         {
           type: "application/ld+json",
-          children: JSON.stringify(
+          children: jsonLd(
             breadcrumbJsonLd([
               { name: "Home", item: "/" },
               { name: "Speaker statistics", item: "/speaker-statistics" },
@@ -67,7 +67,7 @@ export const Route = createFileRoute("/speaker-statistics")({
           ? [
               {
                 type: "application/ld+json",
-                children: JSON.stringify({
+                children: jsonLd({
                   "@context": "https://schema.org",
                   "@type": "Dataset",
                   name: "SummonSpeakers keynote speaker directory statistics",
@@ -80,7 +80,7 @@ export const Route = createFileRoute("/speaker-statistics")({
               },
               {
                 type: "application/ld+json",
-                children: JSON.stringify(faqJsonLd(faqsFor(loaderData.stats))),
+                children: jsonLd(faqJsonLd(faqsFor(loaderData.stats))),
               },
             ]
           : []),

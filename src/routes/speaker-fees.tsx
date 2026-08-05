@@ -3,7 +3,7 @@ import { Page, FAQ, faqJsonLd, Eyebrow } from "@/components/Page";
 import { Breadcrumbs, breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import { ClosingCta } from "@/components/ClosingCta";
 import { feeTiers, feeColumns } from "@/data/fees";
-import { absoluteUrl, ogImageMeta } from "@/lib/site";
+import { absoluteUrl, ogImageMeta, jsonLd } from "@/lib/site";
 
 const faqs = [
   {
@@ -48,14 +48,14 @@ export const Route = createFileRoute("/speaker-fees")({
     scripts: [
       {
         type: "application/ld+json",
-        children: JSON.stringify(
+        children: jsonLd(
           breadcrumbJsonLd([
             { name: "Home", item: "/" },
             { name: "Speaker fees", item: "/speaker-fees" },
           ]),
         ),
       },
-      { type: "application/ld+json", children: JSON.stringify(faqJsonLd(faqs)) },
+      { type: "application/ld+json", children: jsonLd(faqJsonLd(faqs)) },
     ],
   }),
   component: SpeakerFees,

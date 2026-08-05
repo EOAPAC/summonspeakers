@@ -5,7 +5,7 @@ import { ButtonLink } from "@/components/Button";
 import { ClosingCta } from "@/components/ClosingCta";
 import { ROSTER_COUNT } from "@/data/roster-facets";
 import { fetchSpeakers } from "@/lib/speakers.server";
-import { absoluteUrl, ogImageMeta } from "@/lib/site";
+import { absoluteUrl, ogImageMeta, jsonLd } from "@/lib/site";
 
 const values = [
   {
@@ -52,7 +52,7 @@ export const Route = createFileRoute("/about")({
     scripts: [
       {
         type: "application/ld+json",
-        children: JSON.stringify(
+        children: jsonLd(
           breadcrumbJsonLd([
             { name: "Home", item: "/" },
             { name: "About", item: "/about" },
