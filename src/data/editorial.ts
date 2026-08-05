@@ -175,7 +175,7 @@ export const posts: Post[] = [
       { kind: "h2", text: "What we do instead" },
       {
         kind: "p",
-        text: "Speakers pay a flat listing fee. We are not paid a percentage of your booking, so there is no version of this where we make more money by steering you toward a more expensive speaker. That is the whole reason we can publish the numbers.",
+        text: "We publish every band before you ever make contact, so there is nothing to find out on a call. You can compare three speakers across two tiers before anyone on our side or theirs has spoken to you. That is the whole reason the numbers live on the page instead of behind one.",
       },
     ],
   },
@@ -227,7 +227,7 @@ export const caseStudies: CaseStudy[] = [
     metrics: [
       { value: "#1", label: "rated session of the summit" },
       { value: "1,200", label: "delegates" },
-      { value: "$0", label: "markup paid" },
+      { value: "$0", label: "hidden fees" },
     ],
     narrative: [
       {

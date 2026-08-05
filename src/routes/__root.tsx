@@ -84,7 +84,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Browse, compare and book professional keynote speakers directly. Every fee shown upfront. No bureau markup.",
+          "Browse, compare and book professional keynote speakers directly. Every fee shown upfront. No hidden fees.",
       },
       { property: "og:site_name", content: "SummonSpeakers" },
       { property: "og:type", content: "website" },

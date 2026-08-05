@@ -14,7 +14,7 @@ function faqsFor(name: string, fee: string) {
   return [
     {
       q: `What is ${name}'s speaking fee?`,
-      a: `${name}'s published fee band is ${fee}. The final figure depends on the format, the date and travel. There is no bureau markup added on top.`,
+      a: `${name}'s published fee band is ${fee}. The final figure depends on the format, the date and travel. There are no hidden fees on top of what's shown.`,
     },
     {
       q: `How do I book ${name}?`,

@@ -35,7 +35,7 @@ function faqsFor(name: string, roster: RosterPage | null) {
     ...(feeAnswer ? [{ q: `How much do ${phrase} cost?`, a: feeAnswer }] : []),
     {
       q: `How do I book a ${singular}?`,
-      a: `Send an enquiry with your date, audience size and theme. We confirm availability and the exact fee within one business day, then you book directly through us. There is no bureau markup, and cancellation is free up to 14 days before your event.`,
+      a: `Send an enquiry with your date, audience size and theme. We confirm availability and the exact fee within one business day, then you book directly through us. There are no hidden fees, and cancellation is free up to 14 days before your event.`,
     },
     ...(roster && roster.total > 0
       ? [
@@ -117,8 +117,8 @@ export const Route = createFileRoute("/topics/$slug")({
     const t = loaderData.topic;
     const total = loaderData.roster?.total ?? 0;
     const description = total
-      ? `${total.toLocaleString("en-AU")} ${topicPhrase(t.name)}, with fee bands published on every full profile. Compare, shortlist and enquire directly with no bureau markup.`
-      : `${t.heading} with fees shown upfront. Compare fee bands, topics and availability, then book directly with no bureau markup.`;
+      ? `${total.toLocaleString("en-AU")} ${topicPhrase(t.name)}, with fee bands published on every full profile. Compare, shortlist and enquire directly, with fees shown upfront.`
+      : `${t.heading} with fees shown upfront. Compare fee bands, topics and availability, then book directly with the fee shown before you enquire.`;
     return {
       meta: [
         {
