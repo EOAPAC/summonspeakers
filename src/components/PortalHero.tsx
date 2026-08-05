@@ -53,13 +53,20 @@ export function PortalHero() {
     if (!section || typeof window === "undefined") return;
 
     // Reduced motion: leave the shipped-open state alone, bind nothing.
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      document.documentElement.classList.remove("portal-closed");
+      return;
+    }
 
     const root = document.documentElement;
     let raf = 0;
 
     const update = () => {
       raf = 0;
+      // The pre-paint closed-state class must never outlive a frame the rAF
+      // loop owns — on SPA navigation the head script can re-add it after
+      // mount, which would otherwise freeze the closed look over live styles.
+      root.classList.remove("portal-closed");
       const total = section.offsetHeight - window.innerHeight;
       if (total <= 0) return;
       const p = clamp(-section.getBoundingClientRect().top / total, 0, 1);
@@ -170,30 +177,33 @@ export function PortalHero() {
         <div
           ref={panelLRef}
           aria-hidden="true"
-          className="absolute inset-y-0 left-0 w-[52%] border-r border-white/10 bg-[var(--color-footer)] will-change-transform"
+          className="portal-panel absolute inset-y-0 left-0 w-[52%] border-r border-white/10 bg-[var(--color-footer)] will-change-transform"
           style={{ transform: "translate3d(-112%, 0, 0)" }}
         />
         <div
           ref={panelRRef}
           aria-hidden="true"
-          className="absolute inset-y-0 right-0 w-[52%] bg-[var(--color-footer)] will-change-transform"
+          className="portal-panel absolute inset-y-0 right-0 w-[52%] bg-[var(--color-footer)] will-change-transform"
           style={{ transform: "translate3d(112%, 0, 0)" }}
         />
         {/* 5 — seam dots, above the panels so they mark the closed seam */}
         <span
           ref={dotLRef}
           aria-hidden="true"
-          className="absolute left-1/2 top-1/2 size-[7px] -translate-y-1/2 rounded-full bg-white"
+          className="portal-dot absolute left-1/2 top-1/2 size-[7px] -translate-y-1/2 rounded-full bg-white"
           style={{ marginLeft: -21.5, opacity: 0 }}
         />
         <span
           ref={dotRRef}
           aria-hidden="true"
-          className="absolute left-1/2 top-1/2 size-[7px] -translate-y-1/2 rounded-full bg-white"
+          className="portal-dot absolute left-1/2 top-1/2 size-[7px] -translate-y-1/2 rounded-full bg-white"
           style={{ marginLeft: 14.5, opacity: 0 }}
         />
         {/* 6 — content stack, shipped visible */}
-        <div ref={contentRef} className="relative z-10 flex h-full flex-col justify-center">
+        <div
+          ref={contentRef}
+          className="portal-content relative z-10 flex h-full flex-col justify-center"
+        >
           <div className="container-x">
             <h1 className="display max-w-[19ch] text-[length:clamp(34px,6.2vw,92px)]">
               Keynote Speakers Your Event Deserves
@@ -233,7 +243,7 @@ export function PortalHero() {
         <div
           ref={markWrapRef}
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center"
+          className="portal-mark pointer-events-none absolute inset-0 z-20 flex items-center justify-center"
           style={{ opacity: 0 }}
         >
           <p

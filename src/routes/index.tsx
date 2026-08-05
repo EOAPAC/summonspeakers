@@ -32,6 +32,13 @@ export const Route = createFileRoute("/")({
       { rel: "preload", as: "image", href: "/hero-speaker.webp", fetchPriority: "high" },
     ],
     scripts: [
+      // Blocking on purpose: it must run before first paint so the portal hero
+      // renders closed from the very first frame. No-JS visitors never run it
+      // and reduced-motion visitors are skipped, so both get the open page.
+      {
+        children:
+          "try{if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('portal-closed')}catch(e){}",
+      },
       {
         type: "application/ld+json",
         children: JSON.stringify(serviceJsonLd(loaderData?.speakers.length ?? 0)),
