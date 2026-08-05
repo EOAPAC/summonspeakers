@@ -252,6 +252,31 @@
   pointer-events: auto !important;
 }
 
+/* First-paint closed state for the portal hero. The homepage ships its markup
+   open (the safe render for no-JS and reduced motion); a blocking script in the
+   route head adds this class before first paint for JS-on, motion-ok visitors,
+   so the page never flashes open before the scroll effect takes over. The
+   effect removes the class in its first frame. !important because the open
+   state is inline. */
+html.portal-closed .portal-panel {
+  transform: translate3d(0, 0, 0) !important;
+}
+html.portal-closed .portal-dot {
+  opacity: 1 !important;
+}
+html.portal-closed .portal-mark {
+  opacity: 1 !important;
+}
+html.portal-closed .portal-content {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+html.portal-closed .hdr-portal {
+  opacity: 0 !important;
+  transform: translateY(-100%) !important;
+  pointer-events: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
