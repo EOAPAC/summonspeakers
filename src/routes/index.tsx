@@ -6,6 +6,7 @@ import { featuredTopics, pinnedFirst } from "@/data/speakers";
 import { absoluteUrl, ogImageMeta } from "@/lib/site";
 import { serviceJsonLd } from "@/lib/schema";
 import { Page, Eyebrow, FAQ, faqJsonLd } from "@/components/Page";
+import { HeroSentinel } from "@/components/Header";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -139,7 +140,7 @@ function Home() {
           replacements below are 9.9:1 and 5.3:1. Same approach the footer
           already uses, so there is one way of doing dark surfaces, not two.
           `on-ink` switches the focus ring to white. */}
-      <section className="on-ink container-x bg-[var(--color-footer)] pb-20 pt-16 text-surface md:pt-24">
+      <section className="on-ink container-x relative bg-[var(--color-footer)] pb-20 pt-16 text-surface md:pt-24">
         <h1 className="display text-[length:clamp(26px,3.6vw,76px)]">
           Keynote Speakers Your Event Deserves
         </h1>
@@ -170,6 +171,7 @@ function Home() {
             ))}
           </ul>
         </div>
+        <HeroSentinel />
       </section>
 
       <section className="rule-open container-x section-y">

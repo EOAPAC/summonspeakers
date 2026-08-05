@@ -2,13 +2,15 @@ import { createLink, type LinkComponent } from "@tanstack/react-router";
 import type { ComponentProps, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-type Variant = "primary" | "primaryInverse" | "secondary" | "ghost";
+type Variant = "primary" | "primaryInverse" | "secondary" | "ghost" | "ghostInverse";
 
 const base =
   "group inline-flex items-center justify-center gap-3 font-semibold transition-all duration-500 [transition-timing-function:var(--ease)] disabled:opacity-40 disabled:pointer-events-none";
 
+// `ghostInverse` carries the arrow too, so the header CTA keeps its width when
+// it swaps to `primary` on scroll instead of jumping as a glyph appears.
 const arrow = (variant: Variant) =>
-  variant === "primary" || variant === "primaryInverse" ? (
+  variant === "primary" || variant === "primaryInverse" || variant === "ghostInverse" ? (
     <span
       aria-hidden="true"
       className="transition-transform duration-500 [transition-timing-function:var(--ease)] group-hover:translate-x-1 group-hover:-translate-y-1"
@@ -30,6 +32,10 @@ const variants: Record<Variant, string> = {
     "min-h-[var(--hit-min)] text-base underline underline-offset-4 decoration-[var(--line-2)] hover:decoration-ink text-ink",
   ghost:
     "rounded-full border border-[var(--line-2)] min-h-[var(--hit-min)] px-6 text-sm hover:bg-ink hover:text-surface",
+  // `ghost` on a dark section. Its hairline is a black alpha, which disappears
+  // on near-black, and its hover fills black on black.
+  ghostInverse:
+    "rounded-full border border-white/35 min-h-[var(--hit-min)] px-6 text-sm text-surface hover:bg-surface hover:text-ink hover:border-surface",
 };
 
 export function Button({
