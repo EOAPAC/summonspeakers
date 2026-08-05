@@ -541,12 +541,20 @@ export function speakersByTopic(topicName: string, speakers: readonly Speaker[])
  */
 export function pinnedFirst(slugs: readonly string[], speakers: readonly Speaker[]): Speaker[] {
   const seen = new Set<string>();
-  const pinned = slugs.map((slug) => {
+  const pinned: Speaker[] = [];
+  for (const slug of slugs) {
     if (seen.has(slug)) throw new Error(`pinnedFirst lists "${slug}" twice`);
     seen.add(slug);
     const speaker = getSpeaker(slug, speakers);
-    if (!speaker) throw new Error(`pinnedFirst names an unknown speaker slug: "${slug}"`);
-    return speaker;
-  });
+    // Logged and skipped rather than thrown: the speakers now live in a
+    // database that changes independently of deploys, so a missing slug is
+    // data drift, and one renamed speaker must not take the homepage down.
+    // The duplicate check above still throws — that one really is a typo.
+    if (!speaker) {
+      console.error(`pinnedFirst: no published speaker with slug "${slug}"`);
+      continue;
+    }
+    pinned.push(speaker);
+  }
   return [...pinned, ...speakers.filter((s) => !seen.has(s.slug))];
 }

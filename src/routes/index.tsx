@@ -3,13 +3,13 @@ import { SpeakerCard } from "@/components/SpeakerCard";
 import { ClosingCta } from "@/components/ClosingCta";
 import { PortalHero } from "@/components/PortalHero";
 import { featuredTopics, pinnedFirst } from "@/data/speakers";
-import { fetchSpeakers } from "@/lib/speakers.server";
+import { fetchSpeakersBySlugs } from "@/lib/speakers.server";
 import { absoluteUrl, ogImageMeta } from "@/lib/site";
 import { serviceJsonLd } from "@/lib/schema";
 import { Page, Eyebrow, FAQ, faqJsonLd } from "@/components/Page";
 
 export const Route = createFileRoute("/")({
-  loader: async () => ({ speakers: await fetchSpeakers() }),
+  loader: async () => ({ speakers: await fetchSpeakersBySlugs({ data: [...HOME_FEATURED] }) }),
   head: ({ loaderData }) => ({
     meta: [
       { title: "Keynote Speakers, Fees Shown Upfront | SummonSpeakers" },
