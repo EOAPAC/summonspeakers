@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ButtonLink } from "@/components/Button";
 import { SpeakerCard } from "@/components/SpeakerCard";
 import { ClosingCta } from "@/components/ClosingCta";
-import { featuredTopics, speakers } from "@/data/speakers";
+import { featuredTopics, getSpeaker } from "@/data/speakers";
 import { absoluteUrl, ogImageMeta } from "@/lib/site";
 import { serviceJsonLd } from "@/lib/schema";
 import { Page, Eyebrow, FAQ, faqJsonLd } from "@/components/Page";
@@ -110,6 +110,30 @@ const homeTestimonials = [
   },
 ];
 
+/**
+ * The four cards on the homepage, in this order.
+ *
+ * Chosen by slug rather than by reordering the `speakers` array, because that
+ * array also drives /speakers, the sitemap, the similar-speakers rail and the
+ * enquiry form's dropdown — reordering it to change the homepage would quietly
+ * reorder all of those too.
+ *
+ * An unknown slug throws at module load rather than rendering three cards and
+ * leaving nobody to notice the fourth went missing.
+ */
+const HOME_FEATURED = [
+  "helena-brandt",
+  "nina-castellan",
+  "robert-ainsley",
+  "michael-toure",
+] as const;
+
+const homeFeatured = HOME_FEATURED.map((slug) => {
+  const speaker = getSpeaker(slug);
+  if (!speaker) throw new Error(`HOME_FEATURED names an unknown speaker slug: "${slug}"`);
+  return speaker;
+});
+
 function Home() {
   return (
     <Page>
@@ -117,13 +141,9 @@ function Home() {
         <h1 className="display text-[length:clamp(26px,3.6vw,76px)]">
           Keynote Speakers Your Event Deserves
         </h1>
-        <p className="display mt-6 text-[length:var(--display-sm)] text-[var(--ink-2)]">
-          With fees shown upfront.
-        </p>
-
         <p className="mt-10 max-w-[48ch] text-lg text-[var(--ink-2)] md:max-w-none">
-          Browse, compare and book professional speakers directly. No bureau markup, no guessing
-          what they cost.
+          Browse, compare and book professional speakers with fees shown upfront. No bureau markup,
+          no guessing what they cost.
         </p>
         <div className="mt-10 flex flex-wrap items-center gap-8">
           <ButtonLink to="/get-matched">Get matched</ButtonLink>
@@ -236,7 +256,7 @@ function Home() {
           </Link>
         </div>
         <div className="mt-12 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
-          {speakers.slice(0, 4).map((s) => (
+          {homeFeatured.map((s) => (
             <SpeakerCard key={s.slug} speaker={s} />
           ))}
         </div>
