@@ -119,11 +119,10 @@ const homeTestimonials = [
  *
  * Every name above is fictional, same as the twelve speaker profiles, so a
  * photo here carries the same AI-generated disclosure in its alt text. A slug
- * missing from this set — which is every one of them until the images are
- * added — falls back to the hatch placeholder rather than a broken image, so
- * this ships safely ahead of the files existing.
+ * missing from this set falls back to the hatch placeholder rather than a
+ * broken image.
  */
-const TESTIMONIAL_AVATARS = new Set<string>([]);
+const TESTIMONIAL_AVATARS = new Set<string>(["elena-marsh", "tom-verity", "priya-nandan"]);
 
 /**
  * The four cards on the homepage, in this order.
