@@ -8,7 +8,7 @@ import { ButtonLink } from "@/components/Button";
 import { getTopic, pinnedFirst } from "@/data/speakers";
 import type { RosterGender } from "@/data/roster";
 import { fetchRoster } from "@/lib/roster.server";
-import { fetchSpeakers } from "@/lib/speakers.server";
+import { fetchSpeakersBySlugs } from "@/lib/speakers.server";
 import { absoluteUrl, ogImageMeta, pageTitle } from "@/lib/site";
 
 const faqs = [
@@ -93,7 +93,7 @@ export const Route = createFileRoute("/speakers/")({
     const categories = topic?.roster?.categories ?? (deps.category ? [deps.category] : []);
     const gender = topic?.roster?.gender ?? deps.gender ?? "any";
     const place = topic?.roster?.place ?? deps.place ?? "";
-    const speakers = await fetchSpeakers();
+    const speakers = await fetchSpeakersBySlugs({ data: FULL_PROFILE_ORDER });
     return {
       roster: await fetchRoster({
         data: {

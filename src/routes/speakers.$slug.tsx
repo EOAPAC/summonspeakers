@@ -7,10 +7,10 @@ import { ButtonLink } from "@/components/Button";
 import { SpeakerCard } from "@/components/SpeakerCard";
 import { RosterRows } from "@/components/RosterRows";
 import { Portrait } from "@/components/Portrait";
-import { getSpeaker, type Speaker } from "@/data/speakers";
+import type { Speaker } from "@/data/speakers";
 import type { RosterProfile } from "@/data/roster";
 import { fetchRosterProfile } from "@/lib/roster.server";
-import { fetchSpeakers } from "@/lib/speakers.server";
+import { fetchSpeakerBySlug } from "@/lib/speakers.server";
 import { formatFee } from "@/lib/fee";
 import { absoluteUrl, pageTitle, ogImageMeta } from "@/lib/site";
 
@@ -34,14 +34,13 @@ function faqsFor(name: string, fee: string) {
  * portrait is what makes the page worth publishing.
  */
 type ProfileData =
-  | { kind: "full"; speaker: Speaker; speakers: Speaker[] }
+  | { kind: "full"; speaker: Speaker; similar: Speaker[] }
   | { kind: "roster"; profile: RosterProfile };
 
 export const Route = createFileRoute("/speakers/$slug")({
   loader: async ({ params }): Promise<ProfileData> => {
-    const speakers = await fetchSpeakers();
-    const speaker = getSpeaker(params.slug, speakers);
-    if (speaker) return { kind: "full", speaker, speakers };
+    const { speaker, similar } = await fetchSpeakerBySlug({ data: params.slug });
+    if (speaker) return { kind: "full", speaker, similar };
     const { profile } = await fetchRosterProfile({ data: params.slug });
     if (profile) return { kind: "roster", profile };
     throw notFound();
@@ -195,7 +194,7 @@ export const Route = createFileRoute("/speakers/$slug")({
 function SpeakerProfile() {
   const data = Route.useLoaderData();
   if (data.kind === "roster") return <RosterSpeakerProfile profile={data.profile} />;
-  return <FullSpeakerProfile speaker={data.speaker} speakers={data.speakers} />;
+  return <FullSpeakerProfile speaker={data.speaker} similar={data.similar} />;
 }
 
 /**
@@ -290,11 +289,8 @@ function RosterSpeakerProfile({ profile: p }: { profile: RosterProfile }) {
   );
 }
 
-function FullSpeakerProfile({ speaker: s, speakers }: { speaker: Speaker; speakers: Speaker[] }) {
+function FullSpeakerProfile({ speaker: s, similar }: { speaker: Speaker; similar: Speaker[] }) {
   const fee = formatFee(s.fee_min, s.fee_max, s.fee_on_application);
-  const similar = speakers
-    .filter((o) => o.slug !== s.slug && o.topics.some((t) => s.topics.includes(t)))
-    .slice(0, 6);
 
   return (
     <Page>
