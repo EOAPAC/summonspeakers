@@ -19,7 +19,8 @@
     "build:portraits": "bun scripts/build-speaker-portraits.ts",
     "build:plates": "bun scripts/build-speaker-plates.ts",
     "to:webp": "bun scripts/png-to-webp.ts",
-    "import:roster": "bun scripts/import-roster.ts"
+    "import:roster": "bun scripts/import-roster.ts",
+    "scan:roster-images": "bun scripts/scan-roster-images.ts"
   },
   "dependencies": {
     "@fontsource-variable/hanken-grotesk": "^5.3.0",
