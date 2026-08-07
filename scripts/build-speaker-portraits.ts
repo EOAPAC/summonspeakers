@@ -39,7 +39,7 @@ import { roster } from "../src/data/roster.generated";
 // so the only slugs this script can know offline are the roster's and the
 // twelve curated profiles', which it lists by hand.
 const CURATED_SLUGS = [
-  "andres-molina", "daniel-hsu", "dr-maya-ellison", "grace-oyelaran",
+  "andres-molina", "daniel-abbott", "daniel-hsu", "dr-maya-ellison", "grace-oyelaran",
   "helena-brandt", "james-okoro", "michael-toure", "nina-castellan",
   "omar-haddad", "priya-raman", "robert-ainsley", "sarah-lindqvist",
 ];

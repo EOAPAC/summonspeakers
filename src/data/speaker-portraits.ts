@@ -19,6 +19,7 @@ export type PortraitKind = "plate" | "photo";
 
 const PORTRAITS: Readonly<Record<string, { src: string; kind: PortraitKind }>> = {
   "andres-molina": { src: "/speakers/andres-molina.webp", kind: "photo" },
+  "daniel-abbott": { src: "/speakers/daniel-abbott.webp", kind: "photo" },
   "daniel-hsu": { src: "/speakers/daniel-hsu.webp", kind: "photo" },
   "dr-maya-ellison": { src: "/speakers/dr-maya-ellison.webp", kind: "photo" },
   "grace-oyelaran": { src: "/speakers/grace-oyelaran.webp", kind: "photo" },
@@ -61,7 +62,7 @@ export function portraitAlt(slug: string, name: string): string {
   return `AI-generated portrait of ${name}, keynote speaker`;
 }
 
-export const PORTRAIT_COUNT = 12;
+export const PORTRAIT_COUNT = 13;
 
 /**
  * The slugs with a portrait, in one place: the portrait is the editorial
@@ -70,6 +71,7 @@ export const PORTRAIT_COUNT = 12;
  */
 export const portraitSlugs: readonly string[] = [
   "andres-molina",
+  "daniel-abbott",
   "daniel-hsu",
   "dr-maya-ellison",
   "grace-oyelaran",

@@ -152,7 +152,7 @@ const HOME_FEATURED = [
   "helena-brandt",
   "robert-ainsley",
   "nina-castellan",
-  "michael-toure",
+  "daniel-abbott",
 ] as const;
 
 function Home() {

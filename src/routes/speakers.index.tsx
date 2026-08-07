@@ -56,7 +56,7 @@ function isNarrowed(s: RosterSearch): boolean {
 }
 
 /** Display order for the full-profile grid. The rest follow in their own order. */
-const FULL_PROFILE_ORDER = ["helena-brandt", "robert-ainsley", "andres-molina", "omar-haddad"];
+const FULL_PROFILE_ORDER = ["helena-brandt", "robert-ainsley", "daniel-abbott", "omar-haddad"];
 
 export const Route = createFileRoute("/speakers/")({
   // Defaults are omitted rather than defaulted, so /speakers never redirects to
