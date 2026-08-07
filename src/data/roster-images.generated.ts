@@ -667,5 +667,22 @@ export const rosterImageSlugs: readonly string[] = [
   "eric-bailey",
   "eric-campbell",
   "eric-feng",
-  "eric-philips"
+  "eric-philips",
+  "eric-rush",
+  "erica-orange",
+  "erik-wahl",
+  "erika-cramer",
+  "erin-molan",
+  "erin-phillips-oam",
+  "eva-cox",
+  "evan-lucas",
+  "eve-ash",
+  "evonne-goolagong-cawley-ac-mbe",
+  "fadi-chalouhy",
+  "farah-mohamed",
+  "faulty-towers",
+  "felicity-harley",
+  "felicity-ward",
+  "fergus-watts",
+  "fernando-barraza"
 ];
