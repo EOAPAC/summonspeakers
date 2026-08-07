@@ -259,6 +259,10 @@ ${entries.map(([slug, v]) => `  "${slug}": { src: "${v.src}", kind: "${v.kind}" 
 
 const ROSTER_PORTRAITS: ReadonlySet<string> = new Set(rosterImageSlugs);
 
+// Curated portraits of real, named speakers (modelled on their own photos)
+// rather than fictional placeholders — they get the roster-style alt text.
+const REAL_PORTRAITS: ReadonlySet<string> = new Set(["daniel-abbott"]);
+
 /** Public path to a speaker's image, or null when there is not one yet. */
 export function portraitFor(slug: string): string | null {
   return PORTRAITS[slug]?.src ?? (ROSTER_PORTRAITS.has(slug) ? \`/speakers/roster/\${slug}.webp\` : null);
@@ -281,7 +285,7 @@ export function portraitKind(slug: string): PortraitKind | null {
 export function portraitAlt(slug: string, name: string): string {
   const kind = portraitKind(slug);
   if (kind === "plate") return "";
-  if (PORTRAITS[slug])
+  if (PORTRAITS[slug] && !REAL_PORTRAITS.has(slug))
     return \`Portrait of \${name}, keynote speaker (AI-generated placeholder image)\`;
   return \`AI-generated portrait of \${name}, keynote speaker\`;
 }
