@@ -41,7 +41,9 @@ const REAL_PORTRAITS: ReadonlySet<string> = new Set(["daniel-abbott"]);
 
 /** Public path to a speaker's image, or null when there is not one yet. */
 export function portraitFor(slug: string): string | null {
-  return PORTRAITS[slug]?.src ?? (ROSTER_PORTRAITS.has(slug) ? `/speakers/roster/${slug}.webp` : null);
+  return (
+    PORTRAITS[slug]?.src ?? (ROSTER_PORTRAITS.has(slug) ? `/speakers/roster/${slug}.webp` : null)
+  );
 }
 
 export function portraitKind(slug: string): PortraitKind | null {
@@ -86,5 +88,5 @@ export const portraitSlugs: readonly string[] = [
   "omar-haddad",
   "priya-raman",
   "robert-ainsley",
-  "sarah-lindqvist"
+  "sarah-lindqvist",
 ];

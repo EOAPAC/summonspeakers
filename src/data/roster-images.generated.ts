@@ -967,5 +967,5 @@ export const rosterImageSlugs: readonly string[] = [
   "john-pabon",
   "john-riddell",
   "john-rothfield",
-  "john-schumann-am"
+  "john-schumann-am",
 ];
