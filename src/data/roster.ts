@@ -129,6 +129,16 @@ const genderBit = { female: 1, male: 2, nonbinary: 4 } as const;
 
 const profileSlugs = new Set(rosterImageSlugs);
 
+/**
+ * The public directory lists only speakers who have been through the portrait
+ * pipeline — an approved portrait at public/speakers/roster/<slug>.webp is the
+ * bar, the same one rosterProfile applies to /speakers/<slug>. Everyone else
+ * stays in the data (enquiry prefill, slug lookup) but is not listed, counted,
+ * or faceted until their portrait lands, at which point the next regeneration
+ * of roster-images.generated.ts brings them into view.
+ */
+const visibleRoster = roster.filter((e) => profileSlugs.has(e.slug));
+
 export function queryRoster(filters: RosterFilters): RosterPage {
   const wantCategories = filters.categories
     .map((c) => categoryId.get(c))
@@ -148,7 +158,7 @@ export function queryRoster(filters: RosterFilters): RosterPage {
   // rather than disappearing.
   const beforeGender = impossible
     ? []
-    : roster.filter((e) => {
+    : visibleRoster.filter((e) => {
         if (wantCategories.length && !wantCategories.some((id) => e.c.includes(id))) return false;
         if (wantPlace !== undefined && !e.l.some((id) => underPlace(id, wantPlace))) return false;
         if (needle && !e.name.toLowerCase().includes(needle)) return false;
@@ -198,8 +208,8 @@ export function queryRoster(filters: RosterFilters): RosterPage {
   };
 }
 
-/** Total roster size, for the counts quoted on /about and /speakers. */
-export const rosterCount = roster.length;
+/** Visible directory size, for the counts quoted on /about and /speakers. */
+export const rosterCount = visibleRoster.length;
 
 /** Look a roster speaker up by slug, for prefilling an enquiry. */
 export function rosterSpeakerName(slug: string): string | null {
@@ -223,8 +233,9 @@ export type RosterStats = {
 };
 
 /**
- * Directory-wide statistics for /speaker-statistics. Computed from the live
- * roster so every figure on that page stays true after the next import.
+ * Directory-wide statistics for /speaker-statistics. Computed from the visible
+ * (portrait-approved) roster so the page agrees with the directory it
+ * describes, and every figure stays true after the next import.
  */
 export function rosterStats(): RosterStats {
   const regionCounts = new Map<string, number>();
@@ -233,7 +244,7 @@ export function rosterStats(): RosterStats {
   const gender = { female: 0, male: 0, nonbinary: 0, unrecorded: 0 };
   let withFee = 0;
 
-  for (const e of roster) {
+  for (const e of visibleRoster) {
     const regions = new Set<string>();
     const countries = new Set<string>();
     for (const i of e.l) {
@@ -260,7 +271,7 @@ export function rosterStats(): RosterStats {
       .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
 
   return {
-    total: roster.length,
+    total: visibleRoster.length,
     regions: sorted(regionCounts),
     countries: sorted(countryCounts).slice(0, 15),
     countryCount: countryCounts.size,
