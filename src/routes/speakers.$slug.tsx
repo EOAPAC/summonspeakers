@@ -372,34 +372,40 @@ function FullSpeakerProfile({ speaker: s, similar }: { speaker: Speaker; similar
         </section>
       )}
 
-      <section className="rule-open container-x section-y">
-        <h2 className="label-mono text-[var(--ink-3)]">What organisers say</h2>
-        <div className="mt-10 grid gap-8 md:grid-cols-3">
-          {s.testimonials.map((t) => (
-            <figure
-              key={t.author_name}
-              className="rounded-[var(--radius-card)] border border-[var(--line)] p-8"
-            >
-              <blockquote className="text-lg tracking-[-0.02em]">“{t.quote}”</blockquote>
-              <figcaption className="mt-6 text-sm text-[var(--ink-2)]">
-                <span className="block font-semibold text-ink">{t.author_name}</span>
-                {t.author_role}, {t.company}
-              </figcaption>
-            </figure>
-          ))}
-        </div>
-      </section>
+      {/* Hidden until populated: an empty testimonials or clients section
+          reads as a broken page. Each returns on its own once data lands. */}
+      {s.testimonials.length > 0 && (
+        <section className="rule-open container-x section-y">
+          <h2 className="label-mono text-[var(--ink-3)]">What organisers say</h2>
+          <div className="mt-10 grid gap-8 md:grid-cols-3">
+            {s.testimonials.map((t) => (
+              <figure
+                key={t.author_name}
+                className="rounded-[var(--radius-card)] border border-[var(--line)] p-8"
+              >
+                <blockquote className="text-lg tracking-[-0.02em]">“{t.quote}”</blockquote>
+                <figcaption className="mt-6 text-sm text-[var(--ink-2)]">
+                  <span className="block font-semibold text-ink">{t.author_name}</span>
+                  {t.author_role}, {t.company}
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </section>
+      )}
 
-      <section className="container-x pb-24">
-        <h2 className="label-mono text-[var(--ink-3)]">Past clients</h2>
-        <ul className="mt-6 flex flex-wrap gap-x-10 gap-y-4">
-          {s.past_clients.map((c) => (
-            <li key={c} className="label-mono text-[var(--ink-3)]">
-              {c}
-            </li>
-          ))}
-        </ul>
-      </section>
+      {s.past_clients.length > 0 && (
+        <section className="container-x pb-24">
+          <h2 className="label-mono text-[var(--ink-3)]">Past clients</h2>
+          <ul className="mt-6 flex flex-wrap gap-x-10 gap-y-4">
+            {s.past_clients.map((c) => (
+              <li key={c} className="label-mono text-[var(--ink-3)]">
+                {c}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section className="rule-open container-x section-y">
         <h2 className="display text-[length:var(--display-md)]">Fee and travel</h2>
