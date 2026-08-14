@@ -66,9 +66,23 @@ describe("place filtering", () => {
 describe("fees", () => {
   test("imported fees survive to the row payload", () => {
     const withFee = q().rows.filter((r) => r.fee !== null);
-    expect(q({ q: "A. Wess Mitchell" }).rows[0]?.fee).toBe(15000);
+    // A visible (portrait-approved) speaker — the directory only lists those.
+    expect(q({ q: "Adam Cheyer" }).rows[0]?.fee).toBe(15000);
     // Fee is either absent or a positive dollar figure, never 0.
     for (const r of withFee) expect(r.fee).toBeGreaterThan(0);
+  });
+});
+
+describe("portrait gate", () => {
+  test("every listed row has an approved portrait", () => {
+    const page = q({ pageSize: 100 });
+    expect(page.rows.length).toBeGreaterThan(0);
+    for (const r of page.rows) expect(r.hasImage).toBe(true);
+  });
+
+  test("speakers without a portrait are not listed", () => {
+    // A. Wess Mitchell is in the roster data but has no portrait yet.
+    expect(q({ q: "A. Wess Mitchell" }).total).toBe(0);
   });
 });
 
