@@ -46,8 +46,28 @@ export function RosterRows({ rows }: { rows: RosterRow[] }) {
         return (
           <li
             key={r.slug}
-            className="grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-3 border-b border-[var(--line)] py-5 md:grid-cols-[auto_1.2fr_1.4fr_auto] md:gap-x-6"
+            className="group relative grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-3 border-b border-[var(--line)] py-5 md:grid-cols-[auto_1.2fr_1.4fr_auto] md:gap-x-6"
           >
+            {/* Hover portrait pop-up: the profile-page photo, enlarged. Purely
+                decorative (the name sits beside it), pointer-transparent so it
+                never swallows a click, and desktop-only — there is no hover on
+                touch, where it would just flash on tap. */}
+            {r.hasImage && (
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute left-12 top-1/2 z-30 hidden -translate-y-1/2 scale-95 opacity-0 transition duration-300 [transition-timing-function:var(--ease)] group-hover:scale-100 group-hover:opacity-100 md:block"
+              >
+                <img
+                  src={`/speakers/roster/${r.slug}.webp`}
+                  alt=""
+                  width={352}
+                  height={352}
+                  loading="lazy"
+                  decoding="async"
+                  className="size-44 rounded-[var(--radius-card)] border border-[var(--line)] bg-[var(--surface-alt)] object-cover shadow-[0_12px_40px_rgb(0_0_0/0.18)]"
+                />
+              </span>
+            )}
             {portrait}
             <div className="min-w-0">
               {r.hasProfile ? (
