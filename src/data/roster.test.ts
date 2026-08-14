@@ -64,12 +64,18 @@ describe("place filtering", () => {
 });
 
 describe("fees", () => {
-  test("imported fees survive to the row payload", () => {
-    const withFee = q().rows.filter((r) => r.fee !== null);
-    // A visible (portrait-approved) speaker — the directory only lists those.
-    expect(q({ q: "Adam Cheyer" }).rows[0]?.fee).toBe(15000);
-    // Fee is either absent or a positive dollar figure, never 0.
-    for (const r of withFee) expect(r.fee).toBeGreaterThan(0);
+  test("listed fees sit in the published band", () => {
+    const rows = q({ pageSize: 100 }).rows;
+    const withFee = rows.filter((r) => r.fee !== null);
+    expect(withFee.length).toBeGreaterThan(0);
+    // Every listed speaker carries a published price: $5,000–$12,000 in $500
+    // steps. Fee is never 0 and never fractional.
+    for (const r of rows) {
+      expect(r.fee).not.toBeNull();
+      expect(r.fee!).toBeGreaterThanOrEqual(5000);
+      expect(r.fee!).toBeLessThanOrEqual(12000);
+      expect(r.fee! % 500).toBe(0);
+    }
   });
 });
 
