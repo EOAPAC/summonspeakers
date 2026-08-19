@@ -1241,5 +1241,9 @@ export const rosterImageSlugs: readonly string[] = [
   "mark-gallagher",
   "mark-hodgson",
   "mark-hughes-oam",
+  "mark-humphries",
+  "mark-jeffries",
+  "mark-jones",
+  "mark-mathews",
   "mark-squiz-squirrell-oam",
 ];
