@@ -1357,4 +1357,11 @@ export const rosterImageSlugs: readonly string[] = [
   "mike-handcock",
   "mike-jane-pelusey",
   "mike-knapp",
+  "mike-lough",
+  "mike-munro-am",
+  "mike-rhodes",
+  "mike-rutzen",
+  "mike-smith",
+  "mike-smithson",
+  "mike-symonds",
 ];
