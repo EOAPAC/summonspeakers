@@ -1394,4 +1394,7 @@ export const rosterImageSlugs: readonly string[] = [
   "myf-warhurst",
   "nadia-owen",
   "nam-baldwin",
+  "nancy-rademaker",
+  "naomi-henn",
+  "narelda-jacobs",
 ];
