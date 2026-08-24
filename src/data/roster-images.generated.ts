@@ -1457,4 +1457,11 @@ export const rosterImageSlugs: readonly string[] = [
   "nikki-britton",
   "nikki-greenberg",
   "nikki-osborne",
+  "nils-vesk",
+  "nishant-kasibhatla",
+  "noel-pearson",
+  "noel-whittaker-am",
+  "noni-hazlehurst-am",
+  "noor-azizah",
+  "nora-fraser",
 ];
