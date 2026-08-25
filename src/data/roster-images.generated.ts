@@ -1507,4 +1507,9 @@ export const rosterImageSlugs: readonly string[] = [
   "paul-wade-oam",
   "paul-wallbank",
   "pauline-nguyen",
+  "penelope-twemlow",
+  "penny-burke",
+  "penny-locaso",
+  "pete-ceglinski",
+  "pete-goss-mbe",
 ];
