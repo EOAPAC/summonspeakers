@@ -1512,4 +1512,9 @@ export const rosterImageSlugs: readonly string[] = [
   "penny-locaso",
   "pete-ceglinski",
   "pete-goss-mbe",
+  "peter-alexander",
+  "peter-baines-oam",
+  "peter-bell",
+  "peter-berner",
+  "peter-blasina",
 ];
