@@ -87,8 +87,9 @@ describe("portrait gate", () => {
   });
 
   test("speakers without a portrait are not listed", () => {
-    // A. Wess Mitchell is in the roster data but has no portrait yet.
-    expect(q({ q: "A. Wess Mitchell" }).total).toBe(0);
+    // Alexandra Shulman is in the roster data but has no portrait (pipeline
+    // parked her after the attempt cap, so she will never be gated).
+    expect(q({ q: "Alexandra Shulman" }).total).toBe(0);
   });
 });
 
